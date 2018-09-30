@@ -112,7 +112,6 @@
     }
 
     function bubble(elt, bubblecount) {
-        var width = 600;
         var size = ((Math.random()*5 + 10)/10);
         var e = document.createElement('div');
         e.innerHTML = '<span class="particle" style="top:' + (Math.random()*60 + 20) + '%; left:' + (Math.random()*95 + 0) + '%;font-size:' + size + 'em;animation-delay: ' + (((Math.random()*30 + 0))/10) + 's;">+' + bubblecount + '</span>';

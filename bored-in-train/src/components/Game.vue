@@ -28,7 +28,7 @@ import Inventory from '@/components/Inventory.vue';
 export default class Game extends Vue {
   @Prop() private msg!: string;
 
-  private readonly SolidGoods = {
+  private readonly SolidGoods: any = {
     berries: {
         interval: 2000,
         name: 'berries',
@@ -47,29 +47,29 @@ export default class Game extends Vue {
             berries: {
                 name: 'berries',
                 consomation: 1,
-                interval: 10000,
+                interval: 4000,
                 probability: 1,
             },
         },
         interval: 1000,
         probability: 0.1,
     },
-  }
+  };
 
   private readonly TickInterval = 1000;
 
   public mounted() {
-    console.log("I'm bored in a train");
+    console.log(`I'm bored in a train`);
 
     setInterval (() => {
         // First the creation of ressources
         for (let key in this.SolidGoods) {
-            let solidGood = this.SolidGoods[key];
+            let solidGood: any = this.SolidGoods[key];
             if (this.$store.state[solidGood.name].remainingTime <= 0) {
                 this.$store.commit('ResetInterval', { name: solidGood.name, interval: solidGood.interval });
-                if (Math.random() <= solidGood.probability) {
+                DoWithProba(solidGood.probability, () => {
                     this.$store.commit('Increment', { name: solidGood.name, value: 1 });
-                }
+                });
             } else {
                 this.$store.commit('Tick', solidGood.name);
             }
@@ -77,22 +77,25 @@ export default class Game extends Vue {
 
         // Then the consumming of ressources
         for (let key in this.SolidGoods) {
-            let solidGood = this.SolidGoods[key];
+            let solidGood: any = this.SolidGoods[key];
 
             for (let consumedKey in solidGood.consuming) {
                 let consumed = solidGood.consuming[consumedKey];
 
                 if (this.$store.state[solidGood.name].consuming[consumed.name].remainingTime <= 0) {
                     this.$store.commit('ResetIntervalConsuming', { name: solidGood.name, consuming: consumed.name, interval: consumed.interval });
-                    if (Math.random() <= consumed.probability) {
-                        if (this.$store.state[consumed.name].quantity >= consumed.consomation) {
+                    DoWithProba(consumed.probability, () => {
+                        if (this.$store.state[consumed.name].quantity >= consumed.consomation * this.$store.state[solidGood.name].quantity) {
                             this.$store.commit('Increment', { name: consumed.name, value: -consumed.consomation * this.$store.state[solidGood.name].quantity });
                         } else {
-                            // If there is not enough consumable to sustain the good
-                            // TODO: put ressourc ein too fex quantity for this round to 0
-                            this.$store.commit('Increment', { name: solidGood.name, value: -1 });
+                            // Decrease the starving good from the starving part
+                            let nbStarvingGoods = Math.floor(this.$store.state[solidGood.name].quantity - (this.$store.state[consumed.name].quantity / consumed.consomation));
+                            this.$store.commit('Increment', { name: solidGood.name, value: -nbStarvingGoods });
+
+                            // Consumme what can be consummed
+                            this.$store.commit('Increment', { name: consumed.name, value: -this.$store.state[consumed.name].quantity });
                         }
-                    }
+                    });
                 } else {
                     this.$store.commit('TickConsuming', { name: solidGood.name, consuming: consumed.name });
                 }
@@ -100,6 +103,12 @@ export default class Game extends Vue {
         }
 
     }, this.TickInterval);
+
+    function DoWithProba(proba: number, f: () => void) {
+        if (Math.random() <= proba) {
+            f();
+        }
+    }
   }
 }
 </script>

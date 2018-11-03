@@ -1,0 +1,80 @@
+<template>
+    <canvas id="canvas" class="map"
+    v-on:mousedown="handleMouseDown"
+    v-on:mouseup="handleMouseUp"
+    v-on:mousemove="handleMouseMove"
+    :width="size+'px'" :height="size+'px'"></canvas>
+</template>
+
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
+@Component({
+  components: {
+  },
+})
+export default class Map extends Vue {
+    private size = 600;
+    private nbTilesOnRowOrColumn = 15;
+    private ctx: CanvasRenderingContext2D;
+    private canvas: HTMLCanvasElement;
+
+    private mounted() {
+        this.canvas = <HTMLCanvasElement>document.getElementById("canvas");
+        this.ctx = this.canvas.getContext("2d");
+
+        this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
+
+        this.draw();
+    }
+
+    private draw() {
+        this.ctx.clearRect(0, 0, this.size, this.size);
+        
+        var tileSize = this.size / this.nbTilesOnRowOrColumn;
+        for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
+            for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
+                this.ctx.fillStyle = this.$store.state.map[i][j] == 1 ? 'green' : 'gray';
+                this.ctx.fillRect(i*tileSize, j*tileSize, (i+1)*tileSize, (j+1)*tileSize);
+
+                this.ctx.strokeStyle = 'back';
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeRect(i*tileSize, j*tileSize, (i+1)*tileSize, (j+1)*tileSize);
+            }   
+        }   
+    }
+
+    private handleMouseDown(event) {
+        var coord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
+
+        if (coord.x < 0 || coord.y < 0 || coord.x >= this.nbTilesOnRowOrColumn || coord.y >= this.nbTilesOnRowOrColumn)
+            return;
+        
+        this.$store.commit('ChangeTile', {x: coord.x, y: coord.y, type: 2});
+        this.draw();
+    }
+    
+    private handleMouseUp() {
+        
+    }
+    
+    private handleMouseMove() {
+        
+    }
+
+    private getTileFromCoordinate(x: number, y: number) {
+        var factor = (this.nbTilesOnRowOrColumn/this.size);
+        return {
+            x: Math.floor(x*factor),
+            y: Math.floor(y*factor)
+        }
+    }
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="less">
+.map {
+    margin: auto;
+}
+</style>

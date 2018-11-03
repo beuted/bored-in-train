@@ -7,12 +7,13 @@ type consummable = 'population' | 'berries' | 'sticks';
 
 export default new Vuex.Store({
   state: {
+    map: [[0]],
     population: {
       quantity: 100,
       remainingTime: 1000,
       consuming: {
         berries: {
-          remainingTime: 4000,
+          remainingTime: 8000,
         },
       },
     },
@@ -22,6 +23,11 @@ export default new Vuex.Store({
       consuming: undefined,
     },
     sticks: {
+      quantity: 0,
+      remainingTime: 1000,
+      consuming: undefined,
+    },
+    houses: {
       quantity: 0,
       remainingTime: 1000,
       consuming: undefined,
@@ -51,6 +57,18 @@ export default new Vuex.Store({
       if (state[obj.name].consuming === undefined) { return; }
       const a = state[obj.name].consuming; // ugly hack todo: fix types
       (<any> a)[obj.consuming].remainingTime = obj.interval;
+    },
+    // Init the map with 1s
+    InitMap(state, size: number) {
+      state.map = new Array(size).fill(1).map(x => Array(size).fill(1))
+    },
+    // Change a tile of a map giving it a certain type
+    ChangeTile(state, obj: { x: number, y: number, type: number }) {
+      console.debug(`Changing tile ${obj.x}, ${obj.y} to  ${obj.type}`);
+      (state.map[obj.x])[obj.y] = obj.type;
+      
+      if (obj.type == 2)
+        state.houses.quantity++;
     },
   },
   actions: {

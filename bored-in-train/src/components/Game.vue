@@ -3,14 +3,8 @@
     <h1>{{ msg }}</h1>
     <SolidGoods />
     <Inventory />
-
-    <div class="build">
-        <h2>Build</h2>
-        <ul>
-            <li></li>
-            <li></li>
-        </ul>
-    </div>
+    <Storage />
+    <Map />
   </div>
 </template>
 
@@ -18,11 +12,15 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import SolidGoods from '@/components/SolidGoods.vue'; // @ is an alias to /src
 import Inventory from '@/components/Inventory.vue';
+import Storage from '@/components/Storage.vue';
+import Map from '@/components/Map.vue';
 
 @Component({
   components: {
     SolidGoods,
     Inventory,
+    Storage,
+    Map,
   },
 })
 export default class Game extends Vue {
@@ -47,7 +45,7 @@ export default class Game extends Vue {
             berries: {
                 name: 'berries',
                 consomation: 1,
-                interval: 4000,
+                interval: 8000,
                 probability: 1,
             },
         },

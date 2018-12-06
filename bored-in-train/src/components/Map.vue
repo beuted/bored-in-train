@@ -16,12 +16,12 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 export default class Map extends Vue {
     private size = 600;
     private nbTilesOnRowOrColumn = 15;
-    private ctx: CanvasRenderingContext2D;
-    private canvas: HTMLCanvasElement;
+    private ctx!: CanvasRenderingContext2D;
+    private canvas!: HTMLCanvasElement;
 
     private mounted() {
-        this.canvas = <HTMLCanvasElement>document.getElementById("canvas");
-        this.ctx = this.canvas.getContext("2d");
+        this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
+        this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
         this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
 
@@ -44,13 +44,17 @@ export default class Map extends Vue {
         }   
     }
 
-    private handleMouseDown(event) {
+    private handleMouseDown(event: MouseEvent) {
         var coord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
 
         if (coord.x < 0 || coord.y < 0 || coord.x >= this.nbTilesOnRowOrColumn || coord.y >= this.nbTilesOnRowOrColumn)
             return;
         
-        this.$store.commit('ChangeTile', {x: coord.x, y: coord.y, type: 2});
+        if (this.$store.state['sticks'].quantity < 10)
+            return;
+        
+        this.$store.commit('Increment', { name: 'sticks', value: -10 });
+        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: 2 });
         this.draw();
     }
     

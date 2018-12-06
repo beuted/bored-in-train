@@ -58,7 +58,7 @@ export default new Vuex.Store({
       const a = state[obj.name].consuming; // ugly hack todo: fix types
       (<any> a)[obj.consuming].remainingTime = obj.interval;
     },
-    // Init the map with 1s
+    // Init the map with 1
     InitMap(state, size: number) {
       state.map = new Array(size).fill(1).map(x => Array(size).fill(1))
     },

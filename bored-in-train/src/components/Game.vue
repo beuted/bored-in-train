@@ -49,6 +49,10 @@ export default class Game extends Vue {
                 probability: 1,
             },
         },
+        storage: {
+            name: 'houses',
+            capacity: 10
+        },
         interval: 1000,
         probability: 0.1,
     },
@@ -66,7 +70,14 @@ export default class Game extends Vue {
             if (this.$store.state[solidGood.name].remainingTime <= 0) {
                 this.$store.commit('ResetInterval', { name: solidGood.name, interval: solidGood.interval });
                 DoWithProba(solidGood.probability, () => {
-                    this.$store.commit('Increment', { name: solidGood.name, value: 1 });
+                    // See if storage capacity fits
+                    var storageName = solidGood.storage ? solidGood.storage.name : null;
+                    var storageCapacity = solidGood.storage ? solidGood.storage.capacity : null;
+
+                    if (!storageName || this.$store.state[storageName].quantity * storageCapacity >= this.$store.state[solidGood.name].quantity + 1)
+                        this.$store.commit('Increment', { name: solidGood.name, value: 1 });
+                    else
+                        console.log(`${solidGood.name} increment denied due to lack of storage`);
                 });
             } else {
                 this.$store.commit('Tick', solidGood.name);

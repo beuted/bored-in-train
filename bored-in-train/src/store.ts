@@ -9,16 +9,16 @@ export default new Vuex.Store({
   state: {
     map: [[0]],
     population: {
-      quantity: 100,
+      quantity: 1,
       remainingTime: 1000,
       consuming: {
         berries: {
           remainingTime: 8000,
         },
-      },
+      }
     },
     berries: {
-      quantity: 0,
+      quantity: 5,
       remainingTime: 2000,
       consuming: undefined,
     },
@@ -28,7 +28,7 @@ export default new Vuex.Store({
       consuming: undefined,
     },
     houses: {
-      quantity: 0,
+      quantity: 1,
       remainingTime: 1000,
       consuming: undefined,
     },
@@ -58,9 +58,11 @@ export default new Vuex.Store({
       const a = state[obj.name].consuming; // ugly hack todo: fix types
       (<any> a)[obj.consuming].remainingTime = obj.interval;
     },
-    // Init the map with 1
+    // Init the map with 1 and one house
     InitMap(state, size: number) {
-      state.map = new Array(size).fill(1).map(x => Array(size).fill(1))
+      state.map = new Array(size).fill(1).map(x => Array(size).fill(1));
+      var center = Math.floor(size/2);
+      state.map[center][center] = 2;
     },
     // Change a tile of a map giving it a certain type
     ChangeTile(state, obj: { x: number, y: number, type: number }) {

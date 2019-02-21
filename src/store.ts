@@ -36,6 +36,10 @@ export default new Vuex.Store({
   },
   mutations: {
     // Increment the value of a consummable from 'value'
+    ToggleDebugMode(state) {
+      state.debugMode = !state.debugMode
+    },
+    // Increment the value of a consummable from 'value'
     Increment(state, obj: { name: consummable, value: number }) {
       state[obj.name].quantity += obj.value;
     },
@@ -69,7 +73,7 @@ export default new Vuex.Store({
     ChangeTile(state, obj: { x: number, y: number, type: number }) {
       console.debug(`Changing tile ${obj.x}, ${obj.y} to  ${obj.type}`);
       (state.map[obj.x])[obj.y] = obj.type;
-      
+
       if (obj.type == 2)
         state.houses.quantity++;
     },

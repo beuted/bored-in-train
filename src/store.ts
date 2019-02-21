@@ -7,6 +7,7 @@ type consummable = 'population' | 'berries' | 'sticks';
 
 export default new Vuex.Store({
   state: {
+    debugMode: false,
     map: [[0]],
     population: {
       quantity: 1,

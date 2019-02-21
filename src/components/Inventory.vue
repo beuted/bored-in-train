@@ -3,13 +3,12 @@
         <h2>Inventory</h2>
         <ul>
             <li>
-                <span>Berries found: </span>
-                <span> {{ berries }}</span>
-                <span id="berries-particles" class="particletext bubbles    "></span>
+                <span>Berries found: {{ berries.quantity }}</span>
+                <span v-if="debugMode"> {{ berries }}</span>
             </li>
             <li>
-                <span>Stick found: {{ sticks }}</span>
-                <span id="sticks-particles" class="particletext bubbles "></span>            
+                <span>Stick found: {{ sticks.quantity }}</span>
+                <span v-if="debugMode"> {{ sticks }}</span>
             </li>
         </ul>
     </div>
@@ -26,6 +25,10 @@ export default class Inventory extends Vue {
 
     get sticks() {
         return this.$store.state.sticks;
+    }
+
+    get debugMode() {
+        return this.$store.state.debugMode;
     }
 }
 </script>

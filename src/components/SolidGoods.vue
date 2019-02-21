@@ -3,9 +3,8 @@
         <h2>Solid goods</h2>
         <ul>
             <li>
-                <span>Population:</span>
-                <span id="population">{{ population }}</span>
-                <span id="population-particles" class="particletext bubbles "></span>                
+                <span>Population: {{ population.quantity }}</span>
+                <span v-if="debugMode">{{ population }}</span>
             </li>
         </ul>
     </div>
@@ -24,6 +23,9 @@ export default class SolidGoods extends Vue {
         return this.$store.state.population;
     }
 
+    get debugMode() {
+        return this.$store.state.debugMode;
+    }
 }
 </script>
 

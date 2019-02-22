@@ -4,12 +4,16 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 type consummable = 'population' | 'berries' | 'sticks';
-
+type job = 'gatherer' | 'farmer';
 export default new Vuex.Store({
   state: {
     debugMode: false,
     map: [[0]],
     population: {
+      jobs: {
+        gatherer: 0,
+        farmer: 0
+      },
       quantity: 1,
       remainingTime: 1000,
       consuming: {
@@ -76,6 +80,11 @@ export default new Vuex.Store({
 
       if (obj.type == 2)
         state.houses.quantity++;
+    },
+    //Add
+    AddJob(state, obj: { jobName: job, quantity: number }) {
+      console.debug(`AddJob tile ${obj.jobName}, ${obj.quantity}`);
+      state.population.jobs[obj.jobName] += obj.quantity;
     },
   },
   actions: {

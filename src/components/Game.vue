@@ -2,7 +2,7 @@
   <div>
     <h1>{{ msg }} <button v-on:click="toggleDebug()">Debug</button></h1>
 
-    <SolidGoods />
+    <Jobs />
     <Inventory />
     <Storage />
     <Map />
@@ -11,14 +11,14 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import SolidGoods from '@/components/SolidGoods.vue'; // @ is an alias to /src
+import Jobs from '@/components/Jobs.vue'; // @ is an alias to /src
 import Inventory from '@/components/Inventory.vue';
 import Storage from '@/components/Storage.vue';
 import Map from '@/components/Map.vue';
 
 @Component({
   components: {
-    SolidGoods,
+    Jobs,
     Inventory,
     Storage,
     Map,

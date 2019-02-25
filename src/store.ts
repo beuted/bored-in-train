@@ -5,21 +5,91 @@ Vue.use(Vuex);
 
 type consummable = 'population' | 'berries' | 'sticks';
 type job = 'gatherer' | 'farmer';
+type storage = 'houses';
+
+export interface ISolidGoods { //TODO do better, use type consummable
+  population: ISolidGood;
+  berries: ISolidGood;
+  sticks: ISolidGood;
+}
+
+export interface ISolidGood {
+  name: string;
+  interval: number;
+  probability: number;
+  consuming: { //TODO do better, use type consummable
+    population?: IConsuming,
+    berries?: IConsuming,
+    sticks?: IConsuming
+  };
+  storage: IStorage | undefined;
+  job: job | undefined
+}
+
+export interface IConsuming {
+  name: consummable;
+  consomation: number;
+  interval: number;
+  probability: number;
+}
+
+export interface IStorage {
+  name: storage;
+  capacity: number;
+}
+
+export const SolidGoods: ISolidGoods = {
+  population: {
+    name: 'population',
+    consuming: {
+      berries: {
+        name: 'berries',
+        consomation: 1,
+        interval: 8000,
+        probability: 1,
+      },
+    },
+    storage: {
+      name: 'houses',
+      capacity: 10
+    },
+    interval: 1000,
+    probability: 0.1,
+    job: undefined
+  },
+  berries: {
+    interval: 2000,
+    name: 'berries',
+    consuming: {},
+    probability: 1,
+    job: 'gatherer',
+    storage: undefined,
+  },
+  sticks: {
+    interval: 1000,
+    name: 'sticks',
+    consuming: {},
+    probability: 0.2,
+    job: 'gatherer',
+    storage: undefined,
+  },
+};
+
 export default new Vuex.Store({
   state: {
     debugMode: false,
     map: [[0]],
     population: {
-      jobs: {
-        gatherer: 0,
-        farmer: 0
-      },
       quantity: 1,
       remainingTime: 1000,
       consuming: {
         berries: {
           remainingTime: 8000,
         },
+      },
+      jobs: {
+        gatherer: 1,
+        farmer: 0
       }
     },
     berries: {
@@ -90,4 +160,15 @@ export default new Vuex.Store({
   actions: {
 
   },
+  getters: {
+    getRessourceStorage(state): (id: consummable) => number {
+      return (id: consummable) => {
+        var storage = SolidGoods[id].storage;
+        if (storage=== undefined)
+          return -1;
+
+        return state[storage.name].quantity * storage.capacity;
+      }
+    }
+  }
 });

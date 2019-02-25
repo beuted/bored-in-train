@@ -3,11 +3,11 @@
         <h2>Inventory</h2>
         <ul>
             <li>
-                <span>Berries found: {{ berries.quantity }}</span>
+                <span>Berries: {{ berries.quantity }}</span>
                 <span v-if="debugMode"> {{ berries }}</span>
             </li>
             <li>
-                <span>Stick found: {{ sticks.quantity }}</span>
+                <span>Stick: {{ sticks.quantity }}</span>
                 <span v-if="debugMode"> {{ sticks }}</span>
             </li>
         </ul>

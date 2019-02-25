@@ -3,7 +3,7 @@
         <h2>Jobs</h2>
             <ul>
                 <li>
-                    <span>Population: {{ population.quantity }}</span>
+                    <span>Population: {{ population.quantity }} / {{ popStorage }}</span>
                     <span v-if="debugMode">{{ population }}</span>
                 </li>
 
@@ -47,6 +47,10 @@ export default class Jobs extends Vue {
 
     public get debugMode() {
         return this.$store.state.debugMode;
+    }
+
+    public get popStorage() {
+        return this.$store.getters.getRessourceStorage('population');
     }
 
     public addGatherer(quantity: number) {

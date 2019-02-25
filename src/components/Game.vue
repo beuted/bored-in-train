@@ -15,6 +15,7 @@ import Jobs from '@/components/Jobs.vue'; // @ is an alias to /src
 import Inventory from '@/components/Inventory.vue';
 import Storage from '@/components/Storage.vue';
 import Map from '@/components/Map.vue';
+import { SolidGoods, ISolidGood, IConsuming } from '@/store';
 
 @Component({
   components: {
@@ -27,38 +28,6 @@ import Map from '@/components/Map.vue';
 export default class Game extends Vue {
   @Prop() private msg!: string;
 
-  private readonly SolidGoods: any = {
-    berries: {
-        interval: 2000,
-        name: 'berries',
-        consuming: {},
-        probability: 1,
-    },
-    sticks: {
-        interval: 1000,
-        name: 'sticks',
-        consuming: {},
-        probability: 0.2,
-    },
-    population: {
-        name: 'population',
-        consuming: {
-            berries: {
-                name: 'berries',
-                consomation: 1,
-                interval: 8000,
-                probability: 1,
-            },
-        },
-        storage: {
-            name: 'houses',
-            capacity: 10
-        },
-        interval: 1000,
-        probability: 0.1,
-    },
-  };
-
   private readonly TickInterval = 1000;
 
   public toggleDebug() {
@@ -70,19 +39,22 @@ export default class Game extends Vue {
 
     setInterval (() => {
         // First the creation of ressources
-        for (let key in this.SolidGoods) {
-            let solidGood: any = this.SolidGoods[key];
+        for (let key in SolidGoods) {
+            let solidGood: ISolidGood = (<any>SolidGoods)[key]; //TODO: fix typeing weirdlness
+
             if (this.$store.state[solidGood.name].remainingTime <= 0) {
                 this.$store.commit('ResetInterval', { name: solidGood.name, interval: solidGood.interval });
                 DoWithProba(solidGood.probability, () => {
                     // See if storage capacity fits
-                    var storageName = solidGood.storage ? solidGood.storage.name : null;
-                    var storageCapacity = solidGood.storage ? solidGood.storage.capacity : null;
+                    if (!solidGood.storage || this.$store.state[solidGood.storage.name].quantity * solidGood.storage.capacity >= this.$store.state[solidGood.name].quantity + 1) {
 
-                    if (!storageName || this.$store.state[storageName].quantity * storageCapacity >= this.$store.state[solidGood.name].quantity + 1)
-                        this.$store.commit('Increment', { name: solidGood.name, value: 1 });
-                    else
+                        // If no producer is defined, resource will be incremented 1 by 1
+                        var nbProducers = solidGood.job ? this.$store.state.population.jobs[solidGood.job] : 1;
+
+                        this.$store.commit('Increment', { name: solidGood.name, value: nbProducers });
+                    } else {
                         console.log(`${solidGood.name} increment denied due to lack of storage`);
+                    }
                 });
             } else {
                 this.$store.commit('Tick', solidGood.name);
@@ -90,11 +62,11 @@ export default class Game extends Vue {
         }
 
         // Then the consumming of ressources
-        for (let key in this.SolidGoods) {
-            let solidGood: any = this.SolidGoods[key];
+        for (let key in SolidGoods) {
+            let solidGood: ISolidGood = (<any>SolidGoods)[key]; //TODO: fix typeing weirdlness
 
             for (let consumedKey in solidGood.consuming) {
-                let consumed = solidGood.consuming[consumedKey];
+                let consumed: IConsuming = (<any>solidGood.consuming)[consumedKey]; //TODO: fix typeing weirdlness
 
                 if (this.$store.state[solidGood.name].consuming[consumed.name].remainingTime <= 0) {
                     this.$store.commit('ResetIntervalConsuming', { name: solidGood.name, consuming: consumed.name, interval: consumed.interval });

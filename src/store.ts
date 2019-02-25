@@ -3,25 +3,27 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
-type consummable = 'population' | 'berries' | 'sticks';
-type job = 'gatherer' | 'farmer';
-type storage = 'houses';
-
-export interface ISolidGoods { //TODO do better, use type consummable
-  population: ISolidGood;
-  berries: ISolidGood;
-  sticks: ISolidGood;
+enum consummable {
+  population= 'population',
+  berries = 'berries',
+  sticks = 'sticks'
 }
+
+enum job {
+  gatherer = 'gatherer',
+  farmer = 'farmer'
+}
+enum storage {
+  houses= 'houses'
+}
+
+export type ISolidGoods = {[id in consummable]: ISolidGood}
 
 export interface ISolidGood {
   name: string;
   interval: number;
   probability: number;
-  consuming: { //TODO do better, use type consummable
-    population?: IConsuming,
-    berries?: IConsuming,
-    sticks?: IConsuming
-  };
+  consuming: {[id in consummable]?: IConsuming}
   storage: IStorage | undefined;
   job: job | undefined
 }
@@ -40,17 +42,17 @@ export interface IStorage {
 
 export const SolidGoods: ISolidGoods = {
   population: {
-    name: 'population',
+    name: consummable.population,
     consuming: {
       berries: {
-        name: 'berries',
+        name: consummable.berries,
         consomation: 1,
         interval: 8000,
         probability: 1,
       },
     },
     storage: {
-      name: 'houses',
+      name: storage.houses,
       capacity: 10
     },
     interval: 1000,
@@ -59,18 +61,18 @@ export const SolidGoods: ISolidGoods = {
   },
   berries: {
     interval: 2000,
-    name: 'berries',
+    name: consummable.berries,
     consuming: {},
     probability: 1,
-    job: 'gatherer',
+    job: job.gatherer,
     storage: undefined,
   },
   sticks: {
     interval: 1000,
-    name: 'sticks',
+    name: consummable.sticks,
     consuming: {},
     probability: 0.2,
-    job: 'gatherer',
+    job: job.gatherer,
     storage: undefined,
   },
 };

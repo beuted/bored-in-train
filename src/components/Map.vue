@@ -8,9 +8,9 @@
         <div>
             <h2>What to build ?</h2>
             <input type="radio" id="house" value="1" v-model="buildingType">
-            <label for="house">House</label>
+            <label for="house">House  ({{ housesInfo.price }})</label>
             <input type="radio" id="barn" value="2" v-model="buildingType">
-            <label for="barn">Barn</label>
+            <label for="barn">Barn  ({{ barnsInfo.price }})</label>
         </div>
     </div>
 </template>
@@ -18,6 +18,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Building } from '@/models/Building';
+import { StaticStorageInfo } from '@/store';
 
 @Component({
   components: {
@@ -30,6 +31,14 @@ export default class Map extends Vue {
     private canvas!: HTMLCanvasElement;
 
     public buildingType: Building = Building.House;
+
+    get housesInfo() {
+        return StaticStorageInfo.houses;
+    }
+
+    get barnsInfo() {
+        return StaticStorageInfo.barns;
+    }
 
     private mounted() {
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');

@@ -3,7 +3,7 @@
         <h2>Inventory</h2>
         <ul>
             <li>
-                <span>Food: {{ food.quantity }}</span>
+                <span>Food: {{ food.quantity }} / {{ foodStorage }}</span>
                 <span v-if="debugMode"> {{ food }}</span>
             </li>
             <li>
@@ -29,6 +29,10 @@ export default class Inventory extends Vue {
 
     get debugMode() {
         return this.$store.state.debugMode;
+    }
+
+    public get foodStorage() {
+        return this.$store.getters.getRessourceStorage('food');
     }
 }
 </script>

@@ -149,7 +149,7 @@ export default new Vuex.Store({
         });
 
         if (state[obj.name].quantity < totalWithJob) {
-          console.log('Part of your population died you have to remove some jobs');
+          console.warn('You have to remove some jobs'); //TODO
         }
       }
     },
@@ -204,7 +204,7 @@ export default new Vuex.Store({
     getRessourceStorage(state): (id: consummable) => number {
       return (id: consummable) => {
         var storage = StaticConsummableInfo[id].storage;
-        if (storage=== undefined)
+        if (storage === undefined)
           return -1;
 
         return state[storage.name].quantity * storage.capacity;

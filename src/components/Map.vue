@@ -8,9 +8,9 @@
         <div>
             <h2>What to build ?</h2>
             <input type="radio" id="house" value="1" v-model="buildingType">
-            <label for="house">House  ({{ housesInfo.price }})</label>
+            <label for="house" v-once>House  ({{ housesInfo.price }})</label>
             <input type="radio" id="barn" value="2" v-model="buildingType">
-            <label for="barn">Barn  ({{ barnsInfo.price }})</label>
+            <label for="barn" v-once>Barn  ({{ barnsInfo.price }})</label>
         </div>
     </div>
 </template>

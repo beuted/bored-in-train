@@ -3,11 +3,11 @@
         <h2>Inventory</h2>
         <ul>
             <li>
-                <span>Berries: {{ berries.quantity }}</span>
-                <span v-if="debugMode"> {{ berries }}</span>
+                <span>Food: {{ food.quantity }}</span>
+                <span v-if="debugMode"> {{ food }}</span>
             </li>
             <li>
-                <span>Stick: {{ sticks.quantity }}</span>
+                <span>Sticks: {{ sticks.quantity }}</span>
                 <span v-if="debugMode"> {{ sticks }}</span>
             </li>
         </ul>
@@ -19,8 +19,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class Inventory extends Vue {
-    get berries() {
-        return this.$store.state.berries;
+    get food() {
+        return this.$store.state.food;
     }
 
     get sticks() {

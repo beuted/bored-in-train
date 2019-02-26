@@ -12,16 +12,16 @@
                 </li>
                 <li>
                     <span>
-                        Gatherer: {{ population.jobs.gatherer }}
-                        <button :disabled="unemployed <= 0" v-on:click="addGatherer(1)">Add</button>
-                        <button :disabled="population.jobs.gatherer <= 0" v-on:click="addGatherer(-1)">Remove</button>
+                        Wood Gatherer: {{ population.jobs.woodGatherer }}
+                        <button :disabled="unemployed <= 0" v-on:click="addJob(1, 'woodGatherer')">Add</button>
+                        <button :disabled="population.jobs.woodGatherer <= 0" v-on:click="addJob(-1, 'woodGatherer')">Remove</button>
                     </span>
                 </li>
                 <li>
                     <span>
-                        Farmer: {{ population.jobs.farmer }}
-                        <button :disabled="unemployed <= 0" v-on:click="addFarmer(1)">Add</button>
-                        <button :disabled="population.jobs.farmer <= 0" v-on:click="addFarmer(-1)">Remove</button>
+                        Berry Gatherer: {{ population.jobs.berryGatherer }}
+                        <button :disabled="unemployed <= 0" v-on:click="addJob(1, 'berryGatherer')">Add</button>
+                        <button :disabled="population.jobs.berryGatherer <= 0" v-on:click="addJob(-1, 'berryGatherer')">Remove</button>
                     </span>
                 </li>
             </ul>
@@ -53,12 +53,8 @@ export default class Jobs extends Vue {
         return this.$store.getters.getRessourceStorage('population');
     }
 
-    public addGatherer(quantity: number) {
-        this.$store.commit('AddJob', { jobName: 'gatherer', quantity: quantity });
-    }
-
-    public addFarmer(quantity: number) {
-        this.$store.commit('AddJob', { jobName: 'farmer', quantity: quantity });
+    public addJob(quantity: number, jobName: string) {
+        this.$store.commit('AddJob', { jobName: jobName, quantity: quantity });
     }
 
     public canAddJob() {

@@ -5,13 +5,13 @@ Vue.use(Vuex);
 
 enum consummable {
   population= 'population',
-  berries = 'berries',
+  food = 'food',
   sticks = 'sticks'
 }
 
 enum job {
-  gatherer = 'gatherer',
-  farmer = 'farmer'
+  berryGatherer = 'berryGatherer',
+  woodGatherer = 'woodGatherer'
 }
 enum storage {
   houses= 'houses'
@@ -44,8 +44,8 @@ export const SolidGoods: ISolidGoods = {
   population: {
     name: consummable.population,
     consuming: {
-      berries: {
-        name: consummable.berries,
+      food: {
+        name: consummable.food,
         consomation: 1,
         interval: 8000,
         probability: 1,
@@ -59,12 +59,12 @@ export const SolidGoods: ISolidGoods = {
     probability: 0.1,
     job: undefined
   },
-  berries: {
+  food: {
     interval: 2000,
-    name: consummable.berries,
+    name: consummable.food,
     consuming: {},
     probability: 1,
-    job: job.gatherer,
+    job: job.berryGatherer,
     storage: undefined,
   },
   sticks: {
@@ -72,7 +72,7 @@ export const SolidGoods: ISolidGoods = {
     name: consummable.sticks,
     consuming: {},
     probability: 0.2,
-    job: job.gatherer,
+    job: job.woodGatherer,
     storage: undefined,
   },
 };
@@ -82,19 +82,19 @@ export default new Vuex.Store({
     debugMode: false,
     map: [[0]],
     population: {
-      quantity: 1,
+      quantity: 6,
       remainingTime: 1000,
       consuming: {
-        berries: {
+        food: {
           remainingTime: 8000,
         },
       },
       jobs: {
-        gatherer: 1,
-        farmer: 0
+        woodGatherer: 0,
+        berryGatherer: 1,
       }
     },
-    berries: {
+    food: {
       quantity: 5,
       remainingTime: 2000,
       consuming: undefined,
@@ -118,6 +118,18 @@ export default new Vuex.Store({
     // Increment the value of a consummable from 'value'
     Increment(state, obj: { name: consummable, value: number }) {
       state[obj.name].quantity += obj.value;
+
+      // Special case of shrinking population to handle missing jobs
+      if (obj.value < 0 && obj.name == consummable.population) {
+        let totalWithJob = 0;
+        Object.keys(state.population.jobs).forEach((key) => {
+            totalWithJob += (state.population.jobs as any)[key];
+        });
+
+        if (state[obj.name].quantity < totalWithJob) {
+          console.log('Part of your population died you have to remove some jobs');
+        }
+      }
     },
     // Decremente the remaining time before a spawn of a consummable from 1 tick (1000 ms)
     Tick(state, obj: consummable) {

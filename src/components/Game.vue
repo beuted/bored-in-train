@@ -15,7 +15,7 @@ import Jobs from '@/components/Jobs.vue'; // @ is an alias to /src
 import Inventory from '@/components/Inventory.vue';
 import Storage from '@/components/Storage.vue';
 import Map from '@/components/Map.vue';
-import { SolidGoods, ISolidGood, IConsuming } from '@/store';
+import { StaticConsummableInfo, IStaticConsummable, IConsuming } from '@/store';
 
 @Component({
   components: {
@@ -39,8 +39,8 @@ export default class Game extends Vue {
 
     setInterval (() => {
         // First the creation of ressources
-        for (let key in SolidGoods) {
-            let solidGood: ISolidGood = (<any>SolidGoods)[key]; //TODO: fix typeing weirdlness
+        for (let key in StaticConsummableInfo) {
+            let solidGood: IStaticConsummable = (<any>StaticConsummableInfo)[key]; //TODO: fix typeing weirdlness
 
             if (this.$store.state[solidGood.name].remainingTime <= 0) {
                 this.$store.commit('ResetInterval', { name: solidGood.name, interval: solidGood.interval });
@@ -62,8 +62,8 @@ export default class Game extends Vue {
         }
 
         // Then the consumming of ressources
-        for (let key in SolidGoods) {
-            let solidGood: ISolidGood = (<any>SolidGoods)[key]; //TODO: fix typeing weirdlness
+        for (let key in StaticConsummableInfo) {
+            let solidGood: IStaticConsummable = (<any>StaticConsummableInfo)[key]; //TODO: fix typeing weirdlness
 
             for (let consumedKey in solidGood.consuming) {
                 let consumed: IConsuming = (<any>solidGood.consuming)[consumedKey]; //TODO: fix typeing weirdlness

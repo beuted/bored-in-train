@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import { Building } from '@/models/Building';
+
 Vue.use(Vuex);
 
 enum consummable {
@@ -14,18 +16,23 @@ enum job {
   woodGatherer = 'woodGatherer'
 }
 enum storage {
-  houses= 'houses'
+  houses = 'houses',
+  barns = 'barns'
 }
 
-export type ISolidGoods = {[id in consummable]: ISolidGood}
+export type IStaticConsummableInfo = {[id in consummable]: IStaticConsummable}
+export type IStaticStorageInfo = {[id in storage]: IStaticStorage}
 
-export interface ISolidGood {
+export interface IStaticConsummable {
   name: string;
   interval: number;
   probability: number;
   consuming: {[id in consummable]?: IConsuming}
   storage: IStorage | undefined;
-  job: job | undefined
+  job: job | undefined;
+}
+
+export interface IStaticStorage {
 }
 
 export interface IConsuming {
@@ -40,7 +47,14 @@ export interface IStorage {
   capacity: number;
 }
 
-export const SolidGoods: ISolidGoods = {
+export const StaticStorageInfo: IStaticStorageInfo = {
+  houses: {
+  },
+  barns: {
+  }
+}
+
+export const StaticConsummableInfo: IStaticConsummableInfo = {
   population: {
     name: consummable.population,
     consuming: {
@@ -63,9 +77,12 @@ export const SolidGoods: ISolidGoods = {
     interval: 2000,
     name: consummable.food,
     consuming: {},
-    probability: 1,
-    job: job.berryGatherer,
-    storage: undefined,
+    storage: {
+      name: storage.barns,
+      capacity: 10
+    },
+    probability: 0.7,
+    job: job.berryGatherer
   },
   sticks: {
     interval: 1000,
@@ -100,11 +117,16 @@ export default new Vuex.Store({
       consuming: undefined,
     },
     sticks: {
-      quantity: 0,
+      quantity: 100,
       remainingTime: 1000,
       consuming: undefined,
     },
     houses: {
+      quantity: 1,
+      remainingTime: 1000,
+      consuming: undefined,
+    },
+    barns: {
       quantity: 1,
       remainingTime: 1000,
       consuming: undefined,
@@ -153,17 +175,21 @@ export default new Vuex.Store({
     },
     // Init the map with 1 and one house
     InitMap(state, size: number) {
-      state.map = new Array(size).fill(1).map(x => Array(size).fill(1));
+      state.map = new Array(size).fill(0).map(x => Array(size).fill(0));
       var center = Math.floor(size/2);
-      state.map[center][center] = 2;
+      state.map[center][center] = Building.House;
+      state.map[center][center+1] = Building.Barn;
     },
     // Change a tile of a map giving it a certain type
-    ChangeTile(state, obj: { x: number, y: number, type: number }) {
-      console.debug(`Changing tile ${obj.x}, ${obj.y} to  ${obj.type}`);
+    ChangeTile(state, obj: { x: number, y: number, type: Building }) {
+      console.debug(`Changing tile ${obj.x}, ${obj.y} to ${obj.type}`);
       (state.map[obj.x])[obj.y] = obj.type;
 
-      if (obj.type == 2)
+      if (obj.type == Building.House)
         state.houses.quantity++;
+
+      if (obj.type == Building.Barn)
+        state.barns.quantity++;
     },
     //Add
     AddJob(state, obj: { jobName: job, quantity: number }) {
@@ -177,7 +203,7 @@ export default new Vuex.Store({
   getters: {
     getRessourceStorage(state): (id: consummable) => number {
       return (id: consummable) => {
-        var storage = SolidGoods[id].storage;
+        var storage = StaticConsummableInfo[id].storage;
         if (storage=== undefined)
           return -1;
 

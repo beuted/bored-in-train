@@ -1,13 +1,23 @@
 <template>
-    <canvas id="canvas" class="map"
-    v-on:mousedown="handleMouseDown"
-    v-on:mouseup="handleMouseUp"
-    v-on:mousemove="handleMouseMove"
-    :width="size+'px'" :height="size+'px'"></canvas>
+    <div>
+        <canvas id="canvas" class="map"
+            v-on:mousedown="handleMouseDown"
+            v-on:mouseup="handleMouseUp"
+            v-on:mousemove="handleMouseMove"
+            :width="size+'px'" :height="size+'px'"></canvas>
+        <div>
+            <h2>What to build ?</h2>
+            <input type="radio" id="house" value="1" v-model="buildingType">
+            <label for="house">House</label>
+            <input type="radio" id="barn" value="2" v-model="buildingType">
+            <label for="barn">Barn</label>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Building } from '@/models/Building';
 
 @Component({
   components: {
@@ -18,6 +28,8 @@ export default class Map extends Vue {
     private nbTilesOnRowOrColumn = 15;
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
+
+    public buildingType: Building = Building.House;
 
     private mounted() {
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -34,7 +46,7 @@ export default class Map extends Vue {
         var tileSize = this.size / this.nbTilesOnRowOrColumn;
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
-                this.ctx.fillStyle = this.$store.state.map[i][j] == 1 ? 'green' : 'gray';
+                this.ctx.fillStyle = this.getColor(this.$store.state.map[i][j]);
                 this.ctx.fillRect(i*tileSize, j*tileSize, (i+1)*tileSize, (j+1)*tileSize);
 
                 this.ctx.strokeStyle = 'back';
@@ -42,6 +54,14 @@ export default class Map extends Vue {
                 this.ctx.strokeRect(i*tileSize, j*tileSize, (i+1)*tileSize, (j+1)*tileSize);
             }   
         }   
+    }
+
+    private getColor(building: Building): string {
+        switch(building) {
+            case Building.House: return 'gray';
+            case Building.Barn: return 'orange';
+        }
+        return 'green';
     }
 
     private handleMouseDown(event: MouseEvent) {
@@ -54,7 +74,7 @@ export default class Map extends Vue {
             return;
         
         this.$store.commit('Increment', { name: 'sticks', value: -10 });
-        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: 2 });
+        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: +this.buildingType });
         this.draw();
     }
     

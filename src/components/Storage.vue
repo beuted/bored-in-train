@@ -6,6 +6,10 @@
                 <span>Houses: {{ houses.quantity }}</span>
                 <span v-if="debugMode">{{ houses }}</span>
             </li>
+            <li>
+                <span>Barns: {{ barns.quantity }}</span>
+                <span v-if="debugMode">{{ barns }}</span>
+            </li>
         </ul>
     </div>
 </template>
@@ -18,7 +22,9 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
   },
 })
 export default class Storage extends Vue {
-
+    get barns() {
+        return this.$store.state.barns;
+    }
     get houses() {
         return this.$store.state.houses;
     }

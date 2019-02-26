@@ -29,6 +29,8 @@ export default class Game extends Vue {
   @Prop() private msg!: string;
 
   private readonly TickInterval = 1000;
+  private readonly StarvationFactor = 0.5; // Portion of disapearing goods when missing consummable
+  private readonly LackOfStorageFactor = 1.0; // Portion of disapearing goods when missing storage
 
   public toggleDebug() {
       this.$store.commit('ToggleDebugMode');
@@ -45,16 +47,10 @@ export default class Game extends Vue {
             if (this.$store.state[solidGood.name].remainingTime <= 0) {
                 this.$store.commit('ResetInterval', { name: solidGood.name, interval: solidGood.interval });
                 DoWithProba(solidGood.probability, () => {
-                    // See if storage capacity fits
-                    if (!solidGood.storage || this.$store.state[solidGood.storage.name].quantity * solidGood.storage.capacity >= this.$store.state[solidGood.name].quantity + 1) {
+                    // If no producer is defined, resource will be incremented 1 by 1
+                    var nbProducers = solidGood.job ? this.$store.state.population.jobs[solidGood.job] : 1;
 
-                        // If no producer is defined, resource will be incremented 1 by 1
-                        var nbProducers = solidGood.job ? this.$store.state.population.jobs[solidGood.job] : 1;
-
-                        this.$store.commit('Increment', { name: solidGood.name, value: nbProducers });
-                    } else {
-                        console.log(`${solidGood.name} increment denied due to lack of storage`);
-                    }
+                    this.$store.commit('Increment', { name: solidGood.name, value: nbProducers });
                 });
             } else {
                 this.$store.commit('Tick', solidGood.name);
@@ -75,8 +71,9 @@ export default class Game extends Vue {
                             this.$store.commit('Increment', { name: consumed.name, value: -consumed.consomation * this.$store.state[solidGood.name].quantity });
                         } else {
                             // Decrease the starving good from the starving part
-                            let nbStarvingGoods = Math.floor(this.$store.state[solidGood.name].quantity - (this.$store.state[consumed.name].quantity / consumed.consomation));
+                            let nbStarvingGoods = Math.floor(this.StarvationFactor * (this.$store.state[solidGood.name].quantity - (this.$store.state[consumed.name].quantity / consumed.consomation)));
                             this.$store.commit('Increment', { name: solidGood.name, value: -nbStarvingGoods });
+                            console.warn(`${nbStarvingGoods} ${solidGood.name} vanished because they could not find ${consumed.name} `);
 
                             // Consumme what can be consummed
                             this.$store.commit('Increment', { name: consumed.name, value: -this.$store.state[consumed.name].quantity });
@@ -85,6 +82,17 @@ export default class Game extends Vue {
                 } else {
                     this.$store.commit('TickConsuming', { name: solidGood.name, consuming: consumed.name });
                 }
+            }
+        }
+
+        // After operation checks
+        for (let key in StaticConsummableInfo) {
+            let solidGood: IStaticConsummable = (<any>StaticConsummableInfo)[key]; //TODO: fix typeing weirdlness
+            // See if storage fits
+            if (solidGood.storage && this.$store.state[solidGood.storage.name].quantity * solidGood.storage.capacity < this.$store.state[solidGood.name].quantity) {
+                let quantityToRemove = Math.floor(this.LackOfStorageFactor * (this.$store.state[solidGood.name].quantity - this.$store.state[solidGood.storage.name].quantity * solidGood.storage.capacity));
+                this.$store.commit('Increment', { name: solidGood.name, value: -quantityToRemove });
+                console.warn(`${quantityToRemove} ${solidGood.name} were thrown away due to lack of storage`);
             }
         }
 

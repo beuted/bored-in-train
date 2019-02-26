@@ -78,12 +78,16 @@ export default class Map extends Vue {
 
         if (coord.x < 0 || coord.y < 0 || coord.x >= this.nbTilesOnRowOrColumn || coord.y >= this.nbTilesOnRowOrColumn)
             return;
-        
+
         if (this.$store.state['sticks'].quantity < 10)
             return;
-        
+
+        if (+this.buildingType == this.$store.state.map[coord.x][coord.y])
+            return;
+
         this.$store.commit('Increment', { name: 'sticks', value: -10 });
         this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: +this.buildingType });
+
         this.draw();
     }
     

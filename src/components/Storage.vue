@@ -25,6 +25,7 @@ export default class Storage extends Vue {
     get barns() {
         return this.$store.state.barns;
     }
+
     get houses() {
         return this.$store.state.houses;
     }

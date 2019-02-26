@@ -33,6 +33,7 @@ export interface IStaticConsummable {
 }
 
 export interface IStaticStorage {
+  price: {[id in consummable]: number}
 }
 
 export interface IConsuming {
@@ -49,8 +50,18 @@ export interface IStorage {
 
 export const StaticStorageInfo: IStaticStorageInfo = {
   houses: {
+    price: {
+      sticks: 10,
+      food: 0,
+      population: 0
+    }
   },
   barns: {
+    price: {
+      sticks: 10,
+      food: 0,
+      population: 0
+    }
   }
 }
 
@@ -182,7 +193,17 @@ export default new Vuex.Store({
     },
     // Change a tile of a map giving it a certain type
     ChangeTile(state, obj: { x: number, y: number, type: Building }) {
-      console.debug(`Changing tile ${obj.x}, ${obj.y} to ${obj.type}`);
+      var previousType = (state.map[obj.x])[obj.y];
+
+      console.debug(`Changing tile ${obj.x}, ${obj.y} from ${(state.map[obj.x])[obj.y]} to ${obj.type}`);
+
+      // TODO: fix this with a mapping
+      if (previousType == Building.House)
+        state.houses.quantity--;
+
+      if (previousType == Building.Barn)
+        state.barns.quantity--;
+
       (state.map[obj.x])[obj.y] = obj.type;
 
       if (obj.type == Building.House)

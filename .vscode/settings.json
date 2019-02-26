@@ -1,5 +1,6 @@
 {
     "files.exclude": {
+        "dist": true,
         "**/.git": true,         // this is a default value
         "**/.DS_Store": true,    // this is a default value
 

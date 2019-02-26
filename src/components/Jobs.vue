@@ -15,7 +15,6 @@
                         Wood Gatherer: {{ population.jobs.woodGatherer }}
                         <button :disabled="unemployed <= 0" v-on:click="addJob(1, 'woodGatherer')">Add</button>
                         <button :disabled="population.jobs.woodGatherer <= 0" v-on:click="addJob(-1, 'woodGatherer')">Remove</button>
-                        <!--<span>_<label for="woodGatherer">auto-assign</label> <input type="radio" id="woodGatherer" value="woodGatherer" v-model="autoAssignJob"></span>-->
                     </span>
                 </li>
                 <li>
@@ -23,7 +22,6 @@
                         Berry Gatherer: {{ population.jobs.berryGatherer }}
                         <button :disabled="unemployed <= 0" v-on:click="addJob(1, 'berryGatherer')">Add</button>
                         <button :disabled="population.jobs.berryGatherer <= 0" v-on:click="addJob(-1, 'berryGatherer')">Remove</button>
-                        <!--<span :v-if="false">_<label for="berryGatherer">auto-assign</label> <input type="radio" id="berryGatherer" value="berryGatherer" v-model="autoAssignJob"></span>-->
                     </span>
                 </li>
             </ul>
@@ -35,8 +33,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class Jobs extends Vue {
-    public autoAssignJob: string = 'berryGatherer';
-
     public get population() {
         return this.$store.state.population;
     }

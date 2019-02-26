@@ -2,7 +2,9 @@
   "name": "bored-in-train",
   "version": "0.1.0",
   "private": true,
+  "main": "server.js",
   "scripts": {
+    "postinstall": "npm run build",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
@@ -10,6 +12,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "express": "^4.16.4",
     "register-service-worker": "^1.0.0",
     "vue": "^2.5.17",
     "vue-class-component": "^6.0.0",
@@ -31,5 +34,8 @@
     "less-loader": "^4.1.0",
     "typescript": "^3.3.3",
     "vue-template-compiler": "^2.5.17"
+  },
+  "engines": {
+    "node": "10.15.1"
   }
 }

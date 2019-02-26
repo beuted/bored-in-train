@@ -1,5 +1,7 @@
 # bored-in-train
 
+## [Demo](https://boring-idle-game.herokuapp.com)
+
 ## Project setup
 ```
 npm install

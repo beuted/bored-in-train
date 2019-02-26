@@ -56,12 +56,6 @@ export default class Jobs extends Vue {
     public addJob(quantity: number, jobName: string) {
         this.$store.commit('AddJob', { jobName: jobName, quantity: quantity });
     }
-
-    public canAddJob() {
-        this.unemployed > 0;
-    }
-
-
 }
 </script>
 

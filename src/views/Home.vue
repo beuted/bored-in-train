@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <Game msg="Boring Idle Game - Train edition - VueX mod"/>
+    <Game msg="Boring Idle Game"/>
   </div>
 </template>
 

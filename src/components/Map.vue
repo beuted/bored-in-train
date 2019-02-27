@@ -4,7 +4,7 @@
             v-on:mousedown="handleMouseDown"
             v-on:mouseup="handleMouseUp"
             v-on:mousemove="handleMouseMove"
-            :width="size+'px'" :height="size+'px'"></canvas>
+            :width="nbTilesOnRowOrColumn*tileSize+'px'" :height="nbTilesOnRowOrColumn*tileSize+'px'"></canvas>
         <div>
             <h2>What to build ?</h2>
             <input type="radio" id="house" value="1" v-model="buildingType">
@@ -28,10 +28,13 @@ import PriceTooltip from '@/components/PriceTooltip.vue';
   },
 })
 export default class Map extends Vue {
-    private size = 600;
-    private nbTilesOnRowOrColumn = 15;
+    private readonly tileSize = 32;
+    private readonly nbTilesOnRowOrColumn = 20;
+    private mapTileImages: {[id: number]: HTMLImageElement} = {}
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
+
+
 
     public buildingType: Building = Building.House;
 
@@ -44,26 +47,39 @@ export default class Map extends Vue {
     }
 
     private mounted() {
+        var foret = new Image(); foret.src = './img/foret.png';
+        var city = new Image(); city.src = './img/city.png';
+        var barn = new Image(); barn.src = './img/barn.png';
+
+        this.mapTileImages = {
+            0: foret,
+            1: city,
+            2: barn,
+        };
+
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
         this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
         this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
 
-        this.draw();
+        barn.onload = () => {
+                this.draw();
+        }
     }
 
     private draw() {
-        this.ctx.clearRect(0, 0, this.size, this.size);
+        this.ctx.clearRect(0, 0, this.tileSize * this.nbTilesOnRowOrColumn, this.tileSize * this.nbTilesOnRowOrColumn);
 
-        var tileSize = this.size / this.nbTilesOnRowOrColumn;
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
-                this.ctx.fillStyle = this.getColor(this.$store.state.map[i][j]);
-                this.ctx.fillRect(i*tileSize, j*tileSize, (i+1)*tileSize, (j+1)*tileSize);
+                //this.ctx.fillStyle = this.getColor(this.$store.state.map[i][j]);
+                //this.ctx.fillRect(i*tileSize, j*tileSize, (i+1)*tileSize, (j+1)*tileSize);
+
+                this.ctx.drawImage(this.mapTileImages[this.$store.state.map[i][j]], i*this.tileSize, j*this.tileSize);
 
                 this.ctx.strokeStyle = 'back';
                 this.ctx.lineWidth = 1;
-                this.ctx.strokeRect(i*tileSize, j*tileSize, (i+1)*tileSize, (j+1)*tileSize);
+                this.ctx.strokeRect(i*this.tileSize, j*this.tileSize, (i+1)*this.tileSize, (j+1)*this.tileSize);
             }
         }
     }
@@ -103,10 +119,9 @@ export default class Map extends Vue {
     }
 
     private getTileFromCoordinate(x: number, y: number) {
-        var factor = (this.nbTilesOnRowOrColumn/this.size);
         return {
-            x: Math.floor(x*factor),
-            y: Math.floor(y*factor)
+            x: Math.floor(x/this.tileSize),
+            y: Math.floor(y/this.tileSize)
         }
     }
 }

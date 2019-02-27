@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { Building } from '@/models/Building';
+import { Building, BuildingToStorageMapping } from '@/models/Building';
 import { StaticStorageInfo } from '@/store';
 import PriceTooltip from '@/components/PriceTooltip.vue';
 
@@ -96,6 +96,15 @@ export default class Map extends Vue {
         if (this.$store.state['sticks'].quantity < 10)
             return;
 
+        // Check if you can afford your purchase
+        var building: any = BuildingToStorageMapping[+this.buildingType]; //TODO: do the opposite
+        for (let consummable in (StaticStorageInfo as any)[building].price) {
+            let price = (StaticStorageInfo as any)[building].price[consummable];
+
+            if (price && this.$store.state[consummable].quantity < price)
+                return;
+        }
+
         // If building is already there
         if (+this.buildingType == this.$store.state.map[coord.x][coord.y])
             return;
@@ -104,7 +113,14 @@ export default class Map extends Vue {
         if (this.$store.state.map[coord.x][coord.y] == Building.Water)
             return;
 
-        this.$store.commit('Increment', { name: 'sticks', value: -10 }); //TODO: Fix this by iterating on all consummable
+        // Pay the price of your purchase
+        var building: any = BuildingToStorageMapping[+this.buildingType]; //TODO: do the opposite
+        for (let consummable in (StaticStorageInfo as any)[building].price) {
+            let price = (StaticStorageInfo as any)[building].price[consummable];
+            if (price && price != 0)
+                this.$store.commit('Increment', { name: consummable, value: -price });
+        }
+
         this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: +this.buildingType });
 
         this.draw();

@@ -5,17 +5,18 @@ import { Building } from '@/models/Building';
 
 Vue.use(Vuex);
 
-enum consummable {
+export enum consummable {
   population= 'population',
   food = 'food',
   sticks = 'sticks'
 }
 
-enum job {
+export enum job {
   berryGatherer = 'berryGatherer',
   woodGatherer = 'woodGatherer'
 }
-enum storage {
+
+export enum storage {
   houses = 'houses',
   barns = 'barns'
 }
@@ -58,8 +59,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
   },
   barns: {
     price: {
-      sticks: 10,
-      food: 0,
+      sticks: 15,
+      food: 5,
       population: 0
     }
   }

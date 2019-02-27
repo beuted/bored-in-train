@@ -8,9 +8,10 @@
         <div>
             <h2>What to build ?</h2>
             <input type="radio" id="house" value="1" v-model="buildingType">
-            <label for="house" v-once>House  ({{ housesInfo.price }})</label>
+            <label for="house" v-once><PriceTooltip v-once :priceStruct="housesInfo.price">House</PriceTooltip></label>
             <input type="radio" id="barn" value="2" v-model="buildingType">
-            <label for="barn" v-once>Barn  ({{ barnsInfo.price }})</label>
+            <label for="barn"><PriceTooltip v-once :priceStruct="barnsInfo.price">Barn</PriceTooltip></label>
+
         </div>
     </div>
 </template>
@@ -19,9 +20,11 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Building } from '@/models/Building';
 import { StaticStorageInfo } from '@/store';
+import PriceTooltip from '@/components/PriceTooltip.vue';
 
 @Component({
   components: {
+      PriceTooltip
   },
 })
 export default class Map extends Vue {
@@ -51,7 +54,7 @@ export default class Map extends Vue {
 
     private draw() {
         this.ctx.clearRect(0, 0, this.size, this.size);
-        
+
         var tileSize = this.size / this.nbTilesOnRowOrColumn;
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
@@ -61,8 +64,8 @@ export default class Map extends Vue {
                 this.ctx.strokeStyle = 'back';
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeRect(i*tileSize, j*tileSize, (i+1)*tileSize, (j+1)*tileSize);
-            }   
-        }   
+            }
+        }
     }
 
     private getColor(building: Building): string {
@@ -85,18 +88,18 @@ export default class Map extends Vue {
         if (+this.buildingType == this.$store.state.map[coord.x][coord.y])
             return;
 
-        this.$store.commit('Increment', { name: 'sticks', value: -10 });
+        this.$store.commit('Increment', { name: 'sticks', value: -10 }); //TODO: Fix this by iterating on all consummable
         this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: +this.buildingType });
 
         this.draw();
     }
-    
+
     private handleMouseUp() {
-        
+
     }
-    
+
     private handleMouseMove() {
-        
+
     }
 
     private getTileFromCoordinate(x: number, y: number) {

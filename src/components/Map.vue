@@ -7,9 +7,9 @@
             :width="nbTilesOnRowOrColumn*tileSize+'px'" :height="nbTilesOnRowOrColumn*tileSize+'px'"></canvas>
         <div>
             <h2>What to build ?</h2>
-            <input type="radio" id="house" value="3" v-model="buildingType">
+            <input type="radio" id="house" value="houses" v-model="buildingType">
             <label for="house" v-once><PriceTooltip v-once :priceStruct="housesInfo.price">House</PriceTooltip></label>
-            <input type="radio" id="barn" value="4" v-model="buildingType">
+            <input type="radio" id="barn" value="barns" v-model="buildingType">
             <label for="barn"><PriceTooltip v-once :priceStruct="barnsInfo.price">Barn</PriceTooltip></label>
 
         </div>
@@ -18,8 +18,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { Building, BuildingToStorageMapping } from '@/models/Building';
-import { StaticStorageInfo } from '@/store';
+import { Building, StorageToBuildingMapping } from '@/models/Building';
+import { StaticStorageInfo, storage } from '@/store';
 import PriceTooltip from '@/components/PriceTooltip.vue';
 
 @Component({
@@ -34,7 +34,7 @@ export default class Map extends Vue {
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
 
-    public buildingType: Building = Building.House;
+    public buildingType: storage = storage.houses;
 
     get housesInfo() {
         return StaticStorageInfo.houses;
@@ -97,16 +97,15 @@ export default class Map extends Vue {
             return;
 
         // Check if you can afford your purchase
-        var building: any = BuildingToStorageMapping[+this.buildingType]; //TODO: do the opposite
-        for (let consummable in (StaticStorageInfo as any)[building].price) {
-            let price = (StaticStorageInfo as any)[building].price[consummable];
+        for (let consummable in (StaticStorageInfo as any)[this.buildingType].price) {
+            let price = (StaticStorageInfo as any)[this.buildingType].price[consummable];
 
             if (price && this.$store.state[consummable].quantity < price)
                 return;
         }
 
         // If building is already there
-        if (+this.buildingType == this.$store.state.map[coord.x][coord.y])
+        if (StorageToBuildingMapping[this.buildingType] == this.$store.state.map[coord.x][coord.y])
             return;
 
         // You can't build on water
@@ -114,14 +113,13 @@ export default class Map extends Vue {
             return;
 
         // Pay the price of your purchase
-        var building: any = BuildingToStorageMapping[+this.buildingType]; //TODO: do the opposite
-        for (let consummable in (StaticStorageInfo as any)[building].price) {
-            let price = (StaticStorageInfo as any)[building].price[consummable];
+        for (let consummable in (StaticStorageInfo as any)[this.buildingType].price) {
+            let price = (StaticStorageInfo as any)[this.buildingType].price[consummable];
             if (price && price != 0)
                 this.$store.commit('Increment', { name: consummable, value: -price });
         }
 
-        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: +this.buildingType });
+        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: StorageToBuildingMapping[this.buildingType] });
 
         this.draw();
     }

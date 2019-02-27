@@ -9,11 +9,7 @@ export enum Building {
     Farm = 5,
 }
 
-export const BuildingToStorageMapping: {[id: number]: storage | undefined} = {
-    0: undefined,
-    1: undefined,
-    2: undefined,
-    3: storage.houses,
-    4: storage.barns,
-    5: undefined,
-};
+export const StorageToBuildingMapping: {[id in storage]: Building} = {
+    'houses': Building.House,
+    'barns': Building.Barn,
+}

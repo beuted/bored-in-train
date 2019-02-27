@@ -1,5 +1,8 @@
 export enum Building {
-    Nature = 0,
-    House = 1,
-    Barn = 2
+    Foret = 0,
+    Water = 1,
+    Field = 2,
+    House = 3,
+    Barn = 4,
+    Farm = 5,
 }

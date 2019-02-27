@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 import { Building } from '@/models/Building';
+import { MapBuilder } from './services/MapBuilder';
 
 Vue.use(Vuex);
 
@@ -187,10 +188,7 @@ export default new Vuex.Store({
     },
     // Init the map with 1 and one house
     InitMap(state, size: number) {
-      state.map = new Array(size).fill(0).map(x => Array(size).fill(0));
-      var center = Math.floor(size/2);
-      state.map[center][center] = Building.House;
-      state.map[center][center+1] = Building.Barn;
+      state.map = MapBuilder.InitMap(size);
     },
     // Change a tile of a map giving it a certain type
     ChangeTile(state, obj: { x: number, y: number, type: Building }) {

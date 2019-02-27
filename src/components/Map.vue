@@ -7,9 +7,9 @@
             :width="nbTilesOnRowOrColumn*tileSize+'px'" :height="nbTilesOnRowOrColumn*tileSize+'px'"></canvas>
         <div>
             <h2>What to build ?</h2>
-            <input type="radio" id="house" value="1" v-model="buildingType">
+            <input type="radio" id="house" value="3" v-model="buildingType">
             <label for="house" v-once><PriceTooltip v-once :priceStruct="housesInfo.price">House</PriceTooltip></label>
-            <input type="radio" id="barn" value="2" v-model="buildingType">
+            <input type="radio" id="barn" value="4" v-model="buildingType">
             <label for="barn"><PriceTooltip v-once :priceStruct="barnsInfo.price">Barn</PriceTooltip></label>
 
         </div>
@@ -34,8 +34,6 @@ export default class Map extends Vue {
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
 
-
-
     public buildingType: Building = Building.House;
 
     get housesInfo() {
@@ -48,13 +46,19 @@ export default class Map extends Vue {
 
     private mounted() {
         var foret = new Image(); foret.src = './img/foret.png';
+        var water = new Image(); water.src = './img/water.png';
+        var field = new Image(); field.src = './img/field.png';
         var city = new Image(); city.src = './img/city.png';
         var barn = new Image(); barn.src = './img/barn.png';
+        var farm = new Image(); farm.src = './img/farm.png';
 
         this.mapTileImages = {
             0: foret,
-            1: city,
-            2: barn,
+            1: water,
+            2: field,
+            3: city,
+            4: barn,
+            5: farm,
         };
 
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
@@ -62,8 +66,14 @@ export default class Map extends Vue {
 
         this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
 
-        barn.onload = () => {
-                this.draw();
+        var nbImages = Object.keys(this.mapTileImages).length;
+        for (const key in this.mapTileImages)
+        {
+            this.mapTileImages[key].onload = () => {
+                nbImages--;
+                if (nbImages == 0)
+                    this.draw();
+            }
         }
     }
 
@@ -72,24 +82,9 @@ export default class Map extends Vue {
 
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
-                //this.ctx.fillStyle = this.getColor(this.$store.state.map[i][j]);
-                //this.ctx.fillRect(i*tileSize, j*tileSize, (i+1)*tileSize, (j+1)*tileSize);
-
                 this.ctx.drawImage(this.mapTileImages[this.$store.state.map[i][j]], i*this.tileSize, j*this.tileSize);
-
-                this.ctx.strokeStyle = 'back';
-                this.ctx.lineWidth = 1;
-                this.ctx.strokeRect(i*this.tileSize, j*this.tileSize, (i+1)*this.tileSize, (j+1)*this.tileSize);
             }
         }
-    }
-
-    private getColor(building: Building): string {
-        switch(building) {
-            case Building.House: return 'gray';
-            case Building.Barn: return 'orange';
-        }
-        return 'green';
     }
 
     private handleMouseDown(event: MouseEvent) {
@@ -101,7 +96,12 @@ export default class Map extends Vue {
         if (this.$store.state['sticks'].quantity < 10)
             return;
 
+        // If building is already there
         if (+this.buildingType == this.$store.state.map[coord.x][coord.y])
+            return;
+
+        // You can't build on water
+        if (this.$store.state.map[coord.x][coord.y] == Building.Water)
             return;
 
         this.$store.commit('Increment', { name: 'sticks', value: -10 }); //TODO: Fix this by iterating on all consummable

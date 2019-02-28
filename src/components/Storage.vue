@@ -3,12 +3,16 @@
         <h2>Storage</h2>
         <ul>
             <li>
-                <span>Houses: {{ houses.quantity }}</span>
-                <span v-if="debugMode">{{ houses }}</span>
+                <span>Villages: {{ villages.quantity }}</span>
+                <span v-if="debugMode">{{ villages }}</span>
             </li>
             <li>
                 <span>Barns: {{ barns.quantity }}</span>
                 <span v-if="debugMode">{{ barns }}</span>
+            </li>
+            <li>
+                <span>Farms: {{ farms.quantity }}</span>
+                <span v-if="debugMode">{{ farms }}</span>
             </li>
         </ul>
     </div>
@@ -26,8 +30,12 @@ export default class Storage extends Vue {
         return this.$store.state.barns;
     }
 
-    get houses() {
-        return this.$store.state.houses;
+    get villages() {
+        return this.$store.state.villages;
+    }
+
+    get farms() {
+        return this.$store.state.farms;
     }
 
     get debugMode() {

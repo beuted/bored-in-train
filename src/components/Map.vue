@@ -7,10 +7,12 @@
             :width="nbTilesOnRowOrColumn*tileSize+'px'" :height="nbTilesOnRowOrColumn*tileSize+'px'"></canvas>
         <div>
             <h2>What to build ?</h2>
-            <input type="radio" id="house" value="houses" v-model="buildingType">
-            <label for="house" v-once><PriceTooltip v-once :priceStruct="housesInfo.price">House</PriceTooltip></label>
-            <input type="radio" id="barn" value="barns" v-model="buildingType">
+            <input type="radio" id="village" value="villages" v-model="storageType">
+            <label for="village" v-once><PriceTooltip v-once :priceStruct="villagesInfo.price">Village</PriceTooltip></label>
+            <input type="radio" id="barn" value="barns" v-model="storageType">
             <label for="barn"><PriceTooltip v-once :priceStruct="barnsInfo.price">Barn</PriceTooltip></label>
+            <input type="radio" id="farm" value="farms" v-model="storageType">
+            <label for="farm"><PriceTooltip v-once :priceStruct="farmsInfo.price">Farm</PriceTooltip></label>
 
         </div>
     </div>
@@ -21,6 +23,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Building, StorageToBuildingMapping } from '@/models/Building';
 import { StaticStorageInfo, storage } from '@/store';
 import PriceTooltip from '@/components/PriceTooltip.vue';
+import { Environment } from '@/models/Environment';
+import { IMapTile } from '@/models/IMapTile';
 
 @Component({
   components: {
@@ -30,37 +34,46 @@ import PriceTooltip from '@/components/PriceTooltip.vue';
 export default class Map extends Vue {
     private readonly tileSize = 32;
     private readonly nbTilesOnRowOrColumn = 20;
-    private mapTileImages: {[id: number]: HTMLImageElement} = {}
+    private mapTileImages: {
+        foretImage: HTMLImageElement,
+        waterImage: HTMLImageElement,
+        fieldImage: HTMLImageElement,
+        villageImage: HTMLImageElement,
+        barnImage: HTMLImageElement,
+        farmImage: HTMLImageElement
+    } = {
+        foretImage: new Image(),
+        waterImage: new Image(),
+        fieldImage: new Image(),
+        villageImage: new Image(),
+        barnImage: new Image(),
+        farmImage: new Image()
+    }
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
 
-    public buildingType: storage = storage.houses;
+    public storageType: storage = storage.villages;
 
-    get housesInfo() {
-        return StaticStorageInfo.houses;
+    get villagesInfo() {
+        return StaticStorageInfo.villages;
     }
 
     get barnsInfo() {
         return StaticStorageInfo.barns;
     }
 
+    get farmsInfo() {
+        return StaticStorageInfo.farms;
+    }
+
     private mounted() {
-        var foret = new Image(); foret.src = './img/foret.png';
-        var water = new Image(); water.src = './img/water.png';
-        var field = new Image(); field.src = './img/field.png';
-        var city = new Image(); city.src = './img/city.png';
-        var barn = new Image(); barn.src = './img/barn.png';
-        var farm = new Image(); farm.src = './img/farm.png';
-
-        this.mapTileImages = {
-            0: foret,
-            1: water,
-            2: field,
-            3: city,
-            4: barn,
-            5: farm,
-        };
-
+        this.mapTileImages.foretImage.src = './img/foret.png';
+        this.mapTileImages.waterImage.src = './img/water.png';
+        this.mapTileImages.fieldImage.src = './img/field.png';
+        this.mapTileImages.villageImage.src = './img/village.png';
+        this.mapTileImages.barnImage.src = './img/barn.png';
+        this.mapTileImages.farmImage.src = './img/farm.png';
+        
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
         this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
@@ -69,7 +82,7 @@ export default class Map extends Vue {
         var nbImages = Object.keys(this.mapTileImages).length;
         for (const key in this.mapTileImages)
         {
-            this.mapTileImages[key].onload = () => {
+            (this.mapTileImages as any)[key].onload = () => {
                 nbImages--;
                 if (nbImages == 0)
                     this.draw();
@@ -82,12 +95,14 @@ export default class Map extends Vue {
 
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
-                this.ctx.drawImage(this.mapTileImages[this.$store.state.map[i][j]], i*this.tileSize, j*this.tileSize);
+                var image = this.getImageToDisplay(this.$store.state.map[i][j])
+                this.ctx.drawImage(image, i*this.tileSize, j*this.tileSize);
             }
         }
     }
 
     private handleMouseDown(event: MouseEvent) {
+        var buildingType = StorageToBuildingMapping[this.storageType];
         var coord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
 
         if (coord.x < 0 || coord.y < 0 || coord.x >= this.nbTilesOnRowOrColumn || coord.y >= this.nbTilesOnRowOrColumn)
@@ -97,29 +112,29 @@ export default class Map extends Vue {
             return;
 
         // Check if you can afford your purchase
-        for (let consummable in (StaticStorageInfo as any)[this.buildingType].price) {
-            let price = (StaticStorageInfo as any)[this.buildingType].price[consummable];
+        for (let consummable in (StaticStorageInfo as any)[this.storageType].price) {
+            let price = (StaticStorageInfo as any)[this.storageType].price[consummable];
 
             if (price && this.$store.state[consummable].quantity < price)
                 return;
         }
 
         // If building is already there
-        if (StorageToBuildingMapping[this.buildingType] == this.$store.state.map[coord.x][coord.y])
+        if (buildingType == this.$store.state.map[coord.x][coord.y].building)
             return;
 
         // You can't build on water
-        if (this.$store.state.map[coord.x][coord.y] == Building.Water)
+        if (this.$store.state.map[coord.x][coord.y].environment == Environment.Water)
             return;
 
         // Pay the price of your purchase
-        for (let consummable in (StaticStorageInfo as any)[this.buildingType].price) {
-            let price = (StaticStorageInfo as any)[this.buildingType].price[consummable];
+        for (let consummable in (StaticStorageInfo as any)[this.storageType].price) {
+            let price = (StaticStorageInfo as any)[this.storageType].price[consummable];
             if (price && price != 0)
                 this.$store.commit('Increment', { name: consummable, value: -price });
         }
 
-        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: StorageToBuildingMapping[this.buildingType] });
+        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: buildingType });
 
         this.draw();
     }
@@ -130,6 +145,30 @@ export default class Map extends Vue {
 
     private handleMouseMove() {
 
+    }
+
+    private getImageToDisplay(mapTile: IMapTile): HTMLImageElement {
+        if (mapTile.building != Building.NoBuilding) {
+            switch (mapTile.building) {
+                case Building.Village:
+                    return this.mapTileImages.villageImage;
+                case Building.Barn:
+                    return this.mapTileImages.barnImage;
+                case Building.Farm:
+                    return this.mapTileImages.farmImage;
+            }
+        }
+        
+        switch (mapTile.environment) {
+            case Environment.Water:
+                return this.mapTileImages.waterImage;
+            case Environment.Field:
+                return this.mapTileImages.fieldImage;
+            case Environment.Forest:
+                return this.mapTileImages.foretImage;
+        }
+
+        throw new Error(`could not find anything to display for mapTile ${mapTile}`);
     }
 
     private getTileFromCoordinate(x: number, y: number) {

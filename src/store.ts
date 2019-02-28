@@ -18,8 +18,9 @@ export enum job {
 }
 
 export enum storage {
-  houses = 'houses',
-  barns = 'barns'
+  villages = 'villages',
+  barns = 'barns',
+  farms = 'farms'
 }
 
 export type IStaticConsummableInfo = {[id in consummable]: IStaticConsummable}
@@ -51,7 +52,7 @@ export interface IStorage {
 }
 
 export const StaticStorageInfo: IStaticStorageInfo = {
-  houses: {
+  villages: {
     price: {
       sticks: 10,
       food: 0,
@@ -62,6 +63,13 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     price: {
       sticks: 15,
       food: 5,
+      population: 0
+    }
+  },
+  farms: {
+    price: {
+      sticks: 20,
+      food: 10,
       population: 0
     }
   }
@@ -79,7 +87,7 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
       },
     },
     storage: {
-      name: storage.houses,
+      name: storage.villages,
       capacity: 10
     },
     interval: 1000,
@@ -110,7 +118,7 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
 export default new Vuex.Store({
   state: {
     debugMode: false,
-    map: [[0]],
+    map: [[{ building: 0, environment: 0 }]],
     population: {
       quantity: 6,
       remainingTime: 1000,
@@ -134,13 +142,18 @@ export default new Vuex.Store({
       remainingTime: 1000,
       consuming: undefined,
     },
-    houses: {
+    villages: {
       quantity: 1,
       remainingTime: 1000,
       consuming: undefined,
     },
     barns: {
       quantity: 1,
+      remainingTime: 1000,
+      consuming: undefined,
+    },
+    farms: {
+      quantity: 0,
       remainingTime: 1000,
       consuming: undefined,
     },
@@ -186,30 +199,36 @@ export default new Vuex.Store({
       const a = state[obj.name].consuming; // ugly hack todo: fix types
       (<any> a)[obj.consuming].remainingTime = obj.interval;
     },
-    // Init the map with 1 and one house
+    // Init the map
     InitMap(state, size: number) {
       state.map = MapBuilder.InitMap(size);
     },
     // Change a tile of a map giving it a certain type
     ChangeTile(state, obj: { x: number, y: number, type: Building }) {
-      var previousType = (state.map[obj.x])[obj.y];
+      var previousTile = (state.map[obj.x])[obj.y];
 
-      console.debug(`Changing tile ${obj.x}, ${obj.y} from ${(state.map[obj.x])[obj.y]} to ${obj.type}`);
+      console.debug(`Changing tile ${obj.x}, ${obj.y} from ${previousTile.building} to ${obj.type}`);
 
       // TODO: fix this with a mapping
-      if (previousType == Building.House)
-        state.houses.quantity--;
+      if (previousTile.building == Building.Village)
+        state.villages.quantity--;
 
-      if (previousType == Building.Barn)
+      if (previousTile.building == Building.Barn)
         state.barns.quantity--;
 
-      (state.map[obj.x])[obj.y] = obj.type;
+      if (previousTile.building == Building.Farm)
+        state.farms.quantity--;
 
-      if (obj.type == Building.House)
-        state.houses.quantity++;
+      (state.map[obj.x])[obj.y].building = obj.type;
+
+      if (obj.type == Building.Village)
+        state.villages.quantity++;
 
       if (obj.type == Building.Barn)
         state.barns.quantity++;
+
+      if (obj.type == Building.Farm)
+        state.farms.quantity++;
     },
     //Add
     AddJob(state, obj: { jobName: job, quantity: number }) {

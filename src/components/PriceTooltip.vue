@@ -11,14 +11,14 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { consummable } from '@/store'; // @ is an alias to /src
+import { Consummable } from '@/models/Consummable'; // @ is an alias to /src
 
 @Component({
   components: {
   },
 })
 export default class PriceTooltip extends Vue {
-    @Prop() private priceStruct!: {[id in consummable]: number};
+    @Prop() private priceStruct!: {[id in Consummable]: number};
 }
 </script>
 

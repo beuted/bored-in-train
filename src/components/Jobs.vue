@@ -4,7 +4,7 @@
             <ul>
                 <li>
                     <span>Population: {{ population.quantity }} / {{ popStorage }}</span>
-                    <span v-if="debugMode">{{ population }}</span>
+                    <span v-if="debugMode">{{ jobs }}</span>
                 </li>
 
                 <li>
@@ -12,16 +12,16 @@
                 </li>
                 <li>
                     <span>
-                        Wood Gatherer: {{ population.jobs.woodGatherer }}
+                        Wood Gatherer: {{ jobs.woodGatherer.quantity }}
                         <button :disabled="unemployed <= 0" v-on:click="addJob(1, 'woodGatherer')">Add</button>
-                        <button :disabled="population.jobs.woodGatherer <= 0" v-on:click="addJob(-1, 'woodGatherer')">Remove</button>
+                        <button :disabled="jobs.woodGatherer.quantity <= 0" v-on:click="addJob(-1, 'woodGatherer')">Remove</button>
                     </span>
                 </li>
                 <li>
                     <span>
-                        Berry Gatherer: {{ population.jobs.berryGatherer }}
+                        Berry Gatherer: {{ jobs.berryGatherer.quantity }}
                         <button :disabled="unemployed <= 0" v-on:click="addJob(1, 'berryGatherer')">Add</button>
-                        <button :disabled="population.jobs.berryGatherer <= 0" v-on:click="addJob(-1, 'berryGatherer')">Remove</button>
+                        <button :disabled="jobs.berryGatherer.quantity <= 0" v-on:click="addJob(-1, 'berryGatherer')">Remove</button>
                     </span>
                 </li>
             </ul>
@@ -30,6 +30,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import { IState } from '@/store';
 
 @Component({
   components: {
@@ -37,19 +38,26 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 })
 export default class Jobs extends Vue {
     public get population() {
-        return this.$store.state.population;
+        return (this.$store.state as IState).consummable.population;
+    }
+    
+    public get jobs() {
+        return (this.$store.state as IState).jobs;
     }
 
     public get unemployed() {
         let totalWithJob = 0;
-        Object.keys(this.$store.state.population.jobs).forEach((key) => {
-            totalWithJob += this.$store.state.population.jobs[key];
-        });
-        return this.$store.state.population.quantity - totalWithJob;
+        for (let key in (this.$store.state as IState).jobs) {
+            if (key == 'default')
+                continue;
+                
+            totalWithJob += ((this.$store.state as IState).jobs as any)[key].quantity;
+        };
+        return (this.$store.state as IState).consummable.population.quantity - totalWithJob;
     }
 
     public get debugMode() {
-        return this.$store.state.debugMode;
+        return (this.$store.state as IState).debugMode;
     }
 
     public get popStorage() {

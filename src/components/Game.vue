@@ -11,11 +11,13 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import Jobs from '@/components/Jobs.vue'; // @ is an alias to /src
+import { Store } from 'vuex';
+import Jobs from '@/components/Jobs.vue';
 import Inventory from '@/components/Inventory.vue';
 import Storage from '@/components/Storage.vue';
 import Map from '@/components/Map.vue';
-import { StaticConsummableInfo, IStaticConsummable, IConsuming } from '@/store';
+import { StaticConsummableInfo, IStaticConsummable, IConsuming, StaticJobInfo, IStaticJobInfo, IStaticJob, IStaticJobProduction } from '@/services/GameEngine';
+import { IState } from '@/store';
 
 @Component({
   components: {
@@ -30,7 +32,7 @@ export default class Game extends Vue {
 
   private readonly TickInterval = 1000;
   private readonly StarvationFactor = 0.5; // Portion of disapearing goods when missing consummable
-  private readonly LackOfStorageFactor = 1.0; // Portion of disapearing goods when missing storage
+  private readonly LackOfStorageFactor = 1.0; // Portion of disapearing goods when missing storage 
 
   public toggleDebug() {
       this.$store.commit('ToggleDebugMode');
@@ -40,25 +42,55 @@ export default class Game extends Vue {
     console.log(`I'm bored in a train`);
 
     setInterval (() => {
+        let store: Store<IState> = this.$store;
+        
         // First the creation of ressources
-        for (let key in StaticConsummableInfo) {
-            let solidGood: IStaticConsummable = (<any>StaticConsummableInfo)[key]; //TODO: fix typeing weirdlness
+        for (let jobId in StaticJobInfo) {
+            let staticJob: IStaticJob = (<any>StaticJobInfo)[jobId]; //TODO: fix typeing weirdlness
 
-            if (this.$store.state[solidGood.name].remainingTime <= 0) {
-                this.$store.commit('ResetInterval', { name: solidGood.name, interval: solidGood.interval });
-                DoWithProba(solidGood.probability, () => {
-                    // If no producer is defined, resource will be incremented 1 by 1
-                    var nbProducers = solidGood.job ? this.$store.state.population.jobs[solidGood.job] : 1;
+            if ((store.state.jobs as any)[jobId].produceRemainingTime <= 0) {
+                store.commit('ResetProduceInterval', { job: jobId });
 
-                    this.$store.commit('Increment', { name: solidGood.name, value: nbProducers });
-                });
+                for (let consummableId in staticJob.produce) {
+                    let staticJobConsumption: IStaticJobProduction | null = (staticJob.produce as any)[consummableId];
+                    if (staticJobConsumption == null)
+                        continue;
+                
+                    var nbProducers = (store.state.jobs as any)[jobId].quantity;
+                    store.commit('IncrementConsummable', { name: consummableId, value: nbProducers });
+                }
             } else {
-                this.$store.commit('Tick', solidGood.name);
+                store.commit('TickProduce', { job: jobId });
             }
         }
 
         // Then the consumming of ressources
-        for (let key in StaticConsummableInfo) {
+        for (let jobId in StaticJobInfo) {
+            let staticJob: IStaticJob = (<any>StaticJobInfo)[jobId]; //TODO: fix typeing weirdlness
+
+            if ((store.state.jobs as any)[jobId].consumeRemainingTime <= 0) {
+                store.commit('ResetConsummeInterval', { job: jobId });
+
+                for (let consummableId in staticJob.consume) {
+                    let staticJobConsumption: IStaticJobProduction | null = (staticJob.consume as any)[consummableId];
+                    if (staticJobConsumption == null)
+                        continue;
+
+                    var nbConsummer = (store.state.jobs as any)[jobId].quantity;
+                    if ((store.state.consummable as any)[consummableId].quantity >= nbConsummer * staticJobConsumption.quantity) {
+                        store.commit('IncrementConsummable', { name: consummableId, value: -nbConsummer * staticJobConsumption.quantity });
+                    } else {
+                        //TODO: do not produce if needs not fulfilled !!!!
+                    }
+
+                }
+            } else {
+                store.commit('TickConsumme', { job: jobId });
+            }
+        }
+
+        // Previous code, remove when equivalent reached
+        /*for (let key in StaticConsummableInfo) {
             let solidGood: IStaticConsummable = (<any>StaticConsummableInfo)[key]; //TODO: fix typeing weirdlness
 
             for (let consumedKey in solidGood.consuming) {
@@ -83,16 +115,17 @@ export default class Game extends Vue {
                     this.$store.commit('TickConsuming', { name: solidGood.name, consuming: consumed.name });
                 }
             }
-        }
+        }*/
 
         // After operation checks
-        for (let key in StaticConsummableInfo) {
-            let solidGood: IStaticConsummable = (<any>StaticConsummableInfo)[key]; //TODO: fix typeing weirdlness
+        for (let consummableId in StaticConsummableInfo) {
+            let staticConsummable: IStaticConsummable = (<any>StaticConsummableInfo)[consummableId]; //TODO: fix typeing weirdlness
             // See if storage fits
-            if (solidGood.storage && this.$store.state[solidGood.storage.name].quantity * solidGood.storage.capacity < this.$store.state[solidGood.name].quantity) {
-                let quantityToRemove = Math.floor(this.LackOfStorageFactor * (this.$store.state[solidGood.name].quantity - this.$store.state[solidGood.storage.name].quantity * solidGood.storage.capacity));
-                this.$store.commit('Increment', { name: solidGood.name, value: -quantityToRemove });
-                console.warn(`${quantityToRemove} ${solidGood.name} were thrown away due to lack of storage`);
+            if (staticConsummable.storage && staticConsummable.storage.capacity * (store.state.storage as any)[staticConsummable.storage.name].quantity < (store.state.consummable as any)[consummableId].quantity) {
+                let quantityToRemove = Math.floor(this.LackOfStorageFactor *
+                    ((store.state.consummable as any)[consummableId].quantity - store.state.storage[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity));
+                store.commit('IncrementConsummable', { name: consummableId, value: -quantityToRemove });
+                console.warn(`${quantityToRemove} ${consummableId} were thrown away due to lack of storage`);
             }
         }
 

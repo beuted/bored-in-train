@@ -20,6 +20,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import { IState } from '@/store';
 
 @Component({
   components: {
@@ -27,19 +28,19 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 })
 export default class Storage extends Vue {
     get barns() {
-        return this.$store.state.barns;
+        return (this.$store.state as IState).storage.barns;
     }
 
     get villages() {
-        return this.$store.state.villages;
+        return (this.$store.state as IState).storage.villages;
     }
 
     get farms() {
-        return this.$store.state.farms;
+        return (this.$store.state as IState).storage.farms;
     }
 
     get debugMode() {
-        return this.$store.state.debugMode;
+        return (this.$store.state as IState).debugMode;
     }
 
 }

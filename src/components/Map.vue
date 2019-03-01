@@ -21,10 +21,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Building, StorageToBuildingMapping } from '@/models/Building';
-import { StaticStorageInfo, storage } from '@/store';
+import { Storage } from '@/models/Storage';
+import { StaticStorageInfo } from '@/services/GameEngine'
 import PriceTooltip from '@/components/PriceTooltip.vue';
 import { Environment } from '@/models/Environment';
 import { IMapTile } from '@/models/IMapTile';
+import { IState } from '@/store';
 
 @Component({
   components: {
@@ -52,7 +54,7 @@ export default class Map extends Vue {
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
 
-    public storageType: storage = storage.villages;
+    public storageType: Storage = Storage.villages;
 
     get villagesInfo() {
         return StaticStorageInfo.villages;
@@ -108,30 +110,27 @@ export default class Map extends Vue {
         if (coord.x < 0 || coord.y < 0 || coord.x >= this.nbTilesOnRowOrColumn || coord.y >= this.nbTilesOnRowOrColumn)
             return;
 
-        if (this.$store.state['sticks'].quantity < 10)
-            return;
-
         // Check if you can afford your purchase
-        for (let consummable in (StaticStorageInfo as any)[this.storageType].price) {
-            let price = (StaticStorageInfo as any)[this.storageType].price[consummable];
+        for (let consummableId in (StaticStorageInfo as any)[this.storageType].price) {
+            let price = (StaticStorageInfo as any)[this.storageType].price[consummableId];
 
-            if (price && this.$store.state[consummable].quantity < price)
+            if (price && ((this.$store.state as IState).consummable as any)[consummableId].quantity < price)
                 return;
         }
 
         // If building is already there
-        if (buildingType == this.$store.state.map[coord.x][coord.y].building)
+        if (buildingType == (this.$store.state as IState).map[coord.x][coord.y].building)
             return;
 
         // You can't build on water
-        if (this.$store.state.map[coord.x][coord.y].environment == Environment.Water)
+        if ((this.$store.state as IState).map[coord.x][coord.y].environment == Environment.Water)
             return;
 
         // Pay the price of your purchase
         for (let consummable in (StaticStorageInfo as any)[this.storageType].price) {
             let price = (StaticStorageInfo as any)[this.storageType].price[consummable];
             if (price && price != 0)
-                this.$store.commit('Increment', { name: consummable, value: -price });
+                this.$store.commit('IncrementConsummable', { name: consummable, value: -price });
         }
 
         this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: buildingType });

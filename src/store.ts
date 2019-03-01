@@ -3,159 +3,68 @@ import Vuex from 'vuex';
 
 import { Building } from '@/models/Building';
 import { MapBuilder } from './services/MapBuilder';
+import { Consummable } from './models/Consummable';
+import { Storage } from '@/models/Storage';
+import { Job } from './models/Job';
+import { StaticConsummableInfo, StaticJobInfo } from './services/GameEngine';
 
 Vue.use(Vuex);
 
-export enum consummable {
-  population= 'population',
-  food = 'food',
-  sticks = 'sticks'
+export interface IState {
+  debugMode: boolean,
+  map: { building: number, environment: number }[][],
+  consummable: { [id in Consummable]: { quantity: number } },
+  storage: { [id in Storage]: { quantity: number } },
+  jobs: { [id in Job]: { quantity: number, consumeRemainingTime: number, produceRemainingTime: number } },
 }
 
-export enum job {
-  berryGatherer = 'berryGatherer',
-  woodGatherer = 'woodGatherer'
-}
+//TODO: override with something like this
+//interface Vue {
+//  $store: Store<IState>;
+//}
 
-export enum storage {
-  villages = 'villages',
-  barns = 'barns',
-  farms = 'farms'
-}
-
-export type IStaticConsummableInfo = {[id in consummable]: IStaticConsummable}
-export type IStaticStorageInfo = {[id in storage]: IStaticStorage}
-
-export interface IStaticConsummable {
-  name: string;
-  interval: number;
-  probability: number;
-  consuming: {[id in consummable]?: IConsuming}
-  storage: IStorage | undefined;
-  job: job | undefined;
-}
-
-export interface IStaticStorage {
-  price: {[id in consummable]: number}
-}
-
-export interface IConsuming {
-  name: consummable;
-  consomation: number;
-  interval: number;
-  probability: number;
-}
-
-export interface IStorage {
-  name: storage;
-  capacity: number;
-}
-
-export const StaticStorageInfo: IStaticStorageInfo = {
-  villages: {
-    price: {
-      sticks: 10,
-      food: 0,
-      population: 0
-    }
-  },
-  barns: {
-    price: {
-      sticks: 15,
-      food: 5,
-      population: 0
-    }
-  },
-  farms: {
-    price: {
-      sticks: 20,
-      food: 10,
-      population: 0
-    }
-  }
-}
-
-export const StaticConsummableInfo: IStaticConsummableInfo = {
-  population: {
-    name: consummable.population,
-    consuming: {
-      food: {
-        name: consummable.food,
-        consomation: 1,
-        interval: 8000,
-        probability: 1,
-      },
-    },
-    storage: {
-      name: storage.villages,
-      capacity: 10
-    },
-    interval: 1000,
-    probability: 0.1,
-    job: undefined
-  },
-  food: {
-    interval: 2000,
-    name: consummable.food,
-    consuming: {},
-    storage: {
-      name: storage.barns,
-      capacity: 10
-    },
-    probability: 0.7,
-    job: job.berryGatherer
-  },
-  sticks: {
-    interval: 1000,
-    name: consummable.sticks,
-    consuming: {},
-    probability: 0.2,
-    job: job.woodGatherer,
-    storage: undefined,
-  },
-};
-
-export default new Vuex.Store({
+export default new Vuex.Store<IState>({
   state: {
     debugMode: false,
     map: [[{ building: 0, environment: 0 }]],
-    population: {
-      quantity: 6,
-      remainingTime: 1000,
-      consuming: {
-        food: {
-          remainingTime: 8000,
-        },
+    consummable: {
+      population: {
+        quantity: 6,
       },
-      jobs: {
-        woodGatherer: 0,
-        berryGatherer: 1,
+      food: {
+        quantity: 5,
+      },
+      sticks: {
+        quantity: 100,
+      },
+    },
+    storage: {
+      villages: {
+        quantity: 1,
+      },
+      barns: {
+        quantity: 1,
+      },
+      farms: {
+        quantity: 0,
+      },
+    },
+    jobs: {
+      woodGatherer: {
+        quantity: 0,
+        consumeRemainingTime: 1000,
+        produceRemainingTime: 1000,
+      },
+      berryGatherer: {
+        quantity: 1,
+        consumeRemainingTime: 1000,
+        produceRemainingTime: 1000,
+      },
+      default: { //Job producing population
+        quantity: 1,
+        consumeRemainingTime: 1000,
+        produceRemainingTime: 1000,
       }
-    },
-    food: {
-      quantity: 5,
-      remainingTime: 2000,
-      consuming: undefined,
-    },
-    sticks: {
-      quantity: 100,
-      remainingTime: 1000,
-      consuming: undefined,
-    },
-    villages: {
-      quantity: 1,
-      remainingTime: 1000,
-      consuming: undefined,
-    },
-    barns: {
-      quantity: 1,
-      remainingTime: 1000,
-      consuming: undefined,
-    },
-    farms: {
-      quantity: 0,
-      remainingTime: 1000,
-      consuming: undefined,
     },
   },
   mutations: {
@@ -164,40 +73,38 @@ export default new Vuex.Store({
       state.debugMode = !state.debugMode
     },
     // Increment the value of a consummable from 'value'
-    Increment(state, obj: { name: consummable, value: number }) {
-      state[obj.name].quantity += obj.value;
+    IncrementConsummable(state, obj: { name: Consummable, value: number }) {
+      state.consummable[obj.name].quantity += obj.value;
 
       // Special case of shrinking population to handle missing jobs
-      if (obj.value < 0 && obj.name == consummable.population) {
+      if (obj.value < 0 && obj.name == Consummable.population) {
         let totalWithJob = 0;
-        Object.keys(state.population.jobs).forEach((key) => {
-            totalWithJob += (state.population.jobs as any)[key];
-        });
+        for (let key in state.jobs) {
+            totalWithJob += (state.jobs as any)[key].quantity; //FIX ME wassup with the typing issue here ?
+        };
 
-        if (state[obj.name].quantity < totalWithJob) {
+        if (state.consummable.population.quantity < totalWithJob) {
           console.warn('You have to remove some jobs'); //TODO
         }
       }
     },
     // Decremente the remaining time before a spawn of a consummable from 1 tick (1000 ms)
-    Tick(state, obj: consummable) {
-      state[obj].remainingTime -= 1000;
+    TickConsumme(state, obj: { job: Job} ) {
+      state.jobs[obj.job].consumeRemainingTime -= 1000;
+      //TODO tick the default job ?
+    },
+    // Decremente the remaining time before a consumming of a consummable from 1 tick (1000 ms)
+    TickProduce(state, obj: { job: Job} ) {
+      state.jobs[obj.job].produceRemainingTime -= 1000;
+      //TODO tick the default job ?
     },
     // Reset the interval of spawing of a consummable
-    ResetInterval(state, obj: { name: consummable, interval: number }) {
-      state[obj.name].remainingTime = obj.interval;
+    ResetProduceInterval(state, obj: { job: Job }) {
+      state.jobs[obj.job].produceRemainingTime = StaticJobInfo[obj.job].produceInterval;
     },
-    // Decremente the remaining time before a consumption of a consummable from 1 tick (1000 ms)
-    TickConsuming(state, obj: { name: consummable, consuming: consummable }) {
-      if (state[obj.name].consuming === undefined) { return; }
-      const a = state[obj.name].consuming; // ugly hack todo: fix types
-      (<any> a)[obj.consuming].remainingTime -= 1000;
-    },
-    // Reset the interval of consumption of a consummable
-    ResetIntervalConsuming(state, obj: { name: consummable, consuming: consummable, interval: number }) {
-      if (state[obj.name].consuming === undefined) { return; }
-      const a = state[obj.name].consuming; // ugly hack todo: fix types
-      (<any> a)[obj.consuming].remainingTime = obj.interval;
+    // Reset the interval of consumming of a consummable
+    ResetConsummeInterval(state, obj: { job: Job }) {
+      state.jobs[obj.job].consumeRemainingTime = StaticJobInfo[obj.job].consumeInterval;
     },
     // Init the map
     InitMap(state, size: number) {
@@ -211,42 +118,42 @@ export default new Vuex.Store({
 
       // TODO: fix this with a mapping
       if (previousTile.building == Building.Village)
-        state.villages.quantity--;
+        state.storage.villages.quantity--;
 
       if (previousTile.building == Building.Barn)
-        state.barns.quantity--;
+        state.storage.barns.quantity--;
 
       if (previousTile.building == Building.Farm)
-        state.farms.quantity--;
+        state.storage.farms.quantity--;
 
       (state.map[obj.x])[obj.y].building = obj.type;
 
       if (obj.type == Building.Village)
-        state.villages.quantity++;
+        state.storage.villages.quantity++;
 
       if (obj.type == Building.Barn)
-        state.barns.quantity++;
+        state.storage.barns.quantity++;
 
       if (obj.type == Building.Farm)
-        state.farms.quantity++;
+        state.storage.farms.quantity++;
     },
     //Add
-    AddJob(state, obj: { jobName: job, quantity: number }) {
+    AddJob(state, obj: { jobName: Job, quantity: number }) {
       console.debug(`AddJob tile ${obj.jobName}, ${obj.quantity}`);
-      state.population.jobs[obj.jobName] += obj.quantity;
+      state.jobs[obj.jobName].quantity += obj.quantity;
     },
   },
   actions: {
 
   },
   getters: {
-    getRessourceStorage(state): (id: consummable) => number {
-      return (id: consummable) => {
+    getRessourceStorage(state): (id: Consummable) => number {
+      return (id: Consummable) => {
         var storage = StaticConsummableInfo[id].storage;
         if (storage === undefined)
           return -1;
 
-        return state[storage.name].quantity * storage.capacity;
+        return state.storage[storage.name].quantity * storage.capacity;
       }
     }
   }

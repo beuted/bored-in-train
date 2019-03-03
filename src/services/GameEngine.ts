@@ -30,7 +30,8 @@ export type IStaticJobInfo = {[id in Job]: IStaticJob }
 export interface IStaticJob {
   produce: {[id in Consummable]: IStaticJobProduction | null }
   consume: {[id in Consummable]: IStaticJobProduction | null }
-  interval: number
+  interval: number,
+  storage?: IStorage
 }
 
 export interface IStaticJobProduction {
@@ -118,6 +119,32 @@ export const StaticJobInfo: IStaticJobInfo = {
       'sticks': null
     },
     interval: 5000,
+  },
+  'farmer': {
+    produce: {
+      'population': null,
+      'sticks': null,
+      'food': {
+        probability: 1,
+        quantity: 8
+      },
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'sticks': {
+        probability: 1,
+        quantity: 1     
+      }
+    },
+    interval: 10000,
+    storage: {
+      name: Storage.farms,
+      capacity: 10
+    },
   },
   'default':  {
     produce: {

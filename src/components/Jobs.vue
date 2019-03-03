@@ -13,15 +13,22 @@
                 <li>
                     <span>
                         Wood Gatherer: {{ jobs.woodGatherer.quantity }}
-                        <button :disabled="unemployed <= 0" v-on:click="addJob(1, 'woodGatherer')">Add</button>
-                        <button :disabled="jobs.woodGatherer.quantity <= 0" v-on:click="addJob(-1, 'woodGatherer')">Remove</button>
+                        <button v-bind:disabled="!canAddJob(1, 'woodGatherer')" v-on:click="addJob(1, 'woodGatherer')">Add</button>
+                        <button v-bind:disabled="!canRemoveJob(1, 'woodGatherer')"  v-on:click="removeJob(1, 'woodGatherer')">Remove</button>
                     </span>
                 </li>
                 <li>
                     <span>
                         Berry Gatherer: {{ jobs.berryGatherer.quantity }}
-                        <button :disabled="unemployed <= 0" v-on:click="addJob(1, 'berryGatherer')">Add</button>
-                        <button :disabled="jobs.berryGatherer.quantity <= 0" v-on:click="addJob(-1, 'berryGatherer')">Remove</button>
+                        <button v-bind:disabled="!canAddJob(1, 'berryGatherer')" v-on:click="addJob(1, 'berryGatherer')">Add</button>
+                        <button v-bind:disabled="!canRemoveJob(1, 'berryGatherer')" v-on:click="removeJob(1, 'berryGatherer')">Remove</button>
+                    </span>
+                </li>
+                <li>
+                    <span>
+                        Farmer: {{ jobs.farmer.quantity }}
+                        <button v-bind:disabled="!canAddJob(1, 'farmer')" v-on:click="addJob(1, 'farmer')">Add</button>
+                        <button v-bind:disabled="!canRemoveJob(1, 'farmer')" v-on:click="removeJob(1, 'farmer')">Remove</button>
                     </span>
                 </li>
             </ul>
@@ -31,6 +38,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState } from '@/store';
+import { StaticJobInfo, IStorage } from '@/services/GameEngine';
 
 @Component({
   components: {
@@ -65,7 +73,31 @@ export default class Jobs extends Vue {
     }
 
     public addJob(quantity: number, jobName: string) {
-        this.$store.commit('AddJob', { jobName: jobName, quantity: quantity });
+        if (this.canAddJob(quantity, jobName))
+            this.$store.commit('AddJob', { jobName: jobName, quantity: quantity });
+    }
+
+    public removeJob(quantity: number, jobName: string) {
+        if (this.canRemoveJob(quantity, jobName))
+            this.$store.commit('AddJob', { jobName: jobName, quantity: -quantity });
+    }
+
+    public canAddJob(quantity: number, jobName: string): boolean {
+        if (this.unemployed <= 0)
+            return false
+
+        var storageNeeded: IStorage = (StaticJobInfo as any)[jobName].storage;
+
+        if (storageNeeded &&
+            ((this.$store.state as IState).storage as any)[storageNeeded.name].quantity * storageNeeded.capacity
+                <= ((this.$store.state as IState).jobs as any)[jobName].quantity)
+            return false;
+
+        return true;
+    }
+
+    public canRemoveJob(quantity: number, jobName: string) {
+         return ((this.$store.state as IState).jobs as any)[jobName].quantity >= quantity;
     }
 }
 </script>

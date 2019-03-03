@@ -35,7 +35,7 @@ export default new Vuex.Store<IState>({
         quantity: 5,
       },
       sticks: {
-        quantity: 100,
+        quantity: 30,
       },
     },
     storage: {
@@ -56,6 +56,10 @@ export default new Vuex.Store<IState>({
       },
       berryGatherer: {
         quantity: 1,
+        remainingTime: 1000,
+      },
+      farmer: {
+        quantity: 0,
         remainingTime: 1000,
       },
       default: { //Job producing population

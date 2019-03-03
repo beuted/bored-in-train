@@ -1,5 +1,6 @@
 export enum Job {
     default = 'default',
     berryGatherer = 'berryGatherer',
-    woodGatherer = 'woodGatherer'
+    woodGatherer = 'woodGatherer',
+    farmer = 'farmer'
 }

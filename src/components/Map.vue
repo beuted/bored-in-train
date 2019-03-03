@@ -79,7 +79,8 @@ export default class Map extends Vue {
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
         this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
-        this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
+        if ((this.$store.state as IState).map.length <= 0)
+            this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
 
         var nbImages = Object.keys(this.mapTileImages).length;
         for (const key in this.mapTileImages)

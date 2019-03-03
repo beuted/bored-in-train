@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import { Building } from '@/models/Building';
+import { Building, BuildingToStorageMapping } from '@/models/Building';
 import { MapBuilder } from './services/MapBuilder';
 import { Consummable } from './models/Consummable';
 import { Storage } from '@/models/Storage';
@@ -15,7 +15,7 @@ export interface IState {
   map: { building: number, environment: number }[][],
   consummable: { [id in Consummable]: { quantity: number } },
   storage: { [id in Storage]: { quantity: number } },
-  jobs: { [id in Job]: { quantity: number, consumeRemainingTime: number, produceRemainingTime: number } },
+  jobs: { [id in Job]: { quantity: number, remainingTime: number } },
 }
 
 //TODO: override with something like this
@@ -26,7 +26,7 @@ export interface IState {
 export default new Vuex.Store<IState>({
   state: {
     debugMode: false,
-    map: [[{ building: 0, environment: 0 }]],
+    map: [],
     consummable: {
       population: {
         quantity: 6,
@@ -52,18 +52,15 @@ export default new Vuex.Store<IState>({
     jobs: {
       woodGatherer: {
         quantity: 0,
-        consumeRemainingTime: 1000,
-        produceRemainingTime: 1000,
+        remainingTime: 1000,
       },
       berryGatherer: {
         quantity: 1,
-        consumeRemainingTime: 1000,
-        produceRemainingTime: 1000,
+        remainingTime: 1000,
       },
       default: { //Job producing population
         quantity: 1,
-        consumeRemainingTime: 1000,
-        produceRemainingTime: 1000,
+        remainingTime: 1000,
       }
     },
   },
@@ -89,22 +86,13 @@ export default new Vuex.Store<IState>({
       }
     },
     // Decremente the remaining time before a spawn of a consummable from 1 tick (1000 ms)
-    TickConsumme(state, obj: { job: Job} ) {
-      state.jobs[obj.job].consumeRemainingTime -= 1000;
+    TickInterval(state, obj: { job: Job} ) {
+      state.jobs[obj.job].remainingTime -= 1000;
       //TODO tick the default job ?
     },
-    // Decremente the remaining time before a consumming of a consummable from 1 tick (1000 ms)
-    TickProduce(state, obj: { job: Job} ) {
-      state.jobs[obj.job].produceRemainingTime -= 1000;
-      //TODO tick the default job ?
-    },
-    // Reset the interval of spawing of a consummable
-    ResetProduceInterval(state, obj: { job: Job }) {
-      state.jobs[obj.job].produceRemainingTime = StaticJobInfo[obj.job].produceInterval;
-    },
-    // Reset the interval of consumming of a consummable
-    ResetConsummeInterval(state, obj: { job: Job }) {
-      state.jobs[obj.job].consumeRemainingTime = StaticJobInfo[obj.job].consumeInterval;
+    // Reset the interval of spawning/consumming of a consummable
+    ResetInterval(state, obj: { job: Job }) {
+      state.jobs[obj.job].remainingTime = StaticJobInfo[obj.job].interval;
     },
     // Init the map
     InitMap(state, size: number) {
@@ -116,26 +104,17 @@ export default new Vuex.Store<IState>({
 
       console.debug(`Changing tile ${obj.x}, ${obj.y} from ${previousTile.building} to ${obj.type}`);
 
-      // TODO: fix this with a mapping
-      if (previousTile.building == Building.Village)
-        state.storage.villages.quantity--;
-
-      if (previousTile.building == Building.Barn)
-        state.storage.barns.quantity--;
-
-      if (previousTile.building == Building.Farm)
-        state.storage.farms.quantity--;
+      let storageTypeToDestroy = (BuildingToStorageMapping as any)[previousTile.building]
+      if (storageTypeToDestroy != null) {
+        (state.storage as any)[storageTypeToDestroy].quantity--;
+      }
 
       (state.map[obj.x])[obj.y].building = obj.type;
 
-      if (obj.type == Building.Village)
-        state.storage.villages.quantity++;
-
-      if (obj.type == Building.Barn)
-        state.storage.barns.quantity++;
-
-      if (obj.type == Building.Farm)
-        state.storage.farms.quantity++;
+      let storageTypeToBuild = (BuildingToStorageMapping as any)[obj.type]
+      if (storageTypeToBuild != null) {
+        (state.storage as any)[storageTypeToBuild].quantity++;
+      }
     },
     //Add
     AddJob(state, obj: { jobName: Job, quantity: number }) {

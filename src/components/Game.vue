@@ -48,76 +48,55 @@ export default class Game extends Vue {
         for (let jobId in StaticJobInfo) {
             let staticJob: IStaticJob = (<any>StaticJobInfo)[jobId]; //TODO: fix typeing weirdlness
 
-            if ((store.state.jobs as any)[jobId].produceRemainingTime <= 0) {
-                store.commit('ResetProduceInterval', { job: jobId });
+            if ((store.state.jobs as any)[jobId].remainingTime > 0) {
+                store.commit('TickInterval', { job: jobId });
+                continue;
+            }
 
+            store.commit('ResetInterval', { job: jobId });
+
+            for (let consummableId in staticJob.produce) {
+                let staticJobProduction: IStaticJobProduction | null = (staticJob.produce as any)[consummableId];
+                if (staticJobProduction == null)
+                    continue;
+            
+                var nbProducers = (store.state.jobs as any)[jobId].quantity;
+                store.commit('IncrementConsummable', { name: consummableId, value: nbProducers * staticJobProduction.quantity });
+            }
+
+            let nbUnfullfiledWorkers = 0; // Nb workers that have not been receiving ressources therefore will be deduced from production 
+            for (let consummableId in staticJob.consume) {
+                let staticJobConsumption: IStaticJobProduction | null = (staticJob.consume as any)[consummableId];
+                if (staticJobConsumption == null)
+                    continue;
+
+                var nbConsummer = (store.state.jobs as any)[jobId].quantity;
+                if ((store.state.consummable as any)[consummableId].quantity >= nbConsummer * staticJobConsumption.quantity) {
+                    store.commit('IncrementConsummable', { name: consummableId, value: -nbConsummer * staticJobConsumption.quantity });
+                } else {
+                    // Do not produce if needs not fulfilled!
+                    const whatCanBeconsummed = (store.state.consummable as any)[consummableId].quantity;
+                    let nbUnfullfiledWorkersOnConsummable = Math.floor((nbConsummer - (store.state.consummable as any)[consummableId].quantity) / staticJobConsumption.quantity);
+                    nbUnfullfiledWorkers = Math.max(nbUnfullfiledWorkers, nbUnfullfiledWorkersOnConsummable);
+                    
+                    store.commit('IncrementConsummable', { name: consummableId, value: -whatCanBeconsummed });
+                }
+            }
+
+            // Remove part of production based on number of workers with non-fullfiled needs
+            if (nbUnfullfiledWorkers > 0) {
+                console.warn(`${nbUnfullfiledWorkers} ${jobId} have not seen their needs fullfiled, they will not produce any ressource`);
                 for (let consummableId in staticJob.produce) {
-                    let staticJobConsumption: IStaticJobProduction | null = (staticJob.produce as any)[consummableId];
-                    if (staticJobConsumption == null)
+                    let staticJobProduction: IStaticJobProduction | null = (staticJob.produce as any)[consummableId];
+                    if (staticJobProduction == null)
                         continue;
                 
-                    var nbProducers = (store.state.jobs as any)[jobId].quantity;
-                    store.commit('IncrementConsummable', { name: consummableId, value: nbProducers });
+                    store.commit('IncrementConsummable', { name: consummableId, value: -nbUnfullfiledWorkers * staticJobProduction.quantity });
                 }
-            } else {
-                store.commit('TickProduce', { job: jobId });
             }
         }
 
-        // Then the consumming of ressources
-        for (let jobId in StaticJobInfo) {
-            let staticJob: IStaticJob = (<any>StaticJobInfo)[jobId]; //TODO: fix typeing weirdlness
-
-            if ((store.state.jobs as any)[jobId].consumeRemainingTime <= 0) {
-                store.commit('ResetConsummeInterval', { job: jobId });
-
-                for (let consummableId in staticJob.consume) {
-                    let staticJobConsumption: IStaticJobProduction | null = (staticJob.consume as any)[consummableId];
-                    if (staticJobConsumption == null)
-                        continue;
-
-                    var nbConsummer = (store.state.jobs as any)[jobId].quantity;
-                    if ((store.state.consummable as any)[consummableId].quantity >= nbConsummer * staticJobConsumption.quantity) {
-                        store.commit('IncrementConsummable', { name: consummableId, value: -nbConsummer * staticJobConsumption.quantity });
-                    } else {
-                        //TODO: do not produce if needs not fulfilled !!!!
-                    }
-
-                }
-            } else {
-                store.commit('TickConsumme', { job: jobId });
-            }
-        }
-
-        // Previous code, remove when equivalent reached
-        /*for (let key in StaticConsummableInfo) {
-            let solidGood: IStaticConsummable = (<any>StaticConsummableInfo)[key]; //TODO: fix typeing weirdlness
-
-            for (let consumedKey in solidGood.consuming) {
-                let consumed: IConsuming = (<any>solidGood.consuming)[consumedKey]; //TODO: fix typeing weirdlness
-
-                if (this.$store.state[solidGood.name].consuming[consumed.name].remainingTime <= 0) {
-                    this.$store.commit('ResetIntervalConsuming', { name: solidGood.name, consuming: consumed.name, interval: consumed.interval });
-                    DoWithProba(consumed.probability, () => {
-                        if (this.$store.state[consumed.name].quantity >= consumed.consomation * this.$store.state[solidGood.name].quantity) {
-                            this.$store.commit('Increment', { name: consumed.name, value: -consumed.consomation * this.$store.state[solidGood.name].quantity });
-                        } else {
-                            // Decrease the starving good from the starving part
-                            let nbStarvingGoods = Math.floor(this.StarvationFactor * (this.$store.state[solidGood.name].quantity - (this.$store.state[consumed.name].quantity / consumed.consomation)));
-                            this.$store.commit('Increment', { name: solidGood.name, value: -nbStarvingGoods });
-                            console.warn(`${nbStarvingGoods} ${solidGood.name} vanished because they could not find ${consumed.name} `);
-
-                            // Consumme what can be consummed
-                            this.$store.commit('Increment', { name: consumed.name, value: -this.$store.state[consumed.name].quantity });
-                        }
-                    });
-                } else {
-                    this.$store.commit('TickConsuming', { name: solidGood.name, consuming: consumed.name });
-                }
-            }
-        }*/
-
-        // After operation checks
+        // After operation checks (storage, ...)
         for (let consummableId in StaticConsummableInfo) {
             let staticConsummable: IStaticConsummable = (<any>StaticConsummableInfo)[consummableId]; //TODO: fix typeing weirdlness
             // See if storage fits

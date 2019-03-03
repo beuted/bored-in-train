@@ -30,8 +30,7 @@ export type IStaticJobInfo = {[id in Job]: IStaticJob }
 export interface IStaticJob {
   produce: {[id in Consummable]: IStaticJobProduction | null }
   consume: {[id in Consummable]: IStaticJobProduction | null }
-  consumeInterval: number
-  produceInterval: number
+  interval: number
 }
 
 export interface IStaticJobProduction {
@@ -99,8 +98,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'sticks': null
     },
-    produceInterval: 5000,
-    consumeInterval: 8000,
+    interval: 5000,
   },
   'berryGatherer': {
     produce: {
@@ -108,7 +106,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'sticks': null,
       'food': {
         probability: 1,
-        quantity: 1
+        quantity: 2
       },
     },
     consume: {
@@ -119,14 +117,13 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'sticks': null
     },
-    produceInterval: 4000,
-    consumeInterval: 8000,
+    interval: 5000,
   },
   'default':  {
     produce: {
       'population': {
         probability: 1,
-        quantity: 10
+        quantity: 1
       },
       'food': null,
       'sticks': null,
@@ -136,7 +133,6 @@ export const StaticJobInfo: IStaticJobInfo = {
       'food': null,
       'sticks': null
     },
-    produceInterval: 10000,
-    consumeInterval: 8000,
+    interval: 10000,
   },
 }

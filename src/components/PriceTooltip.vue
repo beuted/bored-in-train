@@ -1,5 +1,5 @@
 <template>
-    <div v-once class="tooltip"> <slot></slot>
+    <div v-once class="tooltip"><div v-bind:class="buildableClass"> <slot></slot> </div>
         <span class="tooltip-content">
             <div class="tooltip-title">Price:</div>
             <div v-for="(value, key) in priceStruct" :key="key">
@@ -10,7 +10,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
+import { IState } from '@/store';
 import { Consummable } from '@/models/Consummable'; // @ is an alias to /src
 
 @Component({
@@ -19,6 +20,21 @@ import { Consummable } from '@/models/Consummable'; // @ is an alias to /src
 })
 export default class PriceTooltip extends Vue {
     @Prop() private priceStruct!: {[id in Consummable]: number};
+
+    public get buildableClass() {
+        if (!this.isBuildable())
+            return 'not-buildable';
+
+        return 'buildable';
+    }
+
+    private isBuildable() {
+        for (const [key, value] of Object.entries(this.priceStruct)) {
+            if ((this.$store.state as IState).consummable[key as Consummable].quantity < value)
+                return false;
+        }
+        return true;
+    }
 }
 </script>
 
@@ -57,5 +73,9 @@ export default class PriceTooltip extends Vue {
 .tooltip-title {
     font-weight: bold;
     margin-bottom: 10px;
+}
+
+.not-buildable {
+    color: red;
 }
 </style>

@@ -24,6 +24,7 @@ export interface IState {
 //}
 
 export default new Vuex.Store<IState>({
+  strict: true,
   state: {
     debugMode: false,
     map: [],

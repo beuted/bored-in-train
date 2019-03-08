@@ -18,6 +18,8 @@ import Storage from '@/components/Storage.vue';
 import Map from '@/components/Map.vue';
 import { StaticConsummableInfo, IStaticConsummable, IConsuming, StaticJobInfo, IStaticJobInfo, IStaticJob, IStaticJobProduction } from '@/services/GameEngine';
 import { IState } from '@/store';
+import { Job } from '@/models/Job';
+import { Consummable } from '@/models/Consummable';
 
 @Component({
   components: {
@@ -32,7 +34,7 @@ export default class Game extends Vue {
 
   private readonly TickInterval = 1000;
   private readonly StarvationFactor = 0.5; // Portion of disapearing goods when missing consummable
-  private readonly LackOfStorageFactor = 1.0; // Portion of disapearing goods when missing storage 
+  private readonly LackOfStorageFactor = 1.0; // Portion of disapearing goods when missing storage
 
   public toggleDebug() {
       this.$store.commit('ToggleDebugMode');
@@ -43,12 +45,12 @@ export default class Game extends Vue {
 
     setInterval (() => {
         let store: Store<IState> = this.$store;
-        
+
         // First the creation of ressources
         for (let jobId in StaticJobInfo) {
-            let staticJob: IStaticJob = (<any>StaticJobInfo)[jobId]; //TODO: fix typeing weirdlness
+            let staticJob: IStaticJob = StaticJobInfo[jobId as Job]; //TODO: fix typeing weirdlness
 
-            if ((store.state.jobs as any)[jobId].remainingTime > 0) {
+            if ((store.state as IState).jobs[jobId as Job].remainingTime > 0) {
                 store.commit('TickInterval', { job: jobId });
                 continue;
             }
@@ -56,29 +58,29 @@ export default class Game extends Vue {
             store.commit('ResetInterval', { job: jobId });
 
             for (let consummableId in staticJob.produce) {
-                let staticJobProduction: IStaticJobProduction | null = (staticJob.produce as any)[consummableId];
+                let staticJobProduction: IStaticJobProduction | null = staticJob.produce[consummableId as Consummable];
                 if (staticJobProduction == null)
                     continue;
-            
-                var nbProducers = (store.state.jobs as any)[jobId].quantity;
+
+                var nbProducers = (store.state as IState).jobs[jobId as Job].quantity;
                 store.commit('IncrementConsummable', { name: consummableId, value: nbProducers * staticJobProduction.quantity });
             }
 
-            let nbUnfullfiledWorkers = 0; // Nb workers that have not been receiving ressources therefore will be deduced from production 
+            let nbUnfullfiledWorkers = 0; // Nb workers that have not been receiving ressources therefore will be deduced from production
             for (let consummableId in staticJob.consume) {
-                let staticJobConsumption: IStaticJobProduction | null = (staticJob.consume as any)[consummableId];
+                let staticJobConsumption: IStaticJobProduction | null = staticJob.consume[consummableId as Consummable];
                 if (staticJobConsumption == null)
                     continue;
 
-                var nbConsummer = (store.state.jobs as any)[jobId].quantity;
-                if ((store.state.consummable as any)[consummableId].quantity >= nbConsummer * staticJobConsumption.quantity) {
+                var nbConsummer = (store.state as IState).jobs[jobId as Job].quantity;
+                if ((store.state as IState).consummable[consummableId as Consummable].quantity >= nbConsummer * staticJobConsumption.quantity) {
                     store.commit('IncrementConsummable', { name: consummableId, value: -nbConsummer * staticJobConsumption.quantity });
                 } else {
                     // Do not produce if needs not fulfilled!
-                    const whatCanBeconsummed = (store.state.consummable as any)[consummableId].quantity;
-                    let nbUnfullfiledWorkersOnConsummable = Math.floor((nbConsummer - (store.state.consummable as any)[consummableId].quantity) / staticJobConsumption.quantity);
+                    const whatCanBeconsummed = (store.state as IState).consummable[consummableId as Consummable].quantity;
+                    let nbUnfullfiledWorkersOnConsummable = Math.floor((nbConsummer - (store.state as IState).consummable[consummableId as Consummable].quantity) / staticJobConsumption.quantity);
                     nbUnfullfiledWorkers = Math.max(nbUnfullfiledWorkers, nbUnfullfiledWorkersOnConsummable);
-                    
+
                     store.commit('IncrementConsummable', { name: consummableId, value: -whatCanBeconsummed });
                 }
             }
@@ -87,10 +89,10 @@ export default class Game extends Vue {
             if (nbUnfullfiledWorkers > 0) {
                 console.warn(`${nbUnfullfiledWorkers} ${jobId} have not seen their needs fullfiled, they will not produce any ressource`);
                 for (let consummableId in staticJob.produce) {
-                    let staticJobProduction: IStaticJobProduction | null = (staticJob.produce as any)[consummableId];
+                    let staticJobProduction: IStaticJobProduction | null = staticJob.produce[consummableId as Consummable];
                     if (staticJobProduction == null)
                         continue;
-                
+
                     store.commit('IncrementConsummable', { name: consummableId, value: -nbUnfullfiledWorkers * staticJobProduction.quantity });
                 }
             }
@@ -98,11 +100,11 @@ export default class Game extends Vue {
 
         // After operation checks (storage, ...)
         for (let consummableId in StaticConsummableInfo) {
-            let staticConsummable: IStaticConsummable = (<any>StaticConsummableInfo)[consummableId]; //TODO: fix typeing weirdlness
+            let staticConsummable: IStaticConsummable = StaticConsummableInfo[consummableId as Consummable]; //TODO: fix typeing weirdlness
             // See if storage fits
-            if (staticConsummable.storage && staticConsummable.storage.capacity * (store.state.storage as any)[staticConsummable.storage.name].quantity < (store.state.consummable as any)[consummableId].quantity) {
+            if (staticConsummable.storage && staticConsummable.storage.capacity * (store.state as IState).storage[staticConsummable.storage.name].quantity < (store.state as IState).consummable[consummableId as Consummable].quantity) {
                 let quantityToRemove = Math.floor(this.LackOfStorageFactor *
-                    ((store.state.consummable as any)[consummableId].quantity - store.state.storage[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity));
+                    ((store.state as IState).consummable[consummableId as Consummable].quantity - store.state.storage[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity));
                 store.commit('IncrementConsummable', { name: consummableId, value: -quantityToRemove });
                 console.warn(`${quantityToRemove} ${consummableId} were thrown away due to lack of storage`);
             }

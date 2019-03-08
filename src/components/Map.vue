@@ -27,6 +27,7 @@ import PriceTooltip from '@/components/PriceTooltip.vue';
 import { Environment } from '@/models/Environment';
 import { IMapTile } from '@/models/IMapTile';
 import { IState } from '@/store';
+import { Consummable } from '@/models/Consummable';
 
 @Component({
   components: {
@@ -75,7 +76,7 @@ export default class Map extends Vue {
         this.mapTileImages.villageImage.src = './img/village.png';
         this.mapTileImages.barnImage.src = './img/barn.png';
         this.mapTileImages.farmImage.src = './img/farm.png';
-        
+
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
         this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
@@ -112,10 +113,10 @@ export default class Map extends Vue {
             return;
 
         // Check if you can afford your purchase
-        for (let consummableId in (StaticStorageInfo as any)[this.storageType].price) {
-            let price = (StaticStorageInfo as any)[this.storageType].price[consummableId];
+        for (let consummableId in StaticStorageInfo[this.storageType as Storage].price) {
+            let price = StaticStorageInfo[this.storageType].price[consummableId as Consummable];
 
-            if (price && ((this.$store.state as IState).consummable as any)[consummableId].quantity < price)
+            if (price && (this.$store.state as IState).consummable[consummableId as Consummable].quantity < price)
                 return;
         }
 
@@ -128,8 +129,8 @@ export default class Map extends Vue {
             return;
 
         // Pay the price of your purchase
-        for (let consummable in (StaticStorageInfo as any)[this.storageType].price) {
-            let price = (StaticStorageInfo as any)[this.storageType].price[consummable];
+        for (let consummable in StaticStorageInfo[this.storageType as Storage].price) {
+            let price = StaticStorageInfo[this.storageType as Storage].price[consummable as Consummable];
             if (price && price != 0)
                 this.$store.commit('IncrementConsummable', { name: consummable, value: -price });
         }
@@ -158,7 +159,7 @@ export default class Map extends Vue {
                     return this.mapTileImages.farmImage;
             }
         }
-        
+
         switch (mapTile.environment) {
             case Environment.Water:
                 return this.mapTileImages.waterImage;

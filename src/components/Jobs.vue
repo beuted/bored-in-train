@@ -39,6 +39,8 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState } from '@/store';
 import { StaticJobInfo, IStorage } from '@/services/GameEngine';
+import { Job } from '@/models/Job';
+import { Storage } from '@/models/Storage';
 
 @Component({
   components: {
@@ -48,7 +50,7 @@ export default class Jobs extends Vue {
     public get population() {
         return (this.$store.state as IState).consummable.population;
     }
-    
+
     public get jobs() {
         return (this.$store.state as IState).jobs;
     }
@@ -58,8 +60,8 @@ export default class Jobs extends Vue {
         for (let key in (this.$store.state as IState).jobs) {
             if (key == 'default')
                 continue;
-                
-            totalWithJob += ((this.$store.state as IState).jobs as any)[key].quantity;
+
+            totalWithJob += (this.$store.state as IState).jobs[key as Job].quantity;
         };
         return (this.$store.state as IState).consummable.population.quantity - totalWithJob;
     }
@@ -86,18 +88,18 @@ export default class Jobs extends Vue {
         if (this.unemployed <= 0)
             return false
 
-        var storageNeeded: IStorage = (StaticJobInfo as any)[jobName].storage;
+        var storageNeeded = StaticJobInfo[jobName as Job].storage;
 
         if (storageNeeded &&
-            ((this.$store.state as IState).storage as any)[storageNeeded.name].quantity * storageNeeded.capacity
-                <= ((this.$store.state as IState).jobs as any)[jobName].quantity)
+            (this.$store.state as IState).storage[storageNeeded.name as Storage].quantity * storageNeeded.capacity
+                <= (this.$store.state as IState).jobs[jobName as Job].quantity)
             return false;
 
         return true;
     }
 
     public canRemoveJob(quantity: number, jobName: string) {
-         return ((this.$store.state as IState).jobs as any)[jobName].quantity >= quantity;
+         return (this.$store.state as IState).jobs[jobName as Job].quantity >= quantity;
     }
 }
 </script>

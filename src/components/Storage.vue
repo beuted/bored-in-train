@@ -20,27 +20,27 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IState } from '@/store';
+import { IState, IdleGameVue } from '@/store';
 
 @Component({
   components: {
   },
 })
-export default class Storage extends Vue {
+export default class Storage extends IdleGameVue {
     get barns() {
-        return (this.$store.state as IState).storage.barns;
+        return this.$store.state.storage.barns;
     }
 
     get villages() {
-        return (this.$store.state as IState).storage.villages;
+        return this.$store.state.storage.villages;
     }
 
     get farms() {
-        return (this.$store.state as IState).storage.farms;
+        return this.$store.state.storage.farms;
     }
 
     get debugMode() {
-        return (this.$store.state as IState).debugMode;
+        return this.$store.state.debugMode;
     }
 
 }

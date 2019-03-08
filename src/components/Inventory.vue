@@ -16,20 +16,20 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IState } from '@/store';
+import { IState, IdleGameVue } from '@/store';
 
 @Component
-export default class Inventory extends Vue {
+export default class Inventory extends IdleGameVue {
     get food() {
-        return (this.$store.state as IState).consummable.food;
+        return this.$store.state.consummable.food;
     }
 
     get sticks() {
-        return (this.$store.state as IState).consummable.sticks;
+        return this.$store.state.consummable.sticks;
     }
 
     get debugMode() {
-        return (this.$store.state as IState).debugMode;
+        return this.$store.state.debugMode;
     }
 
     public get foodStorage() {

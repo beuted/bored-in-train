@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, { Store } from 'vuex';
 
 import { Building, BuildingToStorageMapping } from '@/models/Building';
 import { MapBuilder } from './services/MapBuilder';
@@ -9,6 +9,11 @@ import { Job } from './models/Job';
 import { StaticConsummableInfo, StaticJobInfo } from './services/GameEngine';
 
 Vue.use(Vuex);
+
+
+export abstract class IdleGameVue extends Vue {
+  public $store!: Store<IState>;
+}
 
 export interface IState {
   debugMode: boolean,

@@ -26,7 +26,7 @@ import { StaticStorageInfo } from '@/services/GameEngine'
 import PriceTooltip from '@/components/PriceTooltip.vue';
 import { Environment } from '@/models/Environment';
 import { IMapTile } from '@/models/IMapTile';
-import { IState } from '@/store';
+import { IState, IdleGameVue } from '@/store';
 import { Consummable } from '@/models/Consummable';
 
 @Component({
@@ -34,7 +34,7 @@ import { Consummable } from '@/models/Consummable';
       PriceTooltip
   },
 })
-export default class Map extends Vue {
+export default class Map extends IdleGameVue {
     private readonly tileSize = 32;
     private readonly nbTilesOnRowOrColumn = 20;
     private mapTileImages: {

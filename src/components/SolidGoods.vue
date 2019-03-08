@@ -10,12 +10,13 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import { IdleGameVue } from '@/store';
 
 @Component({
   components: {
   },
 })
-export default class SolidGoods extends Vue {
+export default class SolidGoods extends IdleGameVue {
     get debugMode() {
         return this.$store.state.debugMode;
     }

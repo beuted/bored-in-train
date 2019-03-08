@@ -11,14 +11,14 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { IState } from '@/store';
+import { IState, IdleGameVue } from '@/store';
 import { Consummable } from '@/models/Consummable'; // @ is an alias to /src
 
 @Component({
   components: {
   },
 })
-export default class PriceTooltip extends Vue {
+export default class PriceTooltip extends IdleGameVue {
     @Prop() private priceStruct!: {[id in Consummable]: number};
 
     public get buildableClass() {
@@ -30,7 +30,7 @@ export default class PriceTooltip extends Vue {
 
     private isBuildable() {
         for (const [key, value] of Object.entries(this.priceStruct)) {
-            if ((this.$store.state as IState).consummable[key as Consummable].quantity < value)
+            if (this.$store.state.consummable[key as Consummable].quantity < value)
                 return false;
         }
         return true;

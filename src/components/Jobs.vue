@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IState } from '@/store';
+import { IState, IdleGameVue } from '@/store';
 import { StaticJobInfo, IStorage } from '@/services/GameEngine';
 import { Job } from '@/models/Job';
 import { Storage } from '@/models/Storage';
@@ -46,28 +46,28 @@ import { Storage } from '@/models/Storage';
   components: {
   },
 })
-export default class Jobs extends Vue {
+export default class Jobs extends IdleGameVue {
     public get population() {
-        return (this.$store.state as IState).consummable.population;
+        return this.$store.state.consummable.population;
     }
 
     public get jobs() {
-        return (this.$store.state as IState).jobs;
+        return this.$store.state.jobs;
     }
 
     public get unemployed() {
         let totalWithJob = 0;
-        for (let key in (this.$store.state as IState).jobs) {
+        for (let key in this.$store.state.jobs) {
             if (key == 'default')
                 continue;
 
-            totalWithJob += (this.$store.state as IState).jobs[key as Job].quantity;
+            totalWithJob += this.$store.state.jobs[key as Job].quantity;
         };
-        return (this.$store.state as IState).consummable.population.quantity - totalWithJob;
+        return this.$store.state.consummable.population.quantity - totalWithJob;
     }
 
     public get debugMode() {
-        return (this.$store.state as IState).debugMode;
+        return this.$store.state.debugMode;
     }
 
     public get popStorage() {
@@ -91,15 +91,15 @@ export default class Jobs extends Vue {
         var storageNeeded = StaticJobInfo[jobName as Job].storage;
 
         if (storageNeeded &&
-            (this.$store.state as IState).storage[storageNeeded.name as Storage].quantity * storageNeeded.capacity
-                <= (this.$store.state as IState).jobs[jobName as Job].quantity)
+            this.$store.state.storage[storageNeeded.name as Storage].quantity * storageNeeded.capacity
+                <= this.$store.state.jobs[jobName as Job].quantity)
             return false;
 
         return true;
     }
 
     public canRemoveJob(quantity: number, jobName: string) {
-         return (this.$store.state as IState).jobs[jobName as Job].quantity >= quantity;
+         return this.$store.state.jobs[jobName as Job].quantity >= quantity;
     }
 }
 </script>

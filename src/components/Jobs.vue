@@ -12,21 +12,21 @@
                 </li>
                 <li>
                     <span>
-                        Wood Gatherer: {{ jobs.woodGatherer.quantity }}
+                        Wood Gatherer: {{ jobs.woodGatherer.quantity }} / ∞
                         <button v-bind:disabled="!canAddJob(1, 'woodGatherer')" v-on:click="addJob(1, 'woodGatherer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'woodGatherer')"  v-on:click="removeJob(1, 'woodGatherer')">Remove</button>
                     </span>
                 </li>
                 <li>
                     <span>
-                        Berry Gatherer: {{ jobs.berryGatherer.quantity }}
+                        Berry Gatherer: {{ jobs.berryGatherer.quantity }} / ∞
                         <button v-bind:disabled="!canAddJob(1, 'berryGatherer')" v-on:click="addJob(1, 'berryGatherer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'berryGatherer')" v-on:click="removeJob(1, 'berryGatherer')">Remove</button>
                     </span>
                 </li>
                 <li>
                     <span>
-                        Farmer: {{ jobs.farmer.quantity }}
+                        Farmer: {{ jobs.farmer.quantity }} / {{ getMaxStorage('farmer') }}
                         <button v-bind:disabled="!canAddJob(1, 'farmer')" v-on:click="addJob(1, 'farmer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'farmer')" v-on:click="removeJob(1, 'farmer')">Remove</button>
                     </span>
@@ -84,15 +84,20 @@ export default class Jobs extends IdleGameVue {
             this.$store.commit('AddJob', { jobName: jobName, quantity: -quantity });
     }
 
+    public getMaxStorage(jobName: Job): number {
+        var storageNeeded = StaticJobInfo[jobName].storage;
+        if (!storageNeeded)
+            return -1;
+        return this.$store.state.storage[storageNeeded.name as Storage].quantity * storageNeeded.capacity;
+    }
+
     public canAddJob(quantity: number, jobName: string): boolean {
         if (this.unemployed <= 0)
             return false
 
-        var storageNeeded = StaticJobInfo[jobName as Job].storage;
+        var maxStorage = this.getMaxStorage(jobName as Job);
 
-        if (storageNeeded &&
-            this.$store.state.storage[storageNeeded.name as Storage].quantity * storageNeeded.capacity
-                <= this.$store.state.jobs[jobName as Job].quantity)
+        if (maxStorage != -1 && maxStorage <= this.$store.state.jobs[jobName as Job].quantity)
             return false;
 
         return true;

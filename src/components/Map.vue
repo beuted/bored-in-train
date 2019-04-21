@@ -8,12 +8,11 @@
         <div>
             <h2>What to build ?</h2>
             <input type="radio" id="village" value="villages" v-model="storageType">
-            <label for="village" v-once><PriceTooltip v-once :priceStruct="villagesInfo.price">Village</PriceTooltip></label>
-            <input type="radio" id="barn" value="barns" v-model="storageType">
-            <label for="barn"><PriceTooltip v-once :priceStruct="barnsInfo.price">Barn</PriceTooltip></label>
+            <label for="village"><PriceTooltip :priceStruct="villagesInfo.price" :consummables="consummables">Village</PriceTooltip></label>
+            <input type="radio" id="barn" value="barns" v-model="storageType" >
+            <label for="barn"><PriceTooltip :priceStruct="barnsInfo.price" :consummables="consummables">Barn</PriceTooltip></label>
             <input type="radio" id="farm" value="farms" v-model="storageType">
-            <label for="farm"><PriceTooltip v-once :priceStruct="farmsInfo.price">Farm</PriceTooltip></label>
-
+            <label for="farm"><PriceTooltip :priceStruct="farmsInfo.price" :consummables="consummables">Farm</PriceTooltip></label>
         </div>
     </div>
 </template>
@@ -56,6 +55,11 @@ export default class Map extends IdleGameVue {
     private canvas!: HTMLCanvasElement;
 
     public storageType: Storage = Storage.villages;
+
+    get consummables() {
+        console.log('yop');
+        return this.$store.state.consummable;
+    }
 
     get villagesInfo() {
         return StaticStorageInfo.villages;

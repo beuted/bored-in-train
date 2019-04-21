@@ -1,5 +1,5 @@
 <template>
-    <div v-once class="tooltip"><div v-bind:class="buildableClass"> <slot></slot> </div>
+    <div class="tooltip"><div v-bind:class="buildableClass"> <slot></slot> </div>
         <span class="tooltip-content">
             <div class="tooltip-title">Price:</div>
             <div v-for="(value, key) in priceStruct" :key="key">
@@ -20,6 +20,7 @@ import { Consummable } from '@/models/Consummable'; // @ is an alias to /src
 })
 export default class PriceTooltip extends IdleGameVue {
     @Prop() private priceStruct!: {[id in Consummable]: number};
+    @Prop() private consummables!: {[id in Consummable]: { quantity: number }};
 
     public get buildableClass() {
         if (!this.isBuildable())
@@ -30,7 +31,7 @@ export default class PriceTooltip extends IdleGameVue {
 
     private isBuildable() {
         for (const [key, value] of Object.entries(this.priceStruct)) {
-            if (this.$store.state.consummable[key as Consummable].quantity < value)
+            if (this.consummables[key as Consummable].quantity < value)
                 return false;
         }
         return true;

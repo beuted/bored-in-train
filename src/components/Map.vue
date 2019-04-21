@@ -22,11 +22,12 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Building, StorageToBuildingMapping } from '@/models/Building';
 import { Storage } from '@/models/Storage';
 import { StaticStorageInfo } from '@/services/GameEngine'
-import PriceTooltip from '@/components/PriceTooltip.vue';
 import { Environment } from '@/models/Environment';
 import { IMapTile } from '@/models/IMapTile';
 import { IState, IdleGameVue } from '@/store';
 import { Consummable } from '@/models/Consummable';
+
+import PriceTooltip from '@/components/PriceTooltip.vue';
 
 @Component({
   components: {
@@ -57,7 +58,6 @@ export default class Map extends IdleGameVue {
     public storageType: Storage = Storage.villages;
 
     get consummables() {
-        console.log('yop');
         return this.$store.state.consummable;
     }
 

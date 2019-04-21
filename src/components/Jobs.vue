@@ -12,21 +12,21 @@
                 </li>
                 <li>
                     <span>
-                        Wood Gatherer: {{ jobs.woodGatherer.quantity }} / ∞
+                        <JobTooltip v-once jobName="woodGatherer">Wood Gatherer:</JobTooltip> {{ jobs.woodGatherer.quantity }} / ∞
                         <button v-bind:disabled="!canAddJob(1, 'woodGatherer')" v-on:click="addJob(1, 'woodGatherer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'woodGatherer')"  v-on:click="removeJob(1, 'woodGatherer')">Remove</button>
                     </span>
                 </li>
                 <li>
                     <span>
-                        Berry Gatherer: {{ jobs.berryGatherer.quantity }} / ∞
+                        <JobTooltip v-once jobName="berryGatherer">Berry Gatherer:</JobTooltip> {{ jobs.berryGatherer.quantity }} / ∞
                         <button v-bind:disabled="!canAddJob(1, 'berryGatherer')" v-on:click="addJob(1, 'berryGatherer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'berryGatherer')" v-on:click="removeJob(1, 'berryGatherer')">Remove</button>
                     </span>
                 </li>
                 <li>
                     <span>
-                        Farmer: {{ jobs.farmer.quantity }} / {{ getMaxStorage('farmer') }}
+                        <JobTooltip v-once jobName="farmer">Farmer:</JobTooltip> {{ jobs.farmer.quantity }} / {{ getMaxStorage('farmer') }}
                         <button v-bind:disabled="!canAddJob(1, 'farmer')" v-on:click="addJob(1, 'farmer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'farmer')" v-on:click="removeJob(1, 'farmer')">Remove</button>
                     </span>
@@ -42,8 +42,11 @@ import { StaticJobInfo, IStorage } from '@/services/GameEngine';
 import { Job } from '@/models/Job';
 import { Storage } from '@/models/Storage';
 
+import JobTooltip from '@/components/JobTooltip.vue';
+
 @Component({
   components: {
+      JobTooltip
   },
 })
 export default class Jobs extends IdleGameVue {

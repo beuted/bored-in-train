@@ -4,6 +4,7 @@
             v-on:mousedown="handleMouseDown"
             v-on:mouseup="handleMouseUp"
             v-on:mousemove="handleMouseMove"
+            v-on:mouseout="handleMouseOut"
             :width="nbTilesOnRowOrColumn*tileSize+'px'" :height="nbTilesOnRowOrColumn*tileSize+'px'"></canvas>
         <div>
             <h2>What to build ?</h2>
@@ -54,6 +55,8 @@ export default class Map extends IdleGameVue {
     }
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
+
+    private mouseTileCoord: { x: number, y: number } | null = null;
 
     public storageType: Storage = Storage.villages;
 
@@ -107,6 +110,13 @@ export default class Map extends IdleGameVue {
                 this.ctx.drawImage(image, i*this.tileSize, j*this.tileSize);
             }
         }
+
+        if (this.mouseTileCoord) {
+            var image = this.getBuildingImage(StorageToBuildingMapping[this.storageType]);
+            this.ctx.globalAlpha = 0.7;
+            this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize);
+            this.ctx.globalAlpha = 1.0;
+        }
     }
 
     private handleMouseDown(event: MouseEvent) {
@@ -148,20 +158,19 @@ export default class Map extends IdleGameVue {
 
     }
 
-    private handleMouseMove() {
+    private handleMouseOut() {
+        this.mouseTileCoord = null;
+        this.draw();
+    }
 
+    private handleMouseMove(event: MouseEvent) {
+        this.mouseTileCoord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
+        this.draw();
     }
 
     private getImageToDisplay(mapTile: IMapTile): HTMLImageElement {
         if (mapTile.building != Building.NoBuilding) {
-            switch (mapTile.building) {
-                case Building.Village:
-                    return this.mapTileImages.villageImage;
-                case Building.Barn:
-                    return this.mapTileImages.barnImage;
-                case Building.Farm:
-                    return this.mapTileImages.farmImage;
-            }
+            return this.getBuildingImage(mapTile.building);
         }
 
         switch (mapTile.environment) {
@@ -174,6 +183,19 @@ export default class Map extends IdleGameVue {
         }
 
         throw new Error(`could not find anything to display for mapTile ${mapTile}`);
+    }
+
+    private getBuildingImage(building: Building): HTMLImageElement {
+        switch (building) {
+            case Building.Village:
+                return this.mapTileImages.villageImage;
+            case Building.Barn:
+                return this.mapTileImages.barnImage;
+            case Building.Farm:
+                return this.mapTileImages.farmImage;
+        }
+
+        throw new Error(`could not find anything to display for building ${building}`);
     }
 
     private getTileFromCoordinate(x: number, y: number) {

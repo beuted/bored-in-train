@@ -111,7 +111,7 @@ export default class Map extends IdleGameVue {
             }
         }
 
-        if (this.mouseTileCoord) {
+        if (this.mouseTileCoord && this.canBeBuilt(this.mouseTileCoord, StorageToBuildingMapping[this.storageType])) {
             var image = this.getBuildingImage(StorageToBuildingMapping[this.storageType]);
             this.ctx.globalAlpha = 0.7;
             this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize);
@@ -123,23 +123,7 @@ export default class Map extends IdleGameVue {
         var buildingType = StorageToBuildingMapping[this.storageType];
         var coord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
 
-        if (coord.x < 0 || coord.y < 0 || coord.x >= this.nbTilesOnRowOrColumn || coord.y >= this.nbTilesOnRowOrColumn)
-            return;
-
-        // Check if you can afford your purchase
-        for (let consummableId in StaticStorageInfo[this.storageType as Storage].price) {
-            let price = StaticStorageInfo[this.storageType].price[consummableId as Consummable];
-
-            if (price && (this.$store.state as IState).consummable[consummableId as Consummable].quantity < price)
-                return;
-        }
-
-        // If building is already there
-        if (buildingType == (this.$store.state as IState).map[coord.x][coord.y].building)
-            return;
-
-        // You can't build on water
-        if ((this.$store.state as IState).map[coord.x][coord.y].environment == Environment.Water)
+        if (!this.canBeBuilt(coord, buildingType))
             return;
 
         // Pay the price of your purchase
@@ -166,6 +150,29 @@ export default class Map extends IdleGameVue {
     private handleMouseMove(event: MouseEvent) {
         this.mouseTileCoord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
         this.draw();
+    }
+
+    private canBeBuilt(coord: { x: number, y: number }, building: Building) {
+        if (coord.x < 0 || coord.y < 0 || coord.x >= this.nbTilesOnRowOrColumn || coord.y >= this.nbTilesOnRowOrColumn)
+            return false;
+
+        // Check if you can afford your purchase
+        for (let consummableId in StaticStorageInfo[this.storageType as Storage].price) {
+            let price = StaticStorageInfo[this.storageType].price[consummableId as Consummable];
+
+            if (price && (this.$store.state as IState).consummable[consummableId as Consummable].quantity < price)
+                return false;
+        }
+
+        // If building is already there
+        if (building == (this.$store.state as IState).map[coord.x][coord.y].building)
+            return false;
+
+        // You can't build on water
+        if ((this.$store.state as IState).map[coord.x][coord.y].environment == Environment.Water)
+            return false;
+
+        return true;
     }
 
     private getImageToDisplay(mapTile: IMapTile): HTMLImageElement {

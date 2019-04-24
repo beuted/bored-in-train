@@ -20,6 +20,7 @@ import { StaticConsummableInfo, IStaticConsummable, IConsuming, StaticJobInfo, I
 import { IState, IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
 import { Consummable } from '@/models/Consummable';
+import { EventBus, JobProductionEvent } from '@/EventBus';
 
 @Component({
   components: {
@@ -45,6 +46,20 @@ export default class Game extends IdleGameVue {
 
     setInterval (() => {
         let store: Store<IState> = this.$store;
+        var event: JobProductionEvent = {
+            jobName: 'farmer',
+            produced: {
+                population: 0,
+                food: 8,
+                sticks: 0
+            },
+            consumed: {
+                population: 0,
+                food: 0,
+                sticks: 1
+            },
+        }
+        EventBus.$emit('job-production', event);
 
         // First the creation of ressources
         for (let jobId in StaticJobInfo) {

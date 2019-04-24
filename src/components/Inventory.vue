@@ -3,11 +3,11 @@
         <h2>Inventory</h2>
         <ul>
             <li>
-                <span>Food: {{ food.quantity }} / {{ foodStorage }}</span>
+                <span>Food 🍗 {{ food.quantity }} / {{ foodStorage }}</span>
                 <span v-if="debugMode"> {{ food }}</span>
             </li>
             <li>
-                <span>Sticks: {{ sticks.quantity }}</span>
+                <span>Wood 🌲 {{ sticks.quantity }}</span>
                 <span v-if="debugMode"> {{ sticks }}</span>
             </li>
         </ul>

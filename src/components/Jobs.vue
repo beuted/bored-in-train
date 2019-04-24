@@ -12,21 +12,21 @@
                 </li>
                 <li>
                     <span>
-                        <JobTooltip v-once jobName="woodGatherer">Wood Gatherer:</JobTooltip> {{ jobs.woodGatherer.quantity }} / ∞
+                        <JobTooltip v-once jobName="woodGatherer"><ParticleEmitter jobName="woodGatherer">Wood Gatherer:</ParticleEmitter></JobTooltip> {{ jobs.woodGatherer.quantity }} / ∞
                         <button v-bind:disabled="!canAddJob(1, 'woodGatherer')" v-on:click="addJob(1, 'woodGatherer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'woodGatherer')"  v-on:click="removeJob(1, 'woodGatherer')">Remove</button>
                     </span>
                 </li>
                 <li>
                     <span>
-                        <JobTooltip v-once jobName="berryGatherer">Berry Gatherer:</JobTooltip> {{ jobs.berryGatherer.quantity }} / ∞
+                        <JobTooltip v-once jobName="berryGatherer"><ParticleEmitter jobName="berryGatherer">Berry Gatherer:</ParticleEmitter></JobTooltip> {{ jobs.berryGatherer.quantity }} / ∞
                         <button v-bind:disabled="!canAddJob(1, 'berryGatherer')" v-on:click="addJob(1, 'berryGatherer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'berryGatherer')" v-on:click="removeJob(1, 'berryGatherer')">Remove</button>
                     </span>
                 </li>
                 <li>
                     <span>
-                        <JobTooltip v-once jobName="farmer">Farmer:</JobTooltip> {{ jobs.farmer.quantity }} / {{ getMaxStorage('farmer') }}
+                        <JobTooltip v-once jobName="farmer"><ParticleEmitter jobName="farmer">Farmer:</ParticleEmitter></JobTooltip> {{ jobs.farmer.quantity }} / {{ getMaxStorage('farmer') }}
                         <button v-bind:disabled="!canAddJob(1, 'farmer')" v-on:click="addJob(1, 'farmer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'farmer')" v-on:click="removeJob(1, 'farmer')">Remove</button>
                     </span>
@@ -43,10 +43,13 @@ import { Job } from '@/models/Job';
 import { Storage } from '@/models/Storage';
 
 import JobTooltip from '@/components/JobTooltip.vue';
+import ParticleEmitter from '@/components/ParticleEmitter.vue';
+
 
 @Component({
   components: {
-      JobTooltip
+      JobTooltip,
+      ParticleEmitter
   },
 })
 export default class Jobs extends IdleGameVue {

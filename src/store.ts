@@ -7,6 +7,7 @@ import { Consummable } from './models/Consummable';
 import { Storage } from '@/models/Storage';
 import { Job } from './models/Job';
 import { StaticConsummableInfo, StaticJobInfo } from './services/GameEngine';
+import { IJobProductionEvent } from './EventBus';
 
 Vue.use(Vuex);
 
@@ -82,17 +83,11 @@ export default new Vuex.Store<IState>({
     // Increment the value of a consummable from 'value'
     IncrementConsummable(state, obj: { name: Consummable, value: number }) {
       state.consummable[obj.name].quantity += obj.value;
-
-      // Special case of shrinking population to handle missing jobs
-      if (obj.value < 0 && obj.name == Consummable.population) {
-        let totalWithJob = 0;
-        for (let key in state.jobs) {
-            totalWithJob += (state.jobs as any)[key].quantity; //FIX ME wassup with the typing issue here ?
-        };
-
-        if (state.consummable.population.quantity < totalWithJob) {
-          console.warn('You have to remove some jobs'); //TODO
-        }
+    },
+    // Increment the value of a consummable from 'value'
+    IncrementConsummables(state, event: IJobProductionEvent) {
+      for (let consummable in event.produced) {
+        state.consummable[consummable as Consummable].quantity += event.produced[consummable as Consummable];
       }
     },
     // Decremente the remaining time before a spawn of a consummable from 1 tick (1000 ms)

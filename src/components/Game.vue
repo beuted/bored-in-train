@@ -20,7 +20,7 @@ import { StaticConsummableInfo, IStaticConsummable, IConsuming, StaticJobInfo, I
 import { IState, IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
 import { Consummable } from '@/models/Consummable';
-import { EventBus, JobProductionEvent } from '@/EventBus';
+import { EventBus, IJobProductionEvent } from '@/EventBus';
 
 @Component({
   components: {
@@ -46,24 +46,20 @@ export default class Game extends IdleGameVue {
 
     setInterval (() => {
         let store: Store<IState> = this.$store;
-        var event: JobProductionEvent = {
-            jobName: 'farmer',
-            produced: {
-                population: 0,
-                food: 8,
-                sticks: 0
-            },
-            consumed: {
-                population: 0,
-                food: 0,
-                sticks: 1
-            },
-        }
-        EventBus.$emit('job-production', event);
 
         // First the creation of ressources
         for (let jobId in StaticJobInfo) {
             let staticJob: IStaticJob = StaticJobInfo[jobId as Job]; //TODO: fix typeing weirdlness
+            
+            // Create ProductionEvent
+            var event: IJobProductionEvent = {
+                job: jobId as Job,
+                produced: {
+                    population: 0,
+                    food: 0,
+                    sticks: 0
+                }
+            }
 
             if (store.state.jobs[jobId as Job].remainingTime > 0) {
                 store.commit('TickInterval', { job: jobId });
@@ -78,7 +74,7 @@ export default class Game extends IdleGameVue {
                     continue;
 
                 var nbProducers = store.state.jobs[jobId as Job].quantity;
-                store.commit('IncrementConsummable', { name: consummableId, value: nbProducers * staticJobProduction.quantity });
+                event.produced[consummableId as Consummable] += nbProducers * staticJobProduction.quantity;
             }
 
             let nbUnfullfiledWorkers = 0; // Nb workers that have not been receiving ressources therefore will be deduced from production
@@ -89,16 +85,17 @@ export default class Game extends IdleGameVue {
 
                 var nbConsummer = store.state.jobs[jobId as Job].quantity;
                 if (store.state.consummable[consummableId as Consummable].quantity >= nbConsummer * staticJobConsumption.quantity) {
-                    store.commit('IncrementConsummable', { name: consummableId, value: -nbConsummer * staticJobConsumption.quantity });
+                    event.produced[consummableId as Consummable] -= nbConsummer * staticJobConsumption.quantity;
                 } else {
                     // Do not produce if needs not fulfilled!
                     const whatCanBeconsummed = store.state.consummable[consummableId as Consummable].quantity;
                     let nbUnfullfiledWorkersOnConsummable = Math.floor((nbConsummer - store.state.consummable[consummableId as Consummable].quantity) / staticJobConsumption.quantity);
                     nbUnfullfiledWorkers = Math.max(nbUnfullfiledWorkers, nbUnfullfiledWorkersOnConsummable);
 
-                    store.commit('IncrementConsummable', { name: consummableId, value: -whatCanBeconsummed });
+                    event.produced[consummableId as Consummable] -= whatCanBeconsummed;
                 }
             }
+            
 
             // Remove part of production based on number of workers with non-fullfiled needs
             if (nbUnfullfiledWorkers > 0) {
@@ -108,9 +105,12 @@ export default class Game extends IdleGameVue {
                     if (staticJobProduction == null)
                         continue;
 
-                    store.commit('IncrementConsummable', { name: consummableId, value: -nbUnfullfiledWorkers * staticJobProduction.quantity });
+                    event.produced[consummableId as Consummable] -= nbUnfullfiledWorkers * staticJobProduction.quantity;
                 }
             }
+            
+            store.commit('IncrementConsummables', event);
+            EventBus.$emit('job-production', event);
         }
 
         // After operation checks (storage, ...)

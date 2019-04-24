@@ -107,15 +107,12 @@ export const StaticJobInfo: IStaticJobInfo = {
       'sticks': null,
       'food': {
         probability: 1,
-        quantity: 2
+        quantity: 1
       },
     },
     consume: {
       'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
+      'food': null,
       'sticks': null
     },
     interval: 5000,

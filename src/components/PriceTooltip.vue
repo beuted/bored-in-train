@@ -45,7 +45,6 @@ export default class PriceTooltip extends IdleGameVue {
 .tooltip {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
@@ -77,6 +76,6 @@ export default class PriceTooltip extends IdleGameVue {
 }
 
 .not-buildable {
-    color: red;
+    opacity: 0.3;
 }
 </style>

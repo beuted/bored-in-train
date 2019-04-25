@@ -8,12 +8,29 @@
             :width="nbTilesOnRowOrColumn*tileSize+'px'" :height="nbTilesOnRowOrColumn*tileSize+'px'"></canvas>
         <div>
             <h2>What to build ?</h2>
-            <input type="radio" id="village" value="villages" v-model="storageType">
-            <label for="village"><PriceTooltip :priceStruct="villagesInfo.price" :consummables="consummables">Village</PriceTooltip></label>
-            <input type="radio" id="barn" value="barns" v-model="storageType" >
-            <label for="barn"><PriceTooltip :priceStruct="barnsInfo.price" :consummables="consummables">Barn</PriceTooltip></label>
-            <input type="radio" id="farm" value="farms" v-model="storageType">
-            <label for="farm"><PriceTooltip :priceStruct="farmsInfo.price" :consummables="consummables">Farm</PriceTooltip></label>
+
+            <div class="menu">
+                <input type="radio" id="village" value="villages" v-model="storageType">
+                <label for="village">
+                    <PriceTooltip :priceStruct="villagesInfo.price" :consummables="consummables">
+                    <div v-once><img v-bind:src="mapTileImages.villageImage.src"></img></div>
+                    </PriceTooltip>
+                </label>
+
+                <input type="radio" id="barn" value="barns" v-model="storageType" >
+                <label for="barn">
+                    <PriceTooltip :priceStruct="barnsInfo.price" :consummables="consummables">
+                        <div v-once><img v-bind:src="mapTileImages.barnImage.src"></div>
+                    </PriceTooltip>
+                </label>
+
+                <input type="radio" id="farm" value="farms" v-model="storageType">
+                <label for="farm">
+                    <PriceTooltip :priceStruct="farmsInfo.price" :consummables="consummables">
+                        <div v-once><img v-bind:src="mapTileImages.farmImage.src"></div>
+                    </PriceTooltip>
+                </label>
+            </div>
         </div>
     </div>
 </template>
@@ -76,14 +93,17 @@ export default class Map extends IdleGameVue {
         return StaticStorageInfo.farms;
     }
 
-    private mounted() {
+    constructor() {
+        super();
         this.mapTileImages.foretImage.src = './img/foret.png';
         this.mapTileImages.waterImage.src = './img/water.png';
         this.mapTileImages.fieldImage.src = './img/field.png';
         this.mapTileImages.villageImage.src = './img/village.png';
         this.mapTileImages.barnImage.src = './img/barn.png';
         this.mapTileImages.farmImage.src = './img/farm.png';
+    }
 
+    private mounted() {
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
         this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
@@ -218,5 +238,21 @@ export default class Map extends IdleGameVue {
 <style scoped lang="less">
 .map {
     margin: auto;
+}
+.menu {
+
+}
+input {
+    visibility:hidden;
+    width:0;
+    height:0;
+    margin:0;
+}
+label {
+    cursor: pointer;
+    margin: 0 10px 0 10px;
+}
+input:checked + label {
+    border-bottom: 3px solid red;
 }
 </style>

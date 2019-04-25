@@ -2,18 +2,24 @@
     <div class="particle-box"><div> <slot></slot> </div>
         <span class="particle particle-positive">
             <transition name="bounce">
-                <div v-if="showFoodPos">🍗</div>
+                <div v-if="shows['food'].positive">🍗</div>
             </transition>
             <transition name="bounce">
-                <div v-if="showStickPos">🌲</div>
+                <div v-if="shows['sticks'].positive">🌲</div>
+            </transition>
+            <transition name="bounce">
+                <div v-if="shows['stones'].positive">⛏️</div>
             </transition>
         </span>
         <span class="particle particle-negative">
             <transition name="bounce">
-                <div v-if="showFoodNeg">🍗</div>
+                <div v-if="shows['food'].negative">🍗</div>
             </transition>
             <transition name="bounce">
-                <div v-if="showStickNeg">🌲</div>
+                <div v-if="shows['sticks'].negative">🌲</div>
+            </transition>
+            <transition name="bounce">
+                <div v-if="shows['stones'].negative">⛏️</div>
             </transition>
         </span>
     </div>
@@ -25,6 +31,7 @@ import { IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
 import { StaticJobInfo } from '@/services/GameEngine';
 import { EventBus, IJobProductionEvent } from '@/EventBus';
+import { Consummable } from '@/models/Consummable';
 
 @Component({
   components: {
@@ -32,10 +39,13 @@ import { EventBus, IJobProductionEvent } from '@/EventBus';
 })
 export default class ParticleEmitter extends IdleGameVue {
     @Prop() private jobName!: Job;
-    private showFoodPos: boolean = false;
-    private showFoodNeg: boolean = false;
-    private showStickPos: boolean = false;
-    private showStickNeg: boolean = false;
+
+    private shows: { [id in Consummable]: { positive: boolean, negative: boolean } } = {
+        population: { positive: false, negative: false },
+        food: { positive: false, negative: false },
+        sticks: { positive: false, negative: false },
+        stones: { positive: false, negative: false },
+    }
 
     public constructor() {
         super();
@@ -46,20 +56,14 @@ export default class ParticleEmitter extends IdleGameVue {
     }
 
     private emitParticles(event: IJobProductionEvent) {
-        if (event.produced.food > 0) {
-            this.showFoodPos = true;
-            setTimeout(() => { this.showFoodPos = false; }, 800);
-        } else if (event.produced.food < 0) {
-            this.showFoodNeg = true;
-            setTimeout(() => { this.showFoodNeg = false; }, 800);
-        }
-
-        if (event.produced.sticks > 0) {
-            this.showStickPos = true;
-            setTimeout(() => { this.showStickPos = false; }, 800);
-        } else if (event.produced.sticks < 0) {
-            this.showStickNeg = true;
-            setTimeout(() => { this.showStickNeg = false; }, 800);
+        for (let consummable in Consummable) {
+            if (event.produced[consummable as Consummable] > 0) {
+                this.shows[consummable as Consummable].positive = true;
+                setTimeout(() => { this.shows[consummable as Consummable].positive = false; }, 800);
+            } else if (event.produced[consummable as Consummable] < 0) {
+                this.shows[consummable as Consummable].negative = true;
+                setTimeout(() => { this.shows[consummable as Consummable].negative = false; }, 800);
+            }
         }
     }
 }
@@ -81,7 +85,7 @@ export default class ParticleEmitter extends IdleGameVue {
   background-color: transparent;
   text-align: center;
   padding: 5px 0;
-  
+
 
   /* Position the tooltip text - see examples below! */
   position: absolute;

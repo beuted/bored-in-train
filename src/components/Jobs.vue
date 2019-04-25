@@ -12,13 +12,6 @@
                 </li>
                 <li>
                     <span>
-                        <JobTooltip v-once jobName="woodGatherer"><ParticleEmitter jobName="woodGatherer">Wood Gatherer:</ParticleEmitter></JobTooltip> {{ jobs.woodGatherer.quantity }} / ∞
-                        <button v-bind:disabled="!canAddJob(1, 'woodGatherer')" v-on:click="addJob(1, 'woodGatherer')">Add</button>
-                        <button v-bind:disabled="!canRemoveJob(1, 'woodGatherer')"  v-on:click="removeJob(1, 'woodGatherer')">Remove</button>
-                    </span>
-                </li>
-                <li>
-                    <span>
                         <JobTooltip v-once jobName="berryGatherer"><ParticleEmitter jobName="berryGatherer">Berry Gatherer:</ParticleEmitter></JobTooltip> {{ jobs.berryGatherer.quantity }} / ∞
                         <button v-bind:disabled="!canAddJob(1, 'berryGatherer')" v-on:click="addJob(1, 'berryGatherer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'berryGatherer')" v-on:click="removeJob(1, 'berryGatherer')">Remove</button>
@@ -26,9 +19,23 @@
                 </li>
                 <li>
                     <span>
+                        <JobTooltip v-once jobName="woodGatherer"><ParticleEmitter jobName="woodGatherer">Wood Gatherer:</ParticleEmitter></JobTooltip> {{ jobs.woodGatherer.quantity }} / ∞
+                        <button v-bind:disabled="!canAddJob(1, 'woodGatherer')" v-on:click="addJob(1, 'woodGatherer')">Add</button>
+                        <button v-bind:disabled="!canRemoveJob(1, 'woodGatherer')"  v-on:click="removeJob(1, 'woodGatherer')">Remove</button>
+                    </span>
+                </li>
+                <li>
+                    <span>
                         <JobTooltip v-once jobName="farmer"><ParticleEmitter jobName="farmer">Farmer:</ParticleEmitter></JobTooltip> {{ jobs.farmer.quantity }} / {{ getMaxStorage('farmer') }}
                         <button v-bind:disabled="!canAddJob(1, 'farmer')" v-on:click="addJob(1, 'farmer')">Add</button>
                         <button v-bind:disabled="!canRemoveJob(1, 'farmer')" v-on:click="removeJob(1, 'farmer')">Remove</button>
+                    </span>
+                </li>
+                <li>
+                    <span>
+                        <JobTooltip v-once jobName="stoneGatherer"><ParticleEmitter jobName="stoneGatherer">Stone Gatherer:</ParticleEmitter></JobTooltip> {{ jobs.stoneGatherer.quantity }} / ∞
+                        <button v-bind:disabled="!canAddJob(1, 'stoneGatherer')" v-on:click="addJob(1, 'stoneGatherer')">Add</button>
+                        <button v-bind:disabled="!canRemoveJob(1, 'stoneGatherer')"  v-on:click="removeJob(1, 'stoneGatherer')">Remove</button>
                     </span>
                 </li>
             </ul>

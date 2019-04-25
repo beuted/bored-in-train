@@ -50,14 +50,15 @@ export default class Game extends IdleGameVue {
         // First the creation of ressources
         for (let jobId in StaticJobInfo) {
             let staticJob: IStaticJob = StaticJobInfo[jobId as Job]; //TODO: fix typeing weirdlness
-            
+
             // Create ProductionEvent
             var event: IJobProductionEvent = {
                 job: jobId as Job,
                 produced: {
                     population: 0,
                     food: 0,
-                    sticks: 0
+                    sticks: 0,
+                    stones: 0
                 }
             }
 
@@ -95,7 +96,7 @@ export default class Game extends IdleGameVue {
                     event.produced[consummableId as Consummable] -= whatCanBeconsummed;
                 }
             }
-            
+
 
             // Remove part of production based on number of workers with non-fullfiled needs
             if (nbUnfullfiledWorkers > 0) {
@@ -108,7 +109,7 @@ export default class Game extends IdleGameVue {
                     event.produced[consummableId as Consummable] -= nbUnfullfiledWorkers * staticJobProduction.quantity;
                 }
             }
-            
+
             store.commit('IncrementConsummables', event);
             EventBus.$emit('job-production', event);
         }

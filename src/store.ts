@@ -42,7 +42,10 @@ export default new Vuex.Store<IState>({
         quantity: 5,
       },
       sticks: {
-        quantity: 30,
+        quantity: 10,
+      },
+      stones: {
+        quantity: 0,
       },
     },
     storage: {
@@ -57,15 +60,19 @@ export default new Vuex.Store<IState>({
       },
     },
     jobs: {
-      woodGatherer: {
-        quantity: 0,
-        remainingTime: 1000,
-      },
       berryGatherer: {
         quantity: 1,
         remainingTime: 1000,
       },
+      woodGatherer: {
+        quantity: 0,
+        remainingTime: 1000,
+      },
       farmer: {
+        quantity: 0,
+        remainingTime: 1000,
+      },
+      stoneGatherer: {
         quantity: 0,
         remainingTime: 1000,
       },

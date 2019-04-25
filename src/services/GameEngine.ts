@@ -42,23 +42,26 @@ export interface IStaticJobProduction {
 export const StaticStorageInfo: IStaticStorageInfo = {
   villages: {
     price: {
-      sticks: 10,
+      population: 0,
       food: 0,
-      population: 0
+      sticks: 10,
+      stones: 0
     },
   },
   barns: {
     price: {
-      sticks: 15,
+      population: 0,
       food: 5,
-      population: 0
+      sticks: 15,
+      stones: 0
     }
   },
   farms: {
     price: {
-      sticks: 20,
+      population: 0,
       food: 10,
-      population: 0
+      sticks: 20,
+      stones: 0
     }
   }
 }
@@ -79,6 +82,9 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
   sticks: {
     storage: undefined,
   },
+  stones: {
+    storage: undefined,
+  },
 };
 
 export const StaticJobInfo: IStaticJobInfo = {
@@ -89,7 +95,8 @@ export const StaticJobInfo: IStaticJobInfo = {
       'sticks': {
         probability: 1,
         quantity: 1
-      }
+      },
+      'stones': null,
     },
     consume: {
       'population': null,
@@ -97,7 +104,8 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 1
       },
-      'sticks': null
+      'sticks': null,
+      'stones': null,
     },
     interval: 5000,
   },
@@ -109,11 +117,13 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 1
       },
+      'stones': null,
     },
     consume: {
       'population': null,
       'food': null,
-      'sticks': null
+      'sticks': null,
+      'stones': null
     },
     interval: 5000,
   },
@@ -125,6 +135,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 8
       },
+      'stones': null,
     },
     consume: {
       'population': null,
@@ -134,14 +145,36 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'sticks': {
         probability: 1,
-        quantity: 1     
-      }
+        quantity: 1
+      },
+      'stones': null,
     },
     interval: 10000,
     storage: {
       name: Storage.farms,
       capacity: 10
     },
+  },
+  'stoneGatherer': {
+    produce: {
+      'population': null,
+      'food': null,
+      'sticks': null,
+      'stones': {
+        probability: 1,
+        quantity: 1
+      },
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'sticks': null,
+      'stones': null,
+    },
+    interval: 5000,
   },
   'default':  {
     produce: {
@@ -151,11 +184,13 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'food': null,
       'sticks': null,
+      'stones': null,
     },
     consume: {
       'population': null,
       'food': null,
-      'sticks': null
+      'sticks': null,
+      'stones': null,
     },
     interval: 10000,
   },

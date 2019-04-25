@@ -5,5 +5,5 @@ export const EventBus = new Vue();
 
 export interface IJobProductionEvent {
     job: Job;
-    produced:  { [id in Consummable]: number };
+    produced: { [id in Consummable]: number };
 }

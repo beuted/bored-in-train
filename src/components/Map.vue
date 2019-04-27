@@ -140,16 +140,23 @@ export default class Map extends IdleGameVue {
 
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
-                var image = this.getImageToDisplay(this.$store.state.map[i][j])
-                this.ctx.drawImage(image, i*this.tileSize, j*this.tileSize);
+
+                let environmentImage = this.getEnvironmentImage(this.$store.state.map[i][j].environment)
+                this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize);
+
+                let buildingImage = this.getBuildingImage(this.$store.state.map[i][j].building)
+                if (buildingImage)
+                    this.ctx.drawImage(buildingImage, i*this.tileSize, j*this.tileSize);
             }
         }
 
         if (this.mouseTileCoord && this.canBeBuilt(this.mouseTileCoord, StorageToBuildingMapping[this.storageType])) {
-            var image = this.getBuildingImage(StorageToBuildingMapping[this.storageType]);
-            this.ctx.globalAlpha = 0.7;
-            this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize);
-            this.ctx.globalAlpha = 1.0;
+            let image = this.getBuildingImage(StorageToBuildingMapping[this.storageType]);
+            if (image) {
+                this.ctx.globalAlpha = 0.7;
+                this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize);
+                this.ctx.globalAlpha = 1.0;
+            }
         }
     }
 
@@ -209,12 +216,8 @@ export default class Map extends IdleGameVue {
         return true;
     }
 
-    private getImageToDisplay(mapTile: IMapTile): HTMLImageElement {
-        if (mapTile.building != Building.NoBuilding) {
-            return this.getBuildingImage(mapTile.building);
-        }
-
-        switch (mapTile.environment) {
+    private getEnvironmentImage(environment: Environment): HTMLImageElement {
+        switch (environment) {
             case Environment.Water:
                 return this.mapTileImages.waterImage;
             case Environment.Field:
@@ -223,11 +226,13 @@ export default class Map extends IdleGameVue {
                 return this.mapTileImages.foretImage;
         }
 
-        throw new Error(`could not find anything to display for mapTile ${mapTile}`);
+        throw new Error(`could not find anything to display for environment ${environment}`);
     }
 
-    private getBuildingImage(building: Building): HTMLImageElement {
+    private getBuildingImage(building: Building): HTMLImageElement | null {
         switch (building) {
+            case Building.NoBuilding:
+                return null;
             case Building.Village:
                 return this.mapTileImages.villageImage;
             case Building.Barn:

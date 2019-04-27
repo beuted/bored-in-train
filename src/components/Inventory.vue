@@ -14,6 +14,10 @@
                 <span>Stone ⛏️ {{ stones.quantity }}</span>
                 <span v-if="debugMode"> {{ stones }}</span>
             </li>
+            <li>
+                <span>Coal 💎 {{ coals.quantity }}</span>
+                <span v-if="debugMode"> {{ stones }}</span>
+            </li>
         </ul>
     </div>
 </template>
@@ -34,6 +38,10 @@ export default class Inventory extends IdleGameVue {
 
     get stones() {
          return this.$store.state.consummable.stones;
+    }
+
+    get coals() {
+         return this.$store.state.consummable.coals;
     }
 
     get debugMode() {

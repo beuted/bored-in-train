@@ -4,4 +4,5 @@ export enum Job {
     woodGatherer = 'woodGatherer',
     farmer = 'farmer',
     stoneGatherer = 'stoneGatherer',
+    miner = 'miner',
 }

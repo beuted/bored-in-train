@@ -2,5 +2,6 @@ export enum Consummable {
     population= 'population',
     food = 'food',
     sticks = 'sticks',
-    stones = 'stones'
+    stones = 'stones',
+    coals = 'coals'
 }

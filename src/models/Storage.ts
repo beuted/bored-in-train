@@ -1,5 +1,6 @@
 export enum Storage {
     villages = 'villages',
     barns = 'barns',
-    farms = 'farms'
+    farms = 'farms',
+    coalMines = 'coalMines'
 }

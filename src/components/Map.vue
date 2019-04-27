@@ -30,6 +30,13 @@
                         <div v-once><img v-bind:src="mapTileImages.farmImage.src"></div>
                     </PriceTooltip>
                 </label>
+
+                <input type="radio" id="coalMine" value="coalMines" v-model="storageType">
+                <label for="coalMine">
+                    <PriceTooltip :priceStruct="coalMineInfo.price" :consummables="consummables">
+                        <div v-once><img v-bind:src="mapTileImages.coalMineImage.src"></div>
+                    </PriceTooltip>
+                </label>
             </div>
         </div>
     </div>
@@ -61,14 +68,16 @@ export default class Map extends IdleGameVue {
         fieldImage: HTMLImageElement,
         villageImage: HTMLImageElement,
         barnImage: HTMLImageElement,
-        farmImage: HTMLImageElement
+        farmImage: HTMLImageElement,
+        coalMineImage: HTMLImageElement,
     } = {
         foretImage: new Image(),
         waterImage: new Image(),
         fieldImage: new Image(),
         villageImage: new Image(),
         barnImage: new Image(),
-        farmImage: new Image()
+        farmImage: new Image(),
+        coalMineImage: new Image(),
     }
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
@@ -93,6 +102,10 @@ export default class Map extends IdleGameVue {
         return StaticStorageInfo.farms;
     }
 
+    get coalMineInfo() {
+        return StaticStorageInfo.coalMines;
+    }
+
     constructor() {
         super();
         this.mapTileImages.foretImage.src = './img/foret.png';
@@ -101,6 +114,7 @@ export default class Map extends IdleGameVue {
         this.mapTileImages.villageImage.src = './img/village.png';
         this.mapTileImages.barnImage.src = './img/barn.png';
         this.mapTileImages.farmImage.src = './img/farm.png';
+        this.mapTileImages.coalMineImage.src = './img/coal-mine.png';
     }
 
     private mounted() {
@@ -220,6 +234,8 @@ export default class Map extends IdleGameVue {
                 return this.mapTileImages.barnImage;
             case Building.Farm:
                 return this.mapTileImages.farmImage;
+            case Building.CoalMine:
+                return this.mapTileImages.coalMineImage;
         }
 
         throw new Error(`could not find anything to display for building ${building}`);

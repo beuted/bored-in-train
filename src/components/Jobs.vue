@@ -38,6 +38,13 @@
                         <button v-bind:disabled="!canRemoveJob(1, 'stoneGatherer')"  v-on:click="removeJob(1, 'stoneGatherer')">Remove</button>
                     </span>
                 </li>
+                <li>
+                    <span>
+                        <JobTooltip v-once jobName="miner"><ParticleEmitter jobName="miner">Miner:</ParticleEmitter></JobTooltip> {{ jobs.miner.quantity }} / {{ getMaxStorage('miner') }}
+                        <button v-bind:disabled="!canAddJob(1, 'miner')" v-on:click="addJob(1, 'miner')">Add</button>
+                        <button v-bind:disabled="!canRemoveJob(1, 'miner')"  v-on:click="removeJob(1, 'miner')">Remove</button>
+                    </span>
+                </li>
             </ul>
     </div>
 </template>

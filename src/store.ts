@@ -47,6 +47,9 @@ export default new Vuex.Store<IState>({
       stones: {
         quantity: 0,
       },
+      coals: {
+        quantity: 0,
+      },
     },
     storage: {
       villages: {
@@ -56,6 +59,9 @@ export default new Vuex.Store<IState>({
         quantity: 1,
       },
       farms: {
+        quantity: 0,
+      },
+      coalMines: {
         quantity: 0,
       },
     },
@@ -73,6 +79,10 @@ export default new Vuex.Store<IState>({
         remainingTime: 1000,
       },
       stoneGatherer: {
+        quantity: 0,
+        remainingTime: 1000,
+      },
+      miner: {
         quantity: 0,
         remainingTime: 1000,
       },

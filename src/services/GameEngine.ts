@@ -45,7 +45,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       population: 0,
       food: 0,
       sticks: 10,
-      stones: 0
+      stones: 0,
+      coals: 0
     },
   },
   barns: {
@@ -53,7 +54,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       population: 0,
       food: 5,
       sticks: 15,
-      stones: 0
+      stones: 0,
+      coals: 0
     }
   },
   farms: {
@@ -61,7 +63,17 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       population: 0,
       food: 10,
       sticks: 20,
-      stones: 0
+      stones: 0,
+      coals: 0
+    }
+  },
+  coalMines: {
+    price: {
+      population: 0,
+      food: 0,
+      sticks: 50,
+      stones: 50,
+      coals: 0
     }
   }
 }
@@ -85,6 +97,9 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
   stones: {
     storage: undefined,
   },
+  coals: {
+    storage: undefined,
+  },
 };
 
 export const StaticJobInfo: IStaticJobInfo = {
@@ -97,6 +112,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         quantity: 1
       },
       'stones': null,
+      'coals': null,
     },
     consume: {
       'population': null,
@@ -106,6 +122,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'sticks': null,
       'stones': null,
+      'coals': null,
     },
     interval: 5000,
   },
@@ -118,12 +135,14 @@ export const StaticJobInfo: IStaticJobInfo = {
         quantity: 1
       },
       'stones': null,
+      'coals': null,
     },
     consume: {
       'population': null,
       'food': null,
       'sticks': null,
-      'stones': null
+      'stones': null,
+      'coals': null,
     },
     interval: 5000,
   },
@@ -136,23 +155,25 @@ export const StaticJobInfo: IStaticJobInfo = {
         quantity: 8
       },
       'stones': null,
+      'coals': null,
     },
     consume: {
       'population': null,
       'food': {
         probability: 1,
-        quantity: 1
+        quantity: 2
       },
       'sticks': {
         probability: 1,
         quantity: 1
       },
       'stones': null,
+      'coals': null,
     },
     interval: 10000,
     storage: {
       name: Storage.farms,
-      capacity: 10
+      capacity: 3
     },
   },
   'stoneGatherer': {
@@ -164,6 +185,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 1
       },
+      'coals': null,
     },
     consume: {
       'population': null,
@@ -173,8 +195,42 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'sticks': null,
       'stones': null,
+      'coals': null,
     },
-    interval: 5000,
+    interval: 10000,
+  },
+  'miner': {
+    produce: {
+      'population': null,
+      'food': null,
+      'sticks': null,
+      'stones': {
+        probability: 1,
+        quantity: 1
+      },
+      'coals': {
+        probability: 1,
+        quantity: 2
+      },
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 3
+      },
+      'sticks': {
+        probability: 1,
+        quantity: 2
+      },
+      'stones': null,
+      'coals': null,
+    },
+    interval: 15000,
+    storage: {
+      name: Storage.coalMines,
+      capacity: 3
+    },
   },
   'default':  {
     produce: {
@@ -185,12 +241,14 @@ export const StaticJobInfo: IStaticJobInfo = {
       'food': null,
       'sticks': null,
       'stones': null,
+      'coals': null,
     },
     consume: {
       'population': null,
       'food': null,
       'sticks': null,
       'stones': null,
+      'coals': null,
     },
     interval: 10000,
   },

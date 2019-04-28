@@ -109,7 +109,7 @@ export default class Game extends IdleGameVue {
 
             // Remove part of production based on number of workers with non-fullfiled needs
             if (nbUnfullfiledWorkers > 0) {
-                console.warn(`${nbUnfullfiledWorkers} ${jobId} have not seen their needs fullfiled, they will not produce any ressource`);
+                this.$toasted.error(`${nbUnfullfiledWorkers} ${jobId} have not seen their needs fullfiled, they will not produce any ressource`);
                 for (let consummableId in staticJob.produce) {
                     let staticJobProduction: IStaticJobProduction | null = staticJob.produce[consummableId as Consummable];
                     if (staticJobProduction == null)
@@ -131,7 +131,7 @@ export default class Game extends IdleGameVue {
                 let quantityToRemove = Math.floor(this.LackOfStorageFactor *
                     (store.state.consummable[consummableId as Consummable].quantity - store.state.storage[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity));
                 store.commit('IncrementConsummable', { name: consummableId, value: -quantityToRemove });
-                console.warn(`${quantityToRemove} ${consummableId} were thrown away due to lack of storage`);
+                this.$toasted.error(`${quantityToRemove} ${consummableId} were thrown away due to lack of storage`);
             }
         }
 

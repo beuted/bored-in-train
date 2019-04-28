@@ -38,6 +38,7 @@ export default class ResearchComponent extends IdleGameVue {
 
   public buyResearch(researchName: Research) {
     this.$store.commit('BuyResearch', { researchName: researchName });
+    this.$toasted.success(`You discovered ${ResearchInfo[researchName].name}!`);
   }
 
   public mounted() {

@@ -10,7 +10,9 @@ export interface IStaticConsummable {
 }
 
 export interface IStaticStorage {
-  price: {[id in Consummable]: number}
+  name: string;
+  description: string;
+  price: {[id in Consummable]: number};
 }
 
 export interface IConsuming {
@@ -41,6 +43,8 @@ export interface IStaticJobProduction {
 
 export const StaticStorageInfo: IStaticStorageInfo = {
   villages: {
+    name: 'Village',
+    description: 'Increases your maximum population by 10',
     price: {
       population: 0,
       food: 0,
@@ -50,6 +54,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     },
   },
   barns: {
+    name: 'Village',
+    description: 'Increases the quantity of food you can store by 10',
     price: {
       population: 0,
       food: 5,
@@ -59,6 +65,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     }
   },
   farms: {
+    name: 'Farm',
+    description: 'Allows you to recruit 3 farmers',
     price: {
       population: 0,
       food: 10,
@@ -68,6 +76,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     }
   },
   coalMines: {
+    name: 'Coal Mine',
+    description: 'Allows you to recruit 3 miners',
     price: {
       population: 0,
       food: 0,

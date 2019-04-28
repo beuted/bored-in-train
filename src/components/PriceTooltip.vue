@@ -1,8 +1,11 @@
 <template>
     <div class="tooltip"><div v-bind:class="buildableClass"> <slot></slot> </div>
         <span class="tooltip-content">
+            <div class="tooltip-title">{{ storageInfo.name }}</div>
+            <div>{{ storageInfo.description }}</div>
+            <br>
             <div class="tooltip-title">Price:</div>
-            <div v-for="(value, key) in priceStruct" :key="key">
+            <div v-for="(value, key) in storageInfo.price" :key="key">
                 <span v-if="value != 0">{{ key }} x {{ value }}</span>
             </div>
         </span>
@@ -12,14 +15,16 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
-import { Consummable } from '@/models/Consummable'; // @ is an alias to /src
+import { Consummable } from '@/models/Consummable';
+import { StaticStorageInfo } from '@/services/GameEngine';
+import { Storage } from '@/models/Storage';
 
 @Component({
   components: {
   },
 })
 export default class PriceTooltip extends IdleGameVue {
-    @Prop() private priceStruct!: {[id in Consummable]: number};
+    @Prop() private building!: Storage;
     @Prop() private consummables!: {[id in Consummable]: { quantity: number }};
 
     public get buildableClass() {
@@ -29,8 +34,12 @@ export default class PriceTooltip extends IdleGameVue {
         return 'buildable';
     }
 
+    public get storageInfo() {
+        return StaticStorageInfo[this.building];
+    }
+
     private isBuildable() {
-        for (const [key, value] of Object.entries(this.priceStruct)) {
+        for (const [key, value] of Object.entries(StaticStorageInfo[this.building].price)) {
             if (this.consummables[key as Consummable].quantity < value)
                 return false;
         }
@@ -50,7 +59,7 @@ export default class PriceTooltip extends IdleGameVue {
 /* Tooltip text */
 .tooltip .tooltip-content {
   visibility: hidden;
-  width: 120px;
+  width: 200px;
   bottom: 100%;
   left: 50%;
   margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */

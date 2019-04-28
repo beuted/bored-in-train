@@ -1,44 +1,40 @@
 <template>
     <div>
+        <div class="menu">
+            <input type="radio" id="village" value="villages" v-model="storageType">
+            <label for="village">
+                <PriceTooltip building="villages" :consummables="consummables">
+                <div v-once><img v-bind:src="mapTileImages.villageImage.src"></div>
+                </PriceTooltip> x {{ villages.quantity }}
+            </label>
+
+            <input type="radio" id="barn" value="barns" v-model="storageType" >
+            <label for="barn">
+                <PriceTooltip building="barns" :consummables="consummables">
+                    <div v-once><img v-bind:src="mapTileImages.barnImage.src"></div>
+                </PriceTooltip> x {{ barns.quantity }}
+            </label>
+
+            <input type="radio" id="farm" value="farms" v-model="storageType">
+            <label for="farm">
+                <PriceTooltip building="farms" :consummables="consummables">
+                    <div v-once><img v-bind:src="mapTileImages.farmImage.src"></div>
+                </PriceTooltip> x {{ farms.quantity }}
+            </label>
+
+            <input type="radio" id="coalMine" value="coalMines" v-model="storageType">
+            <label for="coalMine">
+                <PriceTooltip building="coalMines" :consummables="consummables">
+                    <div v-once><img v-bind:src="mapTileImages.coalMineImage.src"></div>
+                </PriceTooltip> x {{ coalMines.quantity }}
+            </label>
+        </div>
         <canvas id="canvas" class="map"
             v-on:mousedown="handleMouseDown"
             v-on:mouseup="handleMouseUp"
             v-on:mousemove="handleMouseMove"
             v-on:mouseout="handleMouseOut"
             :width="nbTilesOnRowOrColumn*tileSize+'px'" :height="nbTilesOnRowOrColumn*tileSize+'px'"></canvas>
-        <div>
-            <h2>What to build ?</h2>
-
-            <div class="menu">
-                <input type="radio" id="village" value="villages" v-model="storageType">
-                <label for="village">
-                    <PriceTooltip :priceStruct="villagesInfo.price" :consummables="consummables">
-                    <div v-once><img v-bind:src="mapTileImages.villageImage.src"></img></div>
-                    </PriceTooltip>
-                </label>
-
-                <input type="radio" id="barn" value="barns" v-model="storageType" >
-                <label for="barn">
-                    <PriceTooltip :priceStruct="barnsInfo.price" :consummables="consummables">
-                        <div v-once><img v-bind:src="mapTileImages.barnImage.src"></div>
-                    </PriceTooltip>
-                </label>
-
-                <input type="radio" id="farm" value="farms" v-model="storageType">
-                <label for="farm">
-                    <PriceTooltip :priceStruct="farmsInfo.price" :consummables="consummables">
-                        <div v-once><img v-bind:src="mapTileImages.farmImage.src"></div>
-                    </PriceTooltip>
-                </label>
-
-                <input type="radio" id="coalMine" value="coalMines" v-model="storageType">
-                <label for="coalMine">
-                    <PriceTooltip :priceStruct="coalMineInfo.price" :consummables="consummables">
-                        <div v-once><img v-bind:src="mapTileImages.coalMineImage.src"></div>
-                    </PriceTooltip>
-                </label>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -104,6 +100,22 @@ export default class Map extends IdleGameVue {
 
     get coalMineInfo() {
         return StaticStorageInfo.coalMines;
+    }
+
+    get barns() {
+        return this.$store.state.storage.barns;
+    }
+
+    get villages() {
+        return this.$store.state.storage.villages;
+    }
+
+    get farms() {
+        return this.$store.state.storage.farms;
+    }
+
+    get coalMines() {
+        return this.$store.state.storage.coalMines;
     }
 
     constructor() {
@@ -260,9 +272,11 @@ export default class Map extends IdleGameVue {
 .map {
     margin: auto;
 }
-.menu {
 
+.menu {
+    margin: 20px;
 }
+
 input {
     visibility:hidden;
     width:0;

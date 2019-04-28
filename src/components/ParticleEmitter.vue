@@ -15,16 +15,16 @@
             </transition>
         </span>
         <span class="particle particle-negative">
-            <transition name="bounce">
+            <transition name="unbounce">
                 <div v-if="shows['food'].negative">🍗</div>
             </transition>
-            <transition name="bounce">
+            <transition name="unbounce">
                 <div v-if="shows['sticks'].negative">🌲</div>
             </transition>
-            <transition name="bounce">
+            <transition name="unbounce">
                 <div v-if="shows['stones'].negative">⛏️</div>
             </transition>
-            <transition name="bounce">
+            <transition name="unbounce">
                 <div v-if="shows['coals'].negative">💎</div>
             </transition>
         </span>
@@ -134,6 +134,39 @@ export default class ParticleEmitter extends IdleGameVue {
 }
 
 @keyframes bounce-out
+{
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.unbounce-enter-active {
+    animation: unbounce-in 0.8s;
+}
+
+.unbounce-leave-active {
+    animation: unbounce-out 0.1s; //needed to avoid glitch
+}
+
+@keyframes unbounce-in
+{
+    0% {
+        opacity: 0;
+        transform:translateY(-10px);
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform:translateY(20px);
+    }
+}
+
+@keyframes unbounce-out
 {
     0% {
         opacity: 0;

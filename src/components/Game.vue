@@ -2,10 +2,17 @@
   <div>
     <h1>{{ msg }} <button v-on:click="toggleDebug()">Debug</button></h1>
 
-    <Jobs />
-    <Inventory />
-    <Storage />
-    <Map />
+    <div class="flex-container">
+      <div class="job-item">
+        <Jobs />
+      </div>
+      <div class="map-item">
+        <Map />
+      </div>
+      <div class="inventory-item">
+        <Inventory />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -140,4 +147,24 @@ export default class Game extends IdleGameVue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
+.flex-container {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.inventory-item {
+  margin-top: 60px;
+  width: 300px;
+}
+.job-item {
+  margin-top: 60px;
+  width: 300px;
+}
+.map-item {
+  
+}
 </style>

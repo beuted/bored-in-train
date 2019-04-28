@@ -19,6 +19,7 @@
 </template>
 
 <script lang="ts">
+// UNUSED NOW, INCLUDED IN MAP.vue
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
 

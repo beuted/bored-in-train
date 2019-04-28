@@ -8,6 +8,7 @@ import { Storage } from '@/models/Storage';
 import { Job } from './models/Job';
 import { StaticConsummableInfo, StaticJobInfo } from './services/GameEngine';
 import { IJobProductionEvent } from './EventBus';
+import { Environment } from './models/Environment';
 
 Vue.use(Vuex);
 
@@ -132,6 +133,7 @@ export default new Vuex.Store<IState>({
       }
 
       (state.map[obj.x])[obj.y].building = obj.type;
+      (state.map[obj.x])[obj.y].environment = Environment.Field;
 
       let storageTypeToBuild = (BuildingToStorageMapping as any)[obj.type]
       if (storageTypeToBuild != null) {

@@ -9,6 +9,7 @@ import { Job } from './models/Job';
 import { StaticConsummableInfo, StaticJobInfo } from './services/GameEngine';
 import { IJobProductionEvent } from './EventBus';
 import { Environment } from './models/Environment';
+import { Research } from './models/Research';
 
 Vue.use(Vuex);
 
@@ -23,6 +24,7 @@ export interface IState {
   consummable: { [id in Consummable]: { quantity: number } },
   storage: { [id in Storage]: { quantity: number } },
   jobs: { [id in Job]: { quantity: number, remainingTime: number } },
+  research: { [id in Research]: { owned: boolean } },
 }
 
 //TODO: override with something like this
@@ -92,6 +94,14 @@ export default new Vuex.Store<IState>({
         remainingTime: 1000,
       }
     },
+    research: {
+      agriculture: {
+        owned: false
+      },
+      steamLocomotive: {
+        owned: false
+      },
+    },
   },
   mutations: {
     // Increment the value of a consummable from 'value'
@@ -140,10 +150,14 @@ export default new Vuex.Store<IState>({
         (state.storage as any)[storageTypeToBuild].quantity++;
       }
     },
-    //Add
+    //Add Job
     AddJob(state, obj: { jobName: Job, quantity: number }) {
       console.debug(`AddJob tile ${obj.jobName}, ${obj.quantity}`);
       state.jobs[obj.jobName].quantity += obj.quantity;
+    },
+    BuyResearch(state, obj: { researchName: Research }) {
+      console.debug(`Buying research ${obj.researchName}`);
+      state.research[obj.researchName].owned = true;
     },
   },
   actions: {

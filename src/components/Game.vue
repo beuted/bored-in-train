@@ -19,15 +19,16 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import Jobs from '@/components/Jobs.vue';
-import Inventory from '@/components/Inventory.vue';
-import Storage from '@/components/Storage.vue';
-import Map from '@/components/Map.vue';
 import { StaticConsummableInfo, IStaticConsummable, IConsuming, StaticJobInfo, IStaticJobInfo, IStaticJob, IStaticJobProduction } from '@/services/GameEngine';
 import { IState, IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
 import { Consummable } from '@/models/Consummable';
 import { EventBus, IJobProductionEvent } from '@/EventBus';
+
+import Jobs from '@/components/Jobs.vue';
+import Inventory from '@/components/Inventory.vue';
+import Storage from '@/components/Storage.vue';
+import Map from '@/components/Map.vue';
 
 @Component({
   components: {

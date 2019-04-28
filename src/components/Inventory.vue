@@ -2,21 +2,9 @@
     <div class="inventory">
         <h2>Inventory</h2>
         <ul>
-            <li>
-                <span>Food 🍗 {{ food.quantity }} / {{ foodStorage }}</span>
-                <span v-if="debugMode"> {{ food }}</span>
-            </li>
-            <li>
-                <span>Wood 🌲 {{ wood.quantity }}</span>
-                <span v-if="debugMode"> {{ wood }}</span>
-            </li>
-            <li>
-                <span>Stone ⛏️ {{ stones.quantity }}</span>
-                <span v-if="debugMode"> {{ stones }}</span>
-            </li>
-            <li>
-                <span>Coal 💎 {{ coals.quantity }}</span>
-                <span v-if="debugMode"> {{ stones }}</span>
+            <li v-for="(consummable, key) in consummables" v-bind:key="key">
+                <div> {{ getName(key) }} {{ getIcon(key) }} {{ consummable.quantity }} / {{ getStorage(key) }}</div>
+                <div class="production" v-bind:class="{ negative: computeProduction(key) < 0 }"> ({{ computeProduction(key) }} /sec)</div>
             </li>
         </ul>
     </div>
@@ -25,31 +13,49 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
+import { Job } from '@/models/Job';
+import { Consummable } from '@/models/Consummable';
+import { StaticConsummableInfo, StaticJobInfo, IStorage } from '@/services/GameEngine';
 
 @Component
 export default class Inventory extends IdleGameVue {
-    get food() {
-        return this.$store.state.consummable.food;
+
+    get consummables() {
+         return this.$store.state.consummable;
     }
 
-    get wood() {
-        return this.$store.state.consummable.wood;
+    getName(consummable: Consummable) {
+        return StaticConsummableInfo[consummable].name;
     }
 
-    get stones() {
-         return this.$store.state.consummable.stones;
+    getIcon(consummable: Consummable) {
+        return StaticConsummableInfo[consummable].icon;
     }
 
-    get coals() {
-         return this.$store.state.consummable.coals;
+    public computeProduction(consummable: Consummable) {
+      let production = 0;
+      for (let job in this.$store.state.jobs) {
+          let quantity = this.$store.state.jobs[job as Job].quantity;
+          let interval = StaticJobInfo[job as Job].interval;
+
+          let consumeObj = StaticJobInfo[job as Job].consume[consummable];
+          let consume = consumeObj ? consumeObj.quantity : 0;
+
+          let produceObj = StaticJobInfo[job as Job].produce[consummable];
+          let produce = produceObj ? produceObj.quantity : 0;
+
+          production += (produce - consume) / (interval / 1000) * quantity;
+      }
+      return production.toFixed(2);
     }
 
     get debugMode() {
         return this.$store.state.debugMode;
     }
 
-    public get foodStorage() {
-        return this.$store.getters.getRessourceStorage('food');
+    public getStorage(consummable: string) {
+        var storage = this.$store.getters.getRessourceStorage(consummable);
+        return storage != -1 ? storage : '∞';
     }
 }
 </script>
@@ -68,5 +74,11 @@ li {
 }
 a {
   color: #42b983;
+}
+.production {
+    color: #3a96dd;
+}
+.negative {
+    color: red;
 }
 </style>

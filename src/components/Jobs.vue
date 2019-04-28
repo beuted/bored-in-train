@@ -3,65 +3,16 @@
         <h2>Jobs</h2>
         <ul>
             <li>
-                <span>Population: {{ population.quantity }} / {{ popStorage }}</span>
-                <span v-if="debugMode">{{ jobs }}</span>
-            </li>
-
-            <li>
                 <span>Unemployed: {{ unemployed }}</span>
             </li>
-            <li>
+            <li v-for="jobName in jobs" v-bind:key="jobName">
                 <span class="jobs">
                     <div>
-                        <JobTooltip v-once jobName="berryGatherer"><ParticleEmitter jobName="berryGatherer">Berry Gatherer:</ParticleEmitter></JobTooltip> {{ jobs.berryGatherer.quantity }} / ∞
+                        <JobTooltip :jobName="jobName"><ParticleEmitter :jobName="jobName">{{ getJobDisplayName(jobName) }}:</ParticleEmitter></JobTooltip> {{ getJobQuantity(jobName) }} / {{ getJobMaxStorage(jobName) }}
                     </div>
                     <div>
-                        <button v-bind:disabled="!canAddJob(1, 'berryGatherer')" v-on:click="addJob(1, 'berryGatherer')">Add</button>
-                        <button v-bind:disabled="!canRemoveJob(1, 'berryGatherer')" v-on:click="removeJob(1, 'berryGatherer')">Remove</button>
-                    </div>
-                </span>
-            </li>
-            <li>
-                <span class="jobs">
-                    <div>
-                    <JobTooltip v-once jobName="woodGatherer"><ParticleEmitter jobName="woodGatherer">Wood Gatherer:</ParticleEmitter></JobTooltip> {{ jobs.woodGatherer.quantity }} / ∞
-                    </div>
-                    <div>
-                        <button v-bind:disabled="!canAddJob(1, 'woodGatherer')" v-on:click="addJob(1, 'woodGatherer')">Add</button>
-                        <button v-bind:disabled="!canRemoveJob(1, 'woodGatherer')"  v-on:click="removeJob(1, 'woodGatherer')">Remove</button>
-                    </div>
-                </span>
-            </li>
-            <li>
-                <span class="jobs">
-                    <div>
-                        <JobTooltip v-once jobName="farmer"><ParticleEmitter jobName="farmer">Farmer:</ParticleEmitter></JobTooltip> {{ jobs.farmer.quantity }} / {{ getMaxStorage('farmer') }}
-                    </div>
-                    <div>
-                        <button v-bind:disabled="!canAddJob(1, 'farmer')" v-on:click="addJob(1, 'farmer')">Add</button>
-                        <button v-bind:disabled="!canRemoveJob(1, 'farmer')" v-on:click="removeJob(1, 'farmer')">Remove</button>
-                    </div>
-                </span>
-            </li>
-            <li>
-                <span class="jobs">
-                    <div>
-                        <JobTooltip v-once jobName="stoneGatherer"><ParticleEmitter jobName="stoneGatherer">Stone Gatherer:</ParticleEmitter></JobTooltip> {{ jobs.stoneGatherer.quantity }} / ∞
-                    </div>
-                    <div>
-                        <button v-bind:disabled="!canAddJob(1, 'stoneGatherer')" v-on:click="addJob(1, 'stoneGatherer')">Add</button>
-                        <button v-bind:disabled="!canRemoveJob(1, 'stoneGatherer')"  v-on:click="removeJob(1, 'stoneGatherer')">Remove</button>
-                    </div>
-                </span>
-            </li>
-            <li>
-                <span class="jobs">
-                    <div>
-                        <JobTooltip v-once jobName="miner"><ParticleEmitter jobName="miner">Miner:</ParticleEmitter></JobTooltip> {{ jobs.miner.quantity }} / {{ getMaxStorage('miner') }}
-                    </div>
-                    <div>
-                        <button v-bind:disabled="!canAddJob(1, 'miner')" v-on:click="addJob(1, 'miner')">Add</button>
-                        <button v-bind:disabled="!canRemoveJob(1, 'miner')"  v-on:click="removeJob(1, 'miner')">Remove</button>
+                        <button v-bind:disabled="!canAddJob(1, jobName)" v-on:click="addJob(1, jobName)">Add</button>
+                        <button v-bind:disabled="!canRemoveJob(1, jobName)" v-on:click="removeJob(1, jobName)">Remove</button>
                     </div>
                 </span>
             </li>
@@ -91,8 +42,21 @@ export default class Jobs extends IdleGameVue {
         return this.$store.state.consummable.population;
     }
 
+    public getJobQuantity(jobName: Job) {
+        return this.$store.state.jobs[jobName].quantity;
+    }
+
+    public getJobDisplayName(jobName: Job) {
+        return StaticJobInfo[jobName].name;
+    }
+    
+    public getJobMaxStorage(jobName: Job): string {
+        var maxStorage = this.computeMaxStorage(jobName)
+        return maxStorage != -1 ? String(maxStorage) : '∞'
+    }
+
     public get jobs() {
-        return this.$store.state.jobs;
+        return Object.keys(this.$store.state.jobs).filter(x => x !== 'default');
     }
 
     public get unemployed() {
@@ -124,18 +88,11 @@ export default class Jobs extends IdleGameVue {
             this.$store.commit('AddJob', { jobName: jobName, quantity: -quantity });
     }
 
-    public getMaxStorage(jobName: Job): number {
-        var storageNeeded = StaticJobInfo[jobName].storage;
-        if (!storageNeeded)
-            return -1;
-        return this.$store.state.storage[storageNeeded.name as Storage].quantity * storageNeeded.capacity;
-    }
-
     public canAddJob(quantity: number, jobName: string): boolean {
         if (this.unemployed <= 0)
             return false
 
-        var maxStorage = this.getMaxStorage(jobName as Job);
+        var maxStorage = this.computeMaxStorage(jobName as Job);
 
         if (maxStorage != -1 && maxStorage <= this.$store.state.jobs[jobName as Job].quantity)
             return false;
@@ -145,6 +102,13 @@ export default class Jobs extends IdleGameVue {
 
     public canRemoveJob(quantity: number, jobName: string) {
          return this.$store.state.jobs[jobName as Job].quantity >= quantity;
+    }
+
+    private computeMaxStorage(jobName: Job): number {
+        var storageNeeded = StaticJobInfo[jobName].storage;
+        if (!storageNeeded)
+            return -1;
+        return this.$store.state.storage[storageNeeded.name as Storage].quantity * storageNeeded.capacity;
     }
 }
 </script>

@@ -1,11 +1,14 @@
 import { Consummable } from '@/models/Consummable';
 import { Job } from '@/models/Job';
 import { Storage } from '@/models/Storage';
+import { Research } from '@/models/Research';
 
 export type IStaticConsummableInfo = {[id in Consummable]: IStaticConsummable}
 export type IStaticStorageInfo = {[id in Storage]: IStaticStorage}
 
 export interface IStaticConsummable {
+  name: string;
+  icon: string;
   storage: IStorage | undefined;
 }
 
@@ -25,20 +28,6 @@ export interface IConsuming {
 export interface IStorage {
   name: Storage;
   capacity: number;
-}
-
-export type IStaticJobInfo = {[id in Job]: IStaticJob }
-
-export interface IStaticJob {
-  produce: {[id in Consummable]: IStaticJobProduction | null }
-  consume: {[id in Consummable]: IStaticJobProduction | null }
-  interval: number,
-  storage?: IStorage
-}
-
-export interface IStaticJobProduction {
-  probability: number,
-  quantity: number,
 }
 
 export const StaticStorageInfo: IStaticStorageInfo = {
@@ -90,30 +79,56 @@ export const StaticStorageInfo: IStaticStorageInfo = {
 
 export const StaticConsummableInfo: IStaticConsummableInfo = {
   population: {
+    name: 'Population',
+    icon: '🙋‍♂️',
     storage: {
       name: Storage.villages,
       capacity: 10
     },
   },
   food: {
+    name: 'Food',
+    icon: '🍗',
     storage: {
       name: Storage.barns,
       capacity: 10
     },
   },
   wood: {
+    name: 'Wood',
+    icon: '🌲',
     storage: undefined,
   },
   stones: {
+    name: 'Stones',
+    icon: '⛏️' ,
     storage: undefined,
   },
   coals: {
+    name: 'Coals',
+    icon: '💎',
     storage: undefined,
   },
 };
 
+export type IStaticJobInfo = {[id in Job]: IStaticJob }
+
+export interface IStaticJob {
+  name: string;
+  produce: {[id in Consummable]: IStaticJobProduction | null };
+  consume: {[id in Consummable]: IStaticJobProduction | null };
+  interval: number;
+  storage?: IStorage;
+}
+
+export interface IStaticJobProduction {
+  probability: number;
+  quantity: number;
+}
+
 export const StaticJobInfo: IStaticJobInfo = {
   'woodGatherer': {
+    name: 'Wood gatherer',
     produce: {
       'population': null,
       'food': null,
@@ -137,6 +152,7 @@ export const StaticJobInfo: IStaticJobInfo = {
     interval: 5000,
   },
   'berryGatherer': {
+    name: 'Berry gatherer',
     produce: {
       'population': null,
       'wood': null,
@@ -157,6 +173,7 @@ export const StaticJobInfo: IStaticJobInfo = {
     interval: 5000,
   },
   'farmer': {
+    name: 'Farmer',
     produce: {
       'population': null,
       'wood': null,
@@ -187,6 +204,7 @@ export const StaticJobInfo: IStaticJobInfo = {
     },
   },
   'stoneGatherer': {
+    name: 'Stone gatherer',
     produce: {
       'population': null,
       'food': null,
@@ -210,6 +228,7 @@ export const StaticJobInfo: IStaticJobInfo = {
     interval: 10000,
   },
   'miner': {
+    name: 'Miner',
     produce: {
       'population': null,
       'food': null,
@@ -243,6 +262,7 @@ export const StaticJobInfo: IStaticJobInfo = {
     },
   },
   'default':  {
+    name: 'DEFAULT',
     produce: {
       'population': {
         probability: 1,
@@ -261,5 +281,29 @@ export const StaticJobInfo: IStaticJobInfo = {
       'coals': null,
     },
     interval: 10000,
+  },
+};
+
+export type IResearchInfo = { [id in Research]: IStaticResearch }
+
+export interface IStaticResearch {
+  name: string;
+  description: string;
+  price: number;
+  prerequisite: Research[];
+}
+
+export const ResearchInfo: IResearchInfo = {
+  agriculture: {
+    name: 'Agriculture',
+    description: 'Aggriculture allows you to build farms',
+    price: 10,
+    prerequisite: []
+  },
+  steamLocomotive: {
+    name: 'Steam Locomotive',
+    description: 'Allow you to build coal powered factories',
+    price: 100,
+    prerequisite: [Research.agriculture]
   },
 }

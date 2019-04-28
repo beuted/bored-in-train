@@ -1,5 +1,5 @@
 <template>
-    <div class="tooltip"><div> <slot></slot> </div>
+    <div v-once class="tooltip"><div> <slot></slot> </div>
         <span class="tooltip-content">
             <div>
                 <div class="tooltip-title">Produce:</div>

@@ -1,18 +1,18 @@
 <template>
   <div class="home">
-    <Game msg="Boring Idle Game"/>
+    <Research />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Game from '@/components/Game.vue'; // @ is an alias to /src
+import Research from '@/components/Research.vue'; // @ is an alias to /src
 
 @Component({
   components: {
-    Game,
+    Research,
   },
 })
-export default class Home extends Vue {
+export default class ResearchPage extends Vue {
 }
 </script>

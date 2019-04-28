@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
+import ProductionPage from './views/ProductionPage.vue';
+import ResearchPage from './views/ResearchPage.vue';
 
 Vue.use(Router);
 
@@ -8,8 +9,13 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home,
+      name: 'production',
+      component: ProductionPage,
+    },
+    {
+      path: '/research',
+      name: 'research',
+      component: ResearchPage,
     },
     {
       path: '/about',

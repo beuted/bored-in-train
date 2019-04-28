@@ -48,7 +48,7 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     price: {
       population: 0,
       food: 0,
-      sticks: 10,
+      wood: 10,
       stones: 0,
       coals: 0
     },
@@ -59,7 +59,7 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     price: {
       population: 0,
       food: 5,
-      sticks: 15,
+      wood: 15,
       stones: 0,
       coals: 0
     }
@@ -70,7 +70,7 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     price: {
       population: 0,
       food: 10,
-      sticks: 20,
+      wood: 20,
       stones: 0,
       coals: 0
     }
@@ -81,7 +81,7 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     price: {
       population: 0,
       food: 0,
-      sticks: 50,
+      wood: 50,
       stones: 50,
       coals: 0
     }
@@ -101,7 +101,7 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
       capacity: 10
     },
   },
-  sticks: {
+  wood: {
     storage: undefined,
   },
   stones: {
@@ -117,7 +117,7 @@ export const StaticJobInfo: IStaticJobInfo = {
     produce: {
       'population': null,
       'food': null,
-      'sticks': {
+      'wood': {
         probability: 1,
         quantity: 1
       },
@@ -130,7 +130,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 1
       },
-      'sticks': null,
+      'wood': null,
       'stones': null,
       'coals': null,
     },
@@ -139,7 +139,7 @@ export const StaticJobInfo: IStaticJobInfo = {
   'berryGatherer': {
     produce: {
       'population': null,
-      'sticks': null,
+      'wood': null,
       'food': {
         probability: 1,
         quantity: 1
@@ -150,7 +150,7 @@ export const StaticJobInfo: IStaticJobInfo = {
     consume: {
       'population': null,
       'food': null,
-      'sticks': null,
+      'wood': null,
       'stones': null,
       'coals': null,
     },
@@ -159,7 +159,7 @@ export const StaticJobInfo: IStaticJobInfo = {
   'farmer': {
     produce: {
       'population': null,
-      'sticks': null,
+      'wood': null,
       'food': {
         probability: 1,
         quantity: 8
@@ -173,7 +173,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 2
       },
-      'sticks': {
+      'wood': {
         probability: 1,
         quantity: 1
       },
@@ -190,7 +190,7 @@ export const StaticJobInfo: IStaticJobInfo = {
     produce: {
       'population': null,
       'food': null,
-      'sticks': null,
+      'wood': null,
       'stones': {
         probability: 1,
         quantity: 1
@@ -203,7 +203,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 1
       },
-      'sticks': null,
+      'wood': null,
       'stones': null,
       'coals': null,
     },
@@ -213,7 +213,7 @@ export const StaticJobInfo: IStaticJobInfo = {
     produce: {
       'population': null,
       'food': null,
-      'sticks': null,
+      'wood': null,
       'stones': {
         probability: 1,
         quantity: 1
@@ -229,7 +229,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 3
       },
-      'sticks': {
+      'wood': {
         probability: 1,
         quantity: 2
       },
@@ -249,14 +249,14 @@ export const StaticJobInfo: IStaticJobInfo = {
         quantity: 1
       },
       'food': null,
-      'sticks': null,
+      'wood': null,
       'stones': null,
       'coals': null,
     },
     consume: {
       'population': null,
       'food': null,
-      'sticks': null,
+      'wood': null,
       'stones': null,
       'coals': null,
     },

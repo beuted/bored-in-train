@@ -64,7 +64,7 @@ export default class Game extends IdleGameVue {
                 produced: {
                     population: 0,
                     food: 0,
-                    sticks: 0,
+                    wood: 0,
                     stones: 0,
                     coals: 0
                 }

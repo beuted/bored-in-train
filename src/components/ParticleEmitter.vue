@@ -5,7 +5,7 @@
                 <div v-if="shows['food'].positive">🍗</div>
             </transition>
             <transition name="bounce">
-                <div v-if="shows['sticks'].positive">🌲</div>
+                <div v-if="shows['wood'].positive">🌲</div>
             </transition>
             <transition name="bounce">
                 <div v-if="shows['stones'].positive">⛏️</div>
@@ -19,7 +19,7 @@
                 <div v-if="shows['food'].negative">🍗</div>
             </transition>
             <transition name="unbounce">
-                <div v-if="shows['sticks'].negative">🌲</div>
+                <div v-if="shows['wood'].negative">🌲</div>
             </transition>
             <transition name="unbounce">
                 <div v-if="shows['stones'].negative">⛏️</div>
@@ -49,7 +49,7 @@ export default class ParticleEmitter extends IdleGameVue {
     private shows: { [id in Consummable]: { positive: boolean, negative: boolean } } = {
         population: { positive: false, negative: false },
         food: { positive: false, negative: false },
-        sticks: { positive: false, negative: false },
+        wood: { positive: false, negative: false },
         stones: { positive: false, negative: false },
         coals: { positive: false, negative: false },
     }

@@ -42,7 +42,7 @@ export default new Vuex.Store<IState>({
       food: {
         quantity: 5,
       },
-      sticks: {
+      wood: {
         quantity: 10,
       },
       stones: {

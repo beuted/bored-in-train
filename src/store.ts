@@ -10,9 +10,15 @@ import { StaticConsummableInfo, StaticJobInfo } from './services/GameEngine';
 import { IJobProductionEvent } from './EventBus';
 import { Environment } from './models/Environment';
 import { Research } from './models/Research';
+import VuexPersist from 'vuex-persist'
+
+const vuexPersist = new VuexPersist({
+  key: 'boring-idle-game',
+  storage: localStorage
+})
+
 
 Vue.use(Vuex);
-
 
 export abstract class IdleGameVue extends Vue {
   public $store!: Store<IState>;
@@ -33,6 +39,7 @@ export interface IState {
 //}
 
 export default new Vuex.Store<IState>({
+  plugins: [vuexPersist.plugin],
   strict: true,
   state: {
     debugMode: false,

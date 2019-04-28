@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>{{ msg }} <button v-on:click="toggleDebug()">Debug</button></h1>
+    <h1>{{ msg }} <button v-on:click="toggleDebug()">Debug</button> <button v-on:click="reset()">Reset</button></h1>
 
     <div class="flex-container">
       <div class="job-item">
@@ -47,6 +47,11 @@ export default class Game extends IdleGameVue {
 
   public toggleDebug() {
       this.$store.commit('ToggleDebugMode');
+  }
+
+  public reset() {
+    window.localStorage.removeItem('boring-idle-game');
+    location.reload();
   }
 
   public mounted() {

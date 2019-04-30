@@ -47,8 +47,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     description: 'Increases the quantity of food you can store by 10',
     price: {
       population: 0,
-      food: 5,
-      wood: 15,
+      food: 0,
+      wood: 20,
       stones: 0,
       coals: 0
     }
@@ -58,9 +58,9 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     description: 'Allows you to recruit 3 farmers',
     price: {
       population: 0,
-      food: 10,
+      food: 5,
       wood: 20,
-      stones: 0,
+      stones: 5,
       coals: 0
     }
   },

@@ -26,7 +26,7 @@ export abstract class IdleGameVue extends Vue {
 
 export interface IState {
   debugMode: boolean,
-  map: { building: number, environment: number }[][],
+  map: { building: number, environment: number, discovered: boolean }[][],
   consummable: { [id in Consummable]: { quantity: number } },
   storage: { [id in Storage]: { quantity: number } },
   jobs: { [id in Job]: { quantity: number, remainingTime: number } },

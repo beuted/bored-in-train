@@ -152,13 +152,27 @@ export default class Map extends IdleGameVue {
 
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
+                if (this.$store.state.map[i][j].discovered) {
+                    let environmentImage = this.getEnvironmentImage(this.$store.state.map[i][j].environment)
+                    this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize);
 
-                let environmentImage = this.getEnvironmentImage(this.$store.state.map[i][j].environment)
-                this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize);
-
-                let buildingImage = this.getBuildingImage(this.$store.state.map[i][j].building)
-                if (buildingImage)
-                    this.ctx.drawImage(buildingImage, i*this.tileSize, j*this.tileSize);
+                    let buildingImage = this.getBuildingImage(this.$store.state.map[i][j].building)
+                    if (buildingImage)
+                        this.ctx.drawImage(buildingImage, i*this.tileSize, j*this.tileSize);
+                // TODO: The following statement is REALLY sub-optimal
+                } else if (
+                    (this.$store.state.map[i][j+1] && this.$store.state.map[i][j+1].discovered) ||
+                    (this.$store.state.map[i][j-1] && this.$store.state.map[i][j-1].discovered) ||
+                    (this.$store.state.map[i+1] && this.$store.state.map[i+1][j] && this.$store.state.map[i+1][j].discovered) ||
+                    (this.$store.state.map[i-1] && this.$store.state.map[i-1][j] && this.$store.state.map[i-1][j].discovered)) {
+                     let environmentImage = this.getEnvironmentImage(this.$store.state.map[i][j].environment)
+                    this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize);
+                    this.ctx.globalAlpha = 0.7;
+                    this.ctx.fillRect(i*this.tileSize, j*this.tileSize, i*this.tileSize + 32, j*this.tileSize + 32);
+                    this.ctx.globalAlpha = 1;
+                } else {
+                    this.ctx.fillRect(i*this.tileSize, j*this.tileSize, i*this.tileSize + 32, j*this.tileSize + 32);
+                }
             }
         }
 
@@ -219,6 +233,10 @@ export default class Map extends IdleGameVue {
 
         // If building is already there
         if (building == (this.$store.state as IState).map[coord.x][coord.y].building)
+            return false;
+
+        // If not discovered
+        if (!(this.$store.state as IState).map[coord.x][coord.y].discovered)
             return false;
 
         // You can't build on water

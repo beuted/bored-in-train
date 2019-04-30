@@ -27,10 +27,20 @@ export class MapBuilder {
     ];
 
     public static InitMap(size: number): IMapTile[][] {
-        var map = this.Environments.map(x => x.map(y => { return { building: 0, environment: y }}));
+        var map = this.Environments.map(x => x.map(y => { return { building: 0, environment: y, discovered: false }}));
         var center = Math.floor(size/2);
+
+        // Build buildings
         map[center][center].building = Building.Village;
-        map[center][center+1].building = Building.Barn;
+        map[center][center + 1].building = Building.Barn;
+
+        // Set discovered
+        map[center][center].discovered = true;
+        map[center][center + 1].discovered = true;
+        map[center][center - 1].discovered = true;
+        map[center + 1][center].discovered = true;
+        map[center - 1][center].discovered = true;
+
         return map;
     }
 }

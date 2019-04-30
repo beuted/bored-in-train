@@ -4,4 +4,5 @@ import { Environment } from './Environment';
 export interface IMapTile {
     building : Building;
     environment: Environment;
+    discovered: boolean;
 }

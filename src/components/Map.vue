@@ -103,19 +103,19 @@ export default class Map extends IdleGameVue {
     }
 
     get barns() {
-        return this.$store.state.storage.barns;
+        return this.$store.state.map.storage.barns;
     }
 
     get villages() {
-        return this.$store.state.storage.villages;
+        return this.$store.state.map.storage.villages;
     }
 
     get farms() {
-        return this.$store.state.storage.farms;
+        return this.$store.state.map.storage.farms;
     }
 
     get coalMines() {
-        return this.$store.state.storage.coalMines;
+        return this.$store.state.map.storage.coalMines;
     }
 
     constructor() {
@@ -133,7 +133,7 @@ export default class Map extends IdleGameVue {
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
         this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
-        if ((this.$store.state as IState).map.length <= 0)
+        if (this.$store.state.map.map.length <= 0)
             this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
 
         var nbImages = Object.keys(this.mapTileImages).length;
@@ -152,20 +152,16 @@ export default class Map extends IdleGameVue {
 
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
-                if (this.$store.state.map[i][j].discovered) {
-                    let environmentImage = this.getEnvironmentImage(this.$store.state.map[i][j].environment)
+                if (this.$store.state.map.map[i][j].discovered) {
+                    let environmentImage = this.getEnvironmentImage(this.$store.state.map.map[i][j].environment)
                     this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize);
 
-                    let buildingImage = this.getBuildingImage(this.$store.state.map[i][j].building)
+                    let buildingImage = this.getBuildingImage(this.$store.state.map.map[i][j].building)
                     if (buildingImage)
                         this.ctx.drawImage(buildingImage, i*this.tileSize, j*this.tileSize);
-                // TODO: The following statement is REALLY sub-optimal
-                } else if (
-                    (this.$store.state.map[i][j+1] && this.$store.state.map[i][j+1].discovered) ||
-                    (this.$store.state.map[i][j-1] && this.$store.state.map[i][j-1].discovered) ||
-                    (this.$store.state.map[i+1] && this.$store.state.map[i+1][j] && this.$store.state.map[i+1][j].discovered) ||
-                    (this.$store.state.map[i-1] && this.$store.state.map[i-1][j] && this.$store.state.map[i-1][j].discovered)) {
-                     let environmentImage = this.getEnvironmentImage(this.$store.state.map[i][j].environment)
+                // The following statement is cached
+                } else if (this.$store.getters.tilesDiscoverability[i][j]) {
+                    let environmentImage = this.getEnvironmentImage(this.$store.state.map.map[i][j].environment);
                     this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize);
                     this.ctx.globalAlpha = 0.7;
                     this.ctx.fillRect(i*this.tileSize, j*this.tileSize, i*this.tileSize + 32, j*this.tileSize + 32);
@@ -227,20 +223,20 @@ export default class Map extends IdleGameVue {
         for (let consummableId in StaticStorageInfo[this.storageType as Storage].price) {
             let price = StaticStorageInfo[this.storageType].price[consummableId as Consummable];
 
-            if (price && (this.$store.state as IState).consummable[consummableId as Consummable].quantity < price)
+            if (price && this.$store.state.consummable[consummableId as Consummable].quantity < price)
                 return false;
         }
 
         // If building is already there
-        if (building == (this.$store.state as IState).map[coord.x][coord.y].building)
+        if (building == this.$store.state.map.map[coord.x][coord.y].building)
             return false;
 
         // If not discovered
-        if (!(this.$store.state as IState).map[coord.x][coord.y].discovered)
+        if (!this.$store.state.map.map[coord.x][coord.y].discovered)
             return false;
 
         // You can't build on water
-        if ((this.$store.state as IState).map[coord.x][coord.y].environment == Environment.Water)
+        if (this.$store.state.map.map[coord.x][coord.y].environment == Environment.Water)
             return false;
 
         return true;

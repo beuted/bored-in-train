@@ -108,7 +108,7 @@ export default class Jobs extends IdleGameVue {
         var storageNeeded = StaticJobInfo[jobName].storage;
         if (!storageNeeded)
             return -1;
-        return this.$store.state.storage[storageNeeded.name as Storage].quantity * storageNeeded.capacity;
+        return this.$store.state.map.storage[storageNeeded.name as Storage].quantity * storageNeeded.capacity;
     }
 }
 </script>

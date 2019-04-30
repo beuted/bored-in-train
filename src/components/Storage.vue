@@ -29,15 +29,15 @@ import { IState, IdleGameVue } from '@/store';
 })
 export default class Storage extends IdleGameVue {
     get barns() {
-        return this.$store.state.storage.barns;
+        return this.$store.state.map.storage.barns;
     }
 
     get villages() {
-        return this.$store.state.storage.villages;
+        return this.$store.state.map.storage.villages;
     }
 
     get farms() {
-        return this.$store.state.storage.farms;
+        return this.$store.state.map.storage.farms;
     }
 
     get debugMode() {

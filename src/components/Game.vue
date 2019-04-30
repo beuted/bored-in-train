@@ -132,9 +132,9 @@ export default class Game extends IdleGameVue {
         for (let consummableId in StaticConsummableInfo) {
             let staticConsummable: IStaticConsummable = StaticConsummableInfo[consummableId as Consummable]; //TODO: fix typeing weirdlness
             // See if storage fits
-            if (staticConsummable.storage && staticConsummable.storage.capacity * store.state.storage[staticConsummable.storage.name].quantity < store.state.consummable[consummableId as Consummable].quantity) {
+            if (staticConsummable.storage && staticConsummable.storage.capacity * store.state.map.storage[staticConsummable.storage.name].quantity < store.state.consummable[consummableId as Consummable].quantity) {
                 let quantityToRemove = Math.floor(this.LackOfStorageFactor *
-                    (store.state.consummable[consummableId as Consummable].quantity - store.state.storage[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity));
+                    (store.state.consummable[consummableId as Consummable].quantity - store.state.map.storage[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity));
                 store.commit('IncrementConsummable', { name: consummableId, value: -quantityToRemove });
                 // this.$toasted.error(`${quantityToRemove} ${consummableId} were thrown away due to lack of storage`);
             }
@@ -147,11 +147,11 @@ export default class Game extends IdleGameVue {
       if (nbExplorers <= 0)
         return;
 
-      var nbLandFound = this.$store.state.mapNbTileFound;
+      var nbLandFound = this.$store.state.map.mapNbTileFound;
       // Probabilty in proba of at least 1 explorer out of nbExplorers to find a tile
       var probability = 1-Math.pow(1-1/nbLandFound, nbExplorers);
       if (Math.random() <= probability) {
-         this.$toasted.success('Land Found !');
+         this.$toasted.success(`Land Found! (Probability was: ${probability.toPrecision(2)})`);
          this.$store.commit('DiscoverTile')
       }
     }, 10 * this.TickInterval);

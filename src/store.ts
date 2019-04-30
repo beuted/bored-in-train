@@ -12,6 +12,7 @@ import { Environment } from './models/Environment';
 import { Research } from './models/Research';
 import VuexPersist from 'vuex-persist'
 import { IMapTile } from './models/IMapTile';
+import { UtilService } from './services/UtilService';
 
 const vuexPersist = new VuexPersist({
   key: 'boring-idle-game',
@@ -151,7 +152,7 @@ export default new Vuex.Store<IState>({
     },
     // Change a tile of a map giving it a certain type
     ChangeTile(state, obj: { x: number, y: number, type: Building }) {
-      var previousTile = (state.map[obj.x])[obj.y];
+      var previousTile = state.map[obj.x][obj.y];
 
       console.debug(`Changing tile ${obj.x}, ${obj.y} from ${previousTile.building} to ${obj.type}`);
 
@@ -160,13 +161,31 @@ export default new Vuex.Store<IState>({
         (state.storage as any)[storageTypeToDestroy].quantity--;
       }
 
-      (state.map[obj.x])[obj.y].building = obj.type;
-      (state.map[obj.x])[obj.y].environment = Environment.Field;
+      state.map[obj.x][obj.y].building = obj.type;
+      state.map[obj.x][obj.y].environment = Environment.Field;
 
       let storageTypeToBuild = (BuildingToStorageMapping as any)[obj.type]
       if (storageTypeToBuild != null) {
         (state.storage as any)[storageTypeToBuild].quantity++;
       }
+    },
+    DiscoverTile(state: IState) {
+      var xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(state.map.length));
+      var ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(state.map.length));
+      for (const x of xSuite) {
+        for (const y of ySuite) {
+          if (!state.map[x][y].discovered && (
+            (state.map[x][y+1] && state.map[x][y+1].discovered) ||
+            (state.map[x][y-1] && state.map[x][y-1].discovered) ||
+            (state.map[x+1] && state.map[x+1][y] && state.map[x+1][y].discovered) ||
+            (state.map[x-1] && state.map[x-1][y] && state.map[x-1][y].discovered))) {
+              state.map[x][y].discovered = true;
+              state.mapNbTileFound++;
+              return;
+            }
+        }
+      }
+      console.error('DiscoverTile: No tile left to discover!')
     },
     //Add Job
     AddJob(state, obj: { jobName: Job, quantity: number }) {

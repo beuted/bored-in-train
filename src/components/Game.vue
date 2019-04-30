@@ -148,17 +148,13 @@ export default class Game extends IdleGameVue {
         return;
 
       var nbLandFound = this.$store.state.mapNbTileFound;
-      var probability = 1-Math.pow(1-1/(nbLandFound*10), nbExplorers);
+      // Probabilty in proba of at least 1 explorer out of nbExplorers to find a tile
+      var probability = 1-Math.pow(1-1/nbLandFound, nbExplorers);
       if (Math.random() <= probability) {
-         this.$toasted.success("Land Found !");
+         this.$toasted.success('Land Found !');
+         this.$store.commit('DiscoverTile')
       }
     }, 10 * this.TickInterval);
-
-    function DoWithProba(proba: number, f: () => void) {
-        if (Math.random() <= proba) {
-            f();
-        }
-    }
   }
 }
 </script>

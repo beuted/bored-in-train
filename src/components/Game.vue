@@ -142,6 +142,18 @@ export default class Game extends IdleGameVue {
 
     }, this.TickInterval);
 
+    setInterval (() => {
+      var nbExplorers = this.$store.state.jobs.explorer.quantity;
+      if (nbExplorers <= 0)
+        return;
+
+      var nbLandFound = this.$store.state.mapNbTileFound;
+      var probability = 1-Math.pow(1-1/(nbLandFound*10), nbExplorers);
+      if (Math.random() <= probability) {
+         this.$toasted.success("Land Found !");
+      }
+    }, 10 * this.TickInterval);
+
     function DoWithProba(proba: number, f: () => void) {
         if (Math.random() <= proba) {
             f();
@@ -171,6 +183,6 @@ export default class Game extends IdleGameVue {
   width: 300px;
 }
 .map-item {
-  
+
 }
 </style>

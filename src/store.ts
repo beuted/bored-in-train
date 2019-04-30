@@ -11,6 +11,7 @@ import { IJobProductionEvent } from './EventBus';
 import { Environment } from './models/Environment';
 import { Research } from './models/Research';
 import VuexPersist from 'vuex-persist'
+import { IMapTile } from './models/IMapTile';
 
 const vuexPersist = new VuexPersist({
   key: 'boring-idle-game',
@@ -26,7 +27,8 @@ export abstract class IdleGameVue extends Vue {
 
 export interface IState {
   debugMode: boolean,
-  map: { building: number, environment: number, discovered: boolean }[][],
+  mapNbTileFound: number,
+  map: IMapTile[][],
   consummable: { [id in Consummable]: { quantity: number } },
   storage: { [id in Storage]: { quantity: number } },
   jobs: { [id in Job]: { quantity: number, remainingTime: number } },
@@ -43,6 +45,7 @@ export default new Vuex.Store<IState>({
   strict: true,
   state: {
     debugMode: false,
+    mapNbTileFound: 5,
     map: [],
     consummable: {
       population: {

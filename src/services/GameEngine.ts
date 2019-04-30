@@ -172,6 +172,48 @@ export const StaticJobInfo: IStaticJobInfo = {
     },
     interval: 5000,
   },
+  'explorer': {
+    name: 'Explorer',
+    produce: {
+      'population': null,
+      'wood': null,
+      'food': null,
+      'stones': null,
+      'coals': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': null,
+    },
+    interval: 5000,
+  },
+  'scientist': {
+    name: 'Scientist',
+    produce: {
+      'population': null,
+      'wood': null,
+      'food': null,
+      'stones': null,
+      'coals': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': null,
+    },
+    interval: 5000,
+  },
   'farmer': {
     name: 'Farmer',
     produce: {

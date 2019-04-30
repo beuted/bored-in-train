@@ -84,6 +84,14 @@ export default new Vuex.Store<IState>({
         quantity: 0,
         remainingTime: 1000,
       },
+      explorer: {
+        quantity: 0,
+        remainingTime: 1000,
+      },
+      scientist: {
+        quantity: 0,
+        remainingTime: 1000,
+      },
       farmer: {
         quantity: 0,
         remainingTime: 1000,

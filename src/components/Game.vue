@@ -136,7 +136,7 @@ export default class Game extends IdleGameVue {
                 let quantityToRemove = Math.floor(this.LackOfStorageFactor *
                     (store.state.consummable[consummableId as Consummable].quantity - store.state.storage[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity));
                 store.commit('IncrementConsummable', { name: consummableId, value: -quantityToRemove });
-                this.$toasted.error(`${quantityToRemove} ${consummableId} were thrown away due to lack of storage`);
+                // this.$toasted.error(`${quantityToRemove} ${consummableId} were thrown away due to lack of storage`);
             }
         }
 

@@ -39,7 +39,8 @@ export default class PriceTooltip extends IdleGameVue {
     }
 
     private isBuildable() {
-        for (const [key, value] of Object.entries(StaticStorageInfo[this.building].price)) {
+        for (const key in StaticStorageInfo[this.building].price) {
+            var value = StaticStorageInfo[this.building].price[key as Consummable];
             if (this.consummables[key as Consummable].quantity < value)
                 return false;
         }

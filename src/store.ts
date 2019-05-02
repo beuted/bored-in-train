@@ -5,9 +5,9 @@ import { Consummable } from './models/Consummable';
 import { Job } from './models/Job';
 import { StaticJobInfo } from './services/GameEngine';
 import { IJobProductionEvent } from './EventBus';
-import { Research } from './models/Research';
 import VuexPersist from 'vuex-persist'
 import { MapModule, IMapState } from './store/mapStoreModule';
+import { IResearchState, ResearchModule } from './store/researchStoreModule';
 
 const vuexPersist = new VuexPersist({
   key: 'boring-idle-game',
@@ -22,20 +22,22 @@ export abstract class IdleGameVue extends Vue {
 
 export interface IState {
   map: IMapState;
-  debugMode: boolean,
-  consummable: { [id in Consummable]: { quantity: number } },
-  jobs: { [id in Job]: { quantity: number, remainingTime: number } },
-  research: { [id in Research]: { owned: boolean } },
+  research: IResearchState;
+  debugMode: boolean;
+  consummable: { [id in Consummable]: { quantity: number } };
+  jobs: { [id in Job]: { quantity: number, remainingTime: number } };
 }
 
 export default new Vuex.Store<IState>({
   plugins: [vuexPersist.plugin],
   strict: true,
   modules: {
-    map: MapModule
+    map: MapModule,
+    research: ResearchModule
   },
   state: {
     map: <IMapState><any>null, // TODO: This hack is required to keep the type system happy
+    research: <IResearchState><any>null, // TODO: This hack is required to keep the type system happy
     debugMode: false,
     consummable: {
       population: {
@@ -94,19 +96,7 @@ export default new Vuex.Store<IState>({
         quantity: 1,
         remainingTime: 5000,
       }
-    },
-    research: {
-      agriculture: {
-        owned: false
-      },
-      mining: {
-        owned: false
-      },
-      steamLocomotive: {
-        owned: false
-      },
-      
-    },
+    }
   },
   mutations: {
     // Increment the value of a consummable from 'value'
@@ -136,10 +126,6 @@ export default new Vuex.Store<IState>({
     AddJob(state, obj: { jobName: Job, quantity: number }) {
       console.debug(`AddJob tile ${obj.jobName}, ${obj.quantity}`);
       state.jobs[obj.jobName].quantity += obj.quantity;
-    },
-    BuyResearch(state, obj: { researchName: Research }) {
-      console.debug(`Buying research ${obj.researchName}`);
-      state.research[obj.researchName].owned = true;
     },
   },
   actions: {

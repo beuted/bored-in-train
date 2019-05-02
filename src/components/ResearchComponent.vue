@@ -33,7 +33,7 @@ export default class ResearchComponent extends IdleGameVue {
   }
 
   public isResearchOwned(researchName: Research) {
-    return this.$store.state.research[researchName].owned;
+    return this.$store.state.research.research[researchName].owned;
   }
 
   public buyResearch(researchName: Research) {

@@ -413,7 +413,7 @@ export interface IStaticResearch {
   description: string;
   price: number;
   prerequisite: Research[];
-  unlock: { storages: Storage[] };
+  unlocks: { storages: Storage[] };
 }
 
 export const ResearchInfo: IResearchInfo = {
@@ -422,8 +422,8 @@ export const ResearchInfo: IResearchInfo = {
     description: 'Aggriculture allows you to build farms',
     price: 10,
     prerequisite: [],
-    unlock: {
-      storages: []
+    unlocks: {
+      storages: [Storage.farms]
     }
   },
   mining: {
@@ -431,7 +431,7 @@ export const ResearchInfo: IResearchInfo = {
     description: 'Allows you to build coal mines',
     price: 100,
     prerequisite: [],
-    unlock: {
+    unlocks: {
       storages: [Storage.coalMines]
     }
   },
@@ -440,7 +440,7 @@ export const ResearchInfo: IResearchInfo = {
     description: 'Allows you to build coal powered factories',
     price: 200,
     prerequisite: [Research.mining],
-    unlock: {
+    unlocks: {
       storages: [Storage.coalPowerStations]
     }
   },

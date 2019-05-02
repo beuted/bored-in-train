@@ -1,40 +1,50 @@
 <template>
     <div>
         <div class="menu">
-            <input type="radio" id="village" value="villages" v-model="storageType">
-            <label for="village">
-                <PriceTooltip building="villages" :consummables="consummables">
-                <div v-once><img v-bind:src="mapTileImages.villageImage.src"></div>
-                </PriceTooltip> x {{ villages.quantity }}
-            </label>
+            <span v-if="isKnown('villages')">
+                <input type="radio" id="village" value="villages" v-model="storageType">
+                <label for="village">
+                    <PriceTooltip building="villages" :consummables="consummables">
+                    <div v-once><img v-bind:src="mapTileImages.villageImage.src"></div>
+                    </PriceTooltip> x {{ villages.quantity }}
+                </label>
+            </span>
 
-            <input type="radio" id="barn" value="barns" v-model="storageType" >
-            <label for="barn">
-                <PriceTooltip building="barns" :consummables="consummables">
-                    <div v-once><img v-bind:src="mapTileImages.barnImage.src"></div>
-                </PriceTooltip> x {{ barns.quantity }}
-            </label>
+            <span v-if="isKnown('barns')">
+                <input type="radio" id="barn" value="barns" v-model="storageType" >
+                <label for="barn">
+                    <PriceTooltip building="barns" :consummables="consummables">
+                        <div v-once><img v-bind:src="mapTileImages.barnImage.src"></div>
+                    </PriceTooltip> x {{ barns.quantity }}
+                </label>
+            </span>
 
-            <input type="radio" id="farm" value="farms" v-model="storageType">
-            <label for="farm">
-                <PriceTooltip building="farms" :consummables="consummables">
-                    <div v-once><img v-bind:src="mapTileImages.farmImage.src"></div>
-                </PriceTooltip> x {{ farms.quantity }}
-            </label>
+            <span v-if="isKnown('farms')">
+                <input type="radio" id="farm" value="farms" v-model="storageType">
+                <label for="farm">
+                    <PriceTooltip building="farms" :consummables="consummables">
+                        <div v-once><img v-bind:src="mapTileImages.farmImage.src"></div>
+                    </PriceTooltip> x {{ farms.quantity }}
+                </label>
+            </span>
 
-            <input type="radio" id="coalMine" value="coalMines" v-model="storageType">
-            <label for="coalMine">
-                <PriceTooltip building="coalMines" :consummables="consummables">
-                    <div v-once><img v-bind:src="mapTileImages.coalMineImage.src"></div>
-                </PriceTooltip> x {{ coalMines.quantity }}
-            </label>
+            <span v-if="isKnown('coalMines')">
+                <input type="radio" id="coalMine" value="coalMines" v-model="storageType">
+                <label for="coalMine">
+                    <PriceTooltip building="coalMines" :consummables="consummables">
+                        <div v-once><img v-bind:src="mapTileImages.coalMineImage.src"></div>
+                    </PriceTooltip> x {{ coalMines.quantity }}
+                </label>
+            </span>
 
-            <input type="radio" id="coalPowerStation" value="coalPowerStations" v-model="storageType">
-            <label for="coalPowerStation">
-                <PriceTooltip building="coalPowerStations" :consummables="consummables">
-                    <div v-once><img v-bind:src="mapTileImages.coalPowerStationImage.src"></div>
-                </PriceTooltip> x {{ coalPowerStations.quantity }}
-            </label>
+            <span v-if="isKnown('coalPowerStations')">
+                <input type="radio" id="coalPowerStation" value="coalPowerStations" v-model="storageType">
+                <label for="coalPowerStation">
+                    <PriceTooltip building="coalPowerStations" :consummables="consummables">
+                        <div v-once><img v-bind:src="mapTileImages.coalPowerStationImage.src"></div>
+                    </PriceTooltip> x {{ coalPowerStations.quantity }}
+                </label>
+            </span>
         </div>
         <canvas id="canvas" class="map"
             v-on:mousedown="handleMouseDown"
@@ -49,13 +59,14 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Building, StorageToBuildingMapping } from '@/models/Building';
 import { Storage } from '@/models/Storage';
-import { StaticStorageInfo } from '@/services/GameEngine'
+import { StaticStorageInfo, ResearchInfo } from '@/services/GameEngine'
 import { Environment } from '@/models/Environment';
 import { IMapTile } from '@/models/IMapTile';
 import { IState, IdleGameVue } from '@/store';
 import { Consummable } from '@/models/Consummable';
 
 import PriceTooltip from '@/components/PriceTooltip.vue';
+import { Research } from '../models/Research';
 
 @Component({
   components: {
@@ -270,6 +281,10 @@ export default class Map extends IdleGameVue {
             return false;
 
         return true;
+    }
+
+    private isKnown(storage: Storage) {
+        return this.$store.getters.researchStorageKnown[storage];
     }
 
     private getEnvironmentImage(environment: Environment): HTMLImageElement {

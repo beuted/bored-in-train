@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Building, StorageToBuildingMapping } from '@/models/Building';
 import { Storage } from '@/models/Storage';
 import { StaticStorageInfo } from '@/services/GameEngine'
@@ -77,16 +77,16 @@ export default class Map extends IdleGameVue {
         coalMineImage: new Image(),
         coalDepositeImage: new Image(),
     }
+    @Prop() private map!: IMapTile[][];
+    @Prop() private storage!: { [id in Storage]: { quantity: number } };
+    @Prop() private consummables!: {[id in Consummable]: { quantity: number }};
+
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
 
     private mouseTileCoord: { x: number, y: number } | null = null;
 
     public storageType: Storage = Storage.villages;
-
-    get consummables() {
-        return this.$store.state.consummable;
-    }
 
     get villagesInfo() {
         return StaticStorageInfo.villages;
@@ -105,19 +105,25 @@ export default class Map extends IdleGameVue {
     }
 
     get barns() {
-        return this.$store.state.map.storage.barns;
+        return this.storage.barns;
     }
 
     get villages() {
-        return this.$store.state.map.storage.villages;
+        return this.storage.villages;
     }
 
     get farms() {
-        return this.$store.state.map.storage.farms;
+        return this.storage.farms;
     }
 
     get coalMines() {
-        return this.$store.state.map.storage.coalMines;
+        return this.storage.coalMines;
+    }
+
+    // TODO: I'm not sure why I need to watch this property since it's on the store
+    @Watch('map', { deep: true })
+    onPropertyChanged(value: string, oldValue: string) {
+        this.draw();
     }
 
     constructor() {
@@ -136,7 +142,7 @@ export default class Map extends IdleGameVue {
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
         this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
 
-        if (this.$store.state.map.map.length <= 0)
+        if (this.map.length <= 0)
             this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
 
         var nbImages = Object.keys(this.mapTileImages).length;
@@ -148,23 +154,23 @@ export default class Map extends IdleGameVue {
                     this.draw();
             }
         }
-    }
+    }       
 
     private draw() {
         this.ctx.clearRect(0, 0, this.tileSize * this.nbTilesOnRowOrColumn, this.tileSize * this.nbTilesOnRowOrColumn);
 
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
-                if (this.$store.state.map.map[i][j].discovered) {
-                    let environmentImage = this.getEnvironmentImage(this.$store.state.map.map[i][j].environment)
+                if (this.map[i][j].discovered) {
+                    let environmentImage = this.getEnvironmentImage(this.map[i][j].environment)
                     this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize);
 
-                    let buildingImage = this.getBuildingImage(this.$store.state.map.map[i][j].building)
+                    let buildingImage = this.getBuildingImage(this.map[i][j].building)
                     if (buildingImage)
                         this.ctx.drawImage(buildingImage, i*this.tileSize, j*this.tileSize);
                 // The following statement is cached
                 } else if (this.$store.getters.tilesDiscoverability[i][j]) {
-                    let environmentImage = this.getEnvironmentImage(this.$store.state.map.map[i][j].environment);
+                    let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
                     this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize);
                     this.ctx.globalAlpha = 0.7;
                     this.ctx.fillRect(i*this.tileSize, j*this.tileSize, i*this.tileSize + 32, j*this.tileSize + 32);
@@ -226,24 +232,24 @@ export default class Map extends IdleGameVue {
         for (let consummableId in StaticStorageInfo[this.storageType as Storage].price) {
             let price = StaticStorageInfo[this.storageType].price[consummableId as Consummable];
 
-            if (price && this.$store.state.consummable[consummableId as Consummable].quantity < price)
+            if (price && this.consummables[consummableId as Consummable].quantity < price)
                 return false;
         }
 
         // If building is already there
-        if (building == this.$store.state.map.map[coord.x][coord.y].building)
+        if (building == this.map[coord.x][coord.y].building)
             return false;
 
         // If not discovered
-        if (!this.$store.state.map.map[coord.x][coord.y].discovered)
+        if (!this.map[coord.x][coord.y].discovered)
             return false;
 
         // You can't build on water
-        if (this.$store.state.map.map[coord.x][coord.y].environment == Environment.Water)
+        if (this.map[coord.x][coord.y].environment == Environment.Water)
             return false;
 
         // You must build coalMine on coalDeposite
-        if (building == Building.CoalMine && this.$store.state.map.map[coord.x][coord.y].environment !== Environment.CoalDeposite)
+        if (building == Building.CoalMine && this.map[coord.x][coord.y].environment !== Environment.CoalDeposite)
             return false;
 
         return true;

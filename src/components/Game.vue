@@ -7,7 +7,7 @@
         <Jobs />
       </div>
       <div class="map-item">
-        <Map />
+        <Map :map="map" :storage="storage" :consummables="consummables"/>
       </div>
       <div class="inventory-item">
         <Inventory />
@@ -44,6 +44,18 @@ export default class Game extends IdleGameVue {
   private readonly TickInterval = 1000;
   private readonly StarvationFactor = 0.5; // Portion of disapearing goods when missing consummable
   private readonly LackOfStorageFactor = 1.0; // Portion of disapearing goods when missing storage
+
+  private get map() {
+    return this.$store.state.map.map;
+  }
+
+  private get storage() {
+    return this.$store.state.map.storage;
+  }
+
+  private get consummables() {
+    return this.$store.state.consummable;
+  }
 
   public toggleDebug() {
       this.$store.commit('ToggleDebugMode');
@@ -152,7 +164,7 @@ export default class Game extends IdleGameVue {
       var probability = 1-Math.pow(1-2/nbLandFound, nbExplorers);
       if (Math.random() <= probability) {
          this.$toasted.success(`Land Found! (Probability was: ${probability.toPrecision(2)})`);
-         this.$store.commit('DiscoverTile')
+         this.$store.commit('DiscoverTile');
       }
     }, 10 * this.TickInterval);
   }

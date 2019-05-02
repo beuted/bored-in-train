@@ -55,6 +55,9 @@ export default new Vuex.Store<IState>({
       coals: {
         quantity: 0,
       },
+      knowledge: {
+        quantity: 0,
+      },
       energy: {
         quantity: 0,
       },

@@ -86,6 +86,7 @@ export default class Game extends IdleGameVue {
                     stones: 0,
                     coals: 0,
                     energy: 0,
+                    knowledge: 0
                 }
             }
 

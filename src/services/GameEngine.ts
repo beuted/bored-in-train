@@ -40,7 +40,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       wood: 10,
       stones: 0,
       coals: 0,
-      energy: 0
+      energy: 0,
+      knowledge: 0
     },
   },
   barns: {
@@ -52,7 +53,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       wood: 20,
       stones: 0,
       coals: 0,
-      energy: 0
+      energy: 0,
+      knowledge: 0
     }
   },
   farms: {
@@ -64,7 +66,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       wood: 25,
       stones: 5,
       coals: 0,
-      energy: 0
+      energy: 0,
+      knowledge: 0
     }
   },
   coalMines: {
@@ -76,7 +79,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       wood: 50,
       stones: 50,
       coals: 0,
-      energy: 0
+      energy: 0,
+      knowledge: 0
     }
   },
   coalPowerStations: {
@@ -89,6 +93,7 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       stones: 100,
       coals: 0,
       energy: 0,
+      knowledge: 0
     }
   }
 }
@@ -129,6 +134,11 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
     name: 'Energy',
     icon: '⚡',
     storage: undefined,
+  },
+  knowledge: {
+    name: 'Knowledge',
+    icon: '🔬',
+    storage: undefined,
   }
 };
 
@@ -161,6 +171,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     consume: {
@@ -172,6 +183,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     interval: 5000,
@@ -188,6 +200,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     consume: {
@@ -196,6 +209,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     interval: 5000,
@@ -209,6 +223,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'food': null,
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     consume: {
@@ -220,6 +235,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     interval: 5000,
@@ -233,6 +249,10 @@ export const StaticJobInfo: IStaticJobInfo = {
       'food': null,
       'stones': null,
       'coals': null,
+      'knowledge': {
+        probability: 1,
+        quantity: 1
+      },
       'energy': null,
     },
     consume: {
@@ -244,6 +264,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     interval: 5000,
@@ -260,6 +281,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     consume: {
@@ -274,6 +296,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     interval: 5000,
@@ -294,6 +317,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         quantity: 0.5
       },
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     consume: {
@@ -305,6 +329,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     interval: 5000,
@@ -324,6 +349,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 1
       },
+      'knowledge': null,
       'energy': null,
     },
     consume: {
@@ -338,6 +364,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     interval: 5000,
@@ -355,6 +382,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': {
         probability: 1,
         quantity: 1
@@ -372,6 +400,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 2
       },
+      'knowledge': null,
       'energy': null,
     },
     interval: 5000,
@@ -392,6 +421,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     consume: {
@@ -400,6 +430,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'knowledge': null,
       'energy': null,
     },
     interval: 10000,

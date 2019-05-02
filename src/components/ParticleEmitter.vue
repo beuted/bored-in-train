@@ -16,6 +16,9 @@
             <transition name="bounce">
                 <div v-if="shows['coals'].positive">⚡</div>
             </transition>
+            <transition name="unbounce">
+                <div v-if="shows['knowledge'].positive">🔬</div>
+            </transition>
         </span>
         <span class="particle particle-negative">
             <transition name="unbounce">
@@ -32,6 +35,9 @@
             </transition>
             <transition name="unbounce">
                 <div v-if="shows['energy'].negative">⚡</div>
+            </transition>
+            <transition name="unbounce">
+                <div v-if="shows['knowledge'].negative">🔬</div>
             </transition>
         </span>
     </div>
@@ -60,6 +66,7 @@ export default class ParticleEmitter extends IdleGameVue {
         stones: { positive: false, negative: false },
         coals: { positive: false, negative: false },
         energy: { positive: false, negative: false },
+        knowledge: { positive: false, negative: false },
     }
 
     public constructor() {

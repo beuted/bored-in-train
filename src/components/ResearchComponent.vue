@@ -3,14 +3,15 @@
     <h1>Research</h1>
 
     <div class="flex-container">
-      <div
+      <button
         v-for="(research, researchName) in researchInfos" v-bind:key="researchName"
         class="research-item"
         v-bind:class="{ 'owned': isResearchOwned(researchName), 'cant-afford': cantAffordResearch(researchName) }"
-        v-on:click="buyResearch(researchName)">
+        v-on:click="buyResearch(researchName)"
+        :disabled="cantAffordResearch(researchName) || isResearchOwned(researchName)">
         <div>{{ research.name }}</div>
         <div class="price">Price: {{ research.price }} x 🔬</div>
-      </div>
+      </button>
     </div>
   </div>
 </template>

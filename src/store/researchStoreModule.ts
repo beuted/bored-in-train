@@ -4,6 +4,7 @@ import { Storage } from '@/models/Storage';
 import { ResearchInfo } from '../services/GameEngine';
 import { IState } from '../store';
 import { Research } from '@/models/Research';
+import { Consummable } from '@/models/Consummable';
 
 export interface IResearchState {
   research: { [id in Research]: { owned: boolean } },
@@ -24,9 +25,15 @@ export const ResearchModule: Module<IResearchState, IState> = {
     },
   },
   mutations: {
-    BuyResearch(state, obj: { researchName: Research }) {
-      console.debug(`Buying research ${obj.researchName}`);
+    OwnResearch(state, obj: { researchName: Research }) {
       state.research[obj.researchName].owned = true;
+    },
+  },
+  actions: {
+    BuyResearch(context, obj: { researchName: Research }) {
+      console.debug(`Buying research ${obj.researchName}`);
+      context.commit('OwnResearch', obj);
+      context.commit('IncrementConsummable', { name: Consummable.knowledge, value: -ResearchInfo[obj.researchName as Research].price }, { root: true })
     },
   },
   getters: {

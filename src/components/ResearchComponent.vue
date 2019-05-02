@@ -6,7 +6,7 @@
       <div
         v-for="(research, researchName) in researchInfos" v-bind:key="researchName"
         class="research-item"
-        v-bind:class="{ owned: isResearchOwned(researchName) }"
+        v-bind:class="{ 'owned': isResearchOwned(researchName), 'cant-afford': cantAffordResearch(researchName) }"
         v-on:click="buyResearch(researchName)">
         <div>{{ research.name }}</div>
         <div class="price">Price: {{ research.price }} x 🔬</div>
@@ -37,8 +37,15 @@ export default class ResearchComponent extends IdleGameVue {
   }
 
   public buyResearch(researchName: Research) {
-    this.$store.commit('BuyResearch', { researchName: researchName });
+    if (this.cantAffordResearch(researchName))
+      return;
+
+    this.$store.dispatch('BuyResearch', { researchName: researchName });
     this.$toasted.success(`You discovered ${ResearchInfo[researchName].name}!`);
+  }
+
+  public cantAffordResearch(researchName: Research) {
+    return ResearchInfo[researchName].price > this.$store.state.consummable.knowledge.quantity;
   }
 
   public mounted() {
@@ -70,10 +77,16 @@ export default class ResearchComponent extends IdleGameVue {
   background-color: #EEE;
 }
 
-.research-item.owned {
+.research-item.cant-afford {
   border: 1px solid grey;
   background-color: #EEE;
-  color: grey
+  color: grey;
+  cursor: default;
+}
+.research-item.owned {
+  border: 1px solid green;
+  background-color: lightgreen;
+  cursor: default;
 }
 
 .price {

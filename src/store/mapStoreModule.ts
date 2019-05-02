@@ -55,7 +55,9 @@ export const MapModule: Module<IMapState, IState> = {
       }
 
       state.map[obj.x][obj.y].building = obj.type;
-      state.map[obj.x][obj.y].environment = Environment.Field;
+      // Destroy Forest when building
+      if (state.map[obj.x][obj.y].environment == Environment.Forest)
+        state.map[obj.x][obj.y].environment = Environment.Field;
 
       let storageTypeToBuild = (BuildingToStorageMapping as any)[obj.type]
       if (storageTypeToBuild != null) {

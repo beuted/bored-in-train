@@ -28,6 +28,13 @@
                     <div v-once><img v-bind:src="mapTileImages.coalMineImage.src"></div>
                 </PriceTooltip> x {{ coalMines.quantity }}
             </label>
+
+            <input type="radio" id="coalPowerStation" value="coalPowerStations" v-model="storageType">
+            <label for="coalPowerStation">
+                <PriceTooltip building="coalPowerStations" :consummables="consummables">
+                    <div v-once><img v-bind:src="mapTileImages.coalPowerStationImage.src"></div>
+                </PriceTooltip> x {{ coalPowerStations.quantity }}
+            </label>
         </div>
         <canvas id="canvas" class="map"
             v-on:mousedown="handleMouseDown"
@@ -66,7 +73,8 @@ export default class Map extends IdleGameVue {
         barnImage: HTMLImageElement,
         farmImage: HTMLImageElement,
         coalMineImage: HTMLImageElement,
-        coalDepositeImage: HTMLImageElement
+        coalDepositeImage: HTMLImageElement,
+        coalPowerStationImage: HTMLImageElement
     } = {
         foretImage: new Image(),
         waterImage: new Image(),
@@ -76,7 +84,9 @@ export default class Map extends IdleGameVue {
         farmImage: new Image(),
         coalMineImage: new Image(),
         coalDepositeImage: new Image(),
+        coalPowerStationImage: new Image(),
     }
+
     @Prop() private map!: IMapTile[][];
     @Prop() private storage!: { [id in Storage]: { quantity: number } };
     @Prop() private consummables!: {[id in Consummable]: { quantity: number }};
@@ -88,6 +98,7 @@ export default class Map extends IdleGameVue {
 
     public storageType: Storage = Storage.villages;
 
+    // Buildings Info
     get villagesInfo() {
         return StaticStorageInfo.villages;
     }
@@ -104,6 +115,7 @@ export default class Map extends IdleGameVue {
         return StaticStorageInfo.coalMines;
     }
 
+    // Buildings
     get barns() {
         return this.storage.barns;
     }
@@ -118,6 +130,10 @@ export default class Map extends IdleGameVue {
 
     get coalMines() {
         return this.storage.coalMines;
+    }
+
+    get coalPowerStations() {
+        return this.storage.coalPowerStations;
     }
 
     // TODO: I'm not sure why I need to watch this property since it's on the store
@@ -136,6 +152,7 @@ export default class Map extends IdleGameVue {
         this.mapTileImages.barnImage.src = './img/barn.png';
         this.mapTileImages.farmImage.src = './img/farm.png';
         this.mapTileImages.coalMineImage.src = './img/coal-mine.png';
+        this.mapTileImages.coalPowerStationImage.src = './img/coal-power-station.png';
     }
 
     private mounted() {
@@ -282,6 +299,8 @@ export default class Map extends IdleGameVue {
                 return this.mapTileImages.farmImage;
             case Building.CoalMine:
                 return this.mapTileImages.coalMineImage;
+            case Building.CoalPowerStation:
+                return this.mapTileImages.coalPowerStationImage;
         }
 
         throw new Error(`could not find anything to display for building ${building}`);

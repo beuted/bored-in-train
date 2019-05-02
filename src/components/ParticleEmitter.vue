@@ -13,6 +13,9 @@
             <transition name="bounce">
                 <div v-if="shows['coals'].positive">💎</div>
             </transition>
+            <transition name="bounce">
+                <div v-if="shows['coals'].positive">⚡</div>
+            </transition>
         </span>
         <span class="particle particle-negative">
             <transition name="unbounce">
@@ -26,6 +29,9 @@
             </transition>
             <transition name="unbounce">
                 <div v-if="shows['coals'].negative">💎</div>
+            </transition>
+            <transition name="unbounce">
+                <div v-if="shows['energy'].negative">⚡</div>
             </transition>
         </span>
     </div>
@@ -46,12 +52,14 @@ import { Consummable } from '@/models/Consummable';
 export default class ParticleEmitter extends IdleGameVue {
     @Prop() private jobName!: Job;
 
+    //TODO: symboles could be deduced from GameEngine.ts
     private shows: { [id in Consummable]: { positive: boolean, negative: boolean } } = {
         population: { positive: false, negative: false },
         food: { positive: false, negative: false },
         wood: { positive: false, negative: false },
         stones: { positive: false, negative: false },
         coals: { positive: false, negative: false },
+        energy: { positive: false, negative: false },
     }
 
     public constructor() {

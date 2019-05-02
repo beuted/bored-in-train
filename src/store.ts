@@ -53,48 +53,59 @@ export default new Vuex.Store<IState>({
       coals: {
         quantity: 0,
       },
+      energy: {
+        quantity: 0,
+      },
     },
     jobs: {
       berryGatherer: {
         quantity: 1,
-        remainingTime: 1000,
+        remainingTime: 5000,
       },
       woodGatherer: {
         quantity: 0,
-        remainingTime: 1000,
+        remainingTime: 5000,
       },
       explorer: {
         quantity: 0,
-        remainingTime: 1000,
+        remainingTime: 5000,
       },
       scientist: {
         quantity: 0,
-        remainingTime: 1000,
+        remainingTime: 5000,
       },
       farmer: {
         quantity: 0,
-        remainingTime: 1000,
+        remainingTime: 5000,
       },
       stoneGatherer: {
         quantity: 0,
-        remainingTime: 1000,
+        remainingTime: 5000,
       },
       miner: {
         quantity: 0,
-        remainingTime: 1000,
+        remainingTime: 5000,
+      },
+      coalStationEngineer: {
+        quantity: 0,
+        remainingTime: 5000,
       },
       default: { //Job producing population
         quantity: 1,
-        remainingTime: 1000,
+        remainingTime: 5000,
       }
     },
     research: {
       agriculture: {
         owned: false
       },
+      mining: {
+        owned: false
+      },
       steamLocomotive: {
         owned: false
       },
+      
     },
   },
   mutations: {

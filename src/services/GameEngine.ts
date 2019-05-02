@@ -39,7 +39,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       food: 0,
       wood: 10,
       stones: 0,
-      coals: 0
+      coals: 0,
+      energy: 0
     },
   },
   barns: {
@@ -50,7 +51,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       food: 0,
       wood: 20,
       stones: 0,
-      coals: 0
+      coals: 0,
+      energy: 0
     }
   },
   farms: {
@@ -58,10 +60,11 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     description: 'Allows you to recruit 3 farmers',
     price: {
       population: 0,
-      food: 5,
-      wood: 20,
+      food: 0,
+      wood: 25,
       stones: 5,
-      coals: 0
+      coals: 0,
+      energy: 0
     }
   },
   coalMines: {
@@ -72,7 +75,20 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       food: 0,
       wood: 50,
       stones: 50,
-      coals: 0
+      coals: 0,
+      energy: 0
+    }
+  },
+  coalPowerStations: {
+    name: 'Coal Power Station',
+    description: 'Allows you to recruit 3 coal station engineer',
+    price: {
+      population: 0,
+      food: 0,
+      wood: 25,
+      stones: 100,
+      coals: 0,
+      energy: 0,
     }
   }
 }
@@ -109,6 +125,11 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
     icon: '💎',
     storage: undefined,
   },
+  energy: {
+    name: 'Energy',
+    icon: '⚡',
+    storage: undefined,
+  }
 };
 
 export type IStaticJobInfo = {[id in Job]: IStaticJob }
@@ -140,6 +161,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     consume: {
       'population': null,
@@ -150,6 +172,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     interval: 5000,
   },
@@ -165,6 +188,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     consume: {
       'population': null,
@@ -172,6 +196,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     interval: 5000,
   },
@@ -184,6 +209,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'food': null,
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     consume: {
       'population': null,
@@ -194,6 +220,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     interval: 5000,
   },
@@ -206,6 +233,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'food': null,
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     consume: {
       'population': null,
@@ -216,6 +244,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     interval: 5000,
   },
@@ -231,6 +260,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     consume: {
       'population': null,
@@ -244,6 +274,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     interval: 5000,
     storage: {
@@ -263,6 +294,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         quantity: 0.5
       },
       'coals': null,
+      'energy': null,
     },
     consume: {
       'population': null,
@@ -273,6 +305,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     interval: 5000,
   },
@@ -291,6 +324,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 1
       },
+      'energy': null,
     },
     consume: {
       'population': null,
@@ -304,10 +338,45 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     interval: 5000,
     storage: {
       name: Storage.coalMines,
+      capacity: 3
+    },
+  },
+  'coalStationEngineer': {
+    name: 'Coal Station Eng.',
+    description: 'Burn coal in order to procude energy',
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'energy': {
+        probability: 1,
+        quantity: 1
+      },
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': {
+        probability: 1,
+        quantity: 2
+      },
+      'energy': null,
+    },
+    interval: 5000,
+    storage: {
+      name: Storage.coalPowerStations,
       capacity: 3
     },
   },
@@ -323,6 +392,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     consume: {
       'population': null,
@@ -330,6 +400,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'energy': null,
     },
     interval: 10000,
   },
@@ -342,6 +413,7 @@ export interface IStaticResearch {
   description: string;
   price: number;
   prerequisite: Research[];
+  unlock: { storages: Storage[] };
 }
 
 export const ResearchInfo: IResearchInfo = {
@@ -349,12 +421,27 @@ export const ResearchInfo: IResearchInfo = {
     name: 'Agriculture',
     description: 'Aggriculture allows you to build farms',
     price: 10,
-    prerequisite: []
+    prerequisite: [],
+    unlock: {
+      storages: []
+    }
+  },
+  mining: {
+    name: 'Mining',
+    description: 'Allows you to build coal mines',
+    price: 100,
+    prerequisite: [],
+    unlock: {
+      storages: [Storage.coalMines]
+    }
   },
   steamLocomotive: {
     name: 'Steam Locomotive',
-    description: 'Allow you to build coal powered factories',
-    price: 100,
-    prerequisite: [Research.agriculture]
+    description: 'Allows you to build coal powered factories',
+    price: 200,
+    prerequisite: [Research.mining],
+    unlock: {
+      storages: [Storage.coalPowerStations]
+    }
   },
 }

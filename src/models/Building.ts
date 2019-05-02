@@ -6,6 +6,7 @@ export enum Building {
     Barn = 2,
     Farm = 3,
     CoalMine = 4,
+    CoalPowerStation = 5,
 }
 
 export const StorageToBuildingMapping: {[id in Storage]: Building} = {
@@ -13,6 +14,7 @@ export const StorageToBuildingMapping: {[id in Storage]: Building} = {
     [Storage.barns]: Building.Barn,
     [Storage.farms]: Building.Farm,
     [Storage.coalMines]: Building.CoalMine,
+    [Storage.coalPowerStations]: Building.CoalPowerStation,
 }
 
 export const BuildingToStorageMapping: {[id in Building]: Storage | null} = {
@@ -21,4 +23,6 @@ export const BuildingToStorageMapping: {[id in Building]: Storage | null} = {
     [Building.Barn]: Storage.barns,
     [Building.Farm]: Storage.farms,
     [Building.CoalMine]: Storage.coalMines,
+    [Building.CoalPowerStation]: Storage.coalPowerStations,
+
 }

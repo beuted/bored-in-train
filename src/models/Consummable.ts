@@ -3,5 +3,6 @@ export enum Consummable {
     food = 'food',
     wood = 'wood',
     stones = 'stones',
-    coals = 'coals'
+    coals = 'coals',
+    energy = 'energy',
 }

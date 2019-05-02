@@ -63,7 +63,7 @@ export default class PriceTooltip extends IdleGameVue {
   width: 200px;
   bottom: 100%;
   left: 50%;
-  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  margin-left: -100px; /* Use half of the width (200/2 = 100), to center the tooltip */
   background-color: black;
   color: #fff;
   text-align: center;

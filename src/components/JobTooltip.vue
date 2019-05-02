@@ -2,6 +2,8 @@
     <div v-once class="tooltip"><div> <slot></slot> </div>
         <span class="tooltip-content">
             <div>
+                <div class="tooltip-title">{{ name }}</div>
+                <div> {{ description }}</div>
                 <div class="tooltip-title">Produce:</div>
                 <div v-for="(value, key) in produce" :key="key">
                     <span v-if="value != null">{{ key }} x {{ value.quantity }}</span>
@@ -30,6 +32,14 @@ import { StaticJobInfo } from '@/services/GameEngine';
 export default class JobTooltip extends IdleGameVue {
     @Prop() private jobName!: Job;
 
+    public get name() {
+        return StaticJobInfo[this.jobName].name;
+    }
+
+    public get description() {
+        return StaticJobInfo[this.jobName].description;
+    }
+
     public get produce() {
         return StaticJobInfo[this.jobName].produce;
     }
@@ -52,14 +62,14 @@ export default class JobTooltip extends IdleGameVue {
 /* Tooltip text */
 .tooltip .tooltip-content {
   visibility: hidden;
-  width: 120px;
+  width: 200px;
   bottom: 100%;
   left: 50%;
-  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  margin-left: -100px; /* Use half of the width (200/2 = 100), to center the tooltip */
   background-color: black;
   color: #fff;
   text-align: center;
-  padding: 5px 0;
+  padding: 5px;
   border-radius: 6px;
 
   /* Position the tooltip text - see examples below! */

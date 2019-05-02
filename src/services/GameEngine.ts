@@ -43,8 +43,8 @@ export const StaticStorageInfo: IStaticStorageInfo = {
     },
   },
   barns: {
-    name: 'Village',
-    description: 'Increases the quantity of food you can store by 10',
+    name: 'Barns',
+    description: 'Increases the quantity of food you can store by 20',
     price: {
       population: 0,
       food: 0,
@@ -66,7 +66,7 @@ export const StaticStorageInfo: IStaticStorageInfo = {
   },
   coalMines: {
     name: 'Coal Mine',
-    description: 'Allows you to recruit 3 miners',
+    description: 'Allows you to recruit 3 miners, must be built on a coal deposite',
     price: {
       population: 0,
       food: 0,
@@ -91,7 +91,7 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
     icon: '🍗',
     storage: {
       name: Storage.barns,
-      capacity: 10
+      capacity: 20
     },
   },
   wood: {
@@ -115,6 +115,7 @@ export type IStaticJobInfo = {[id in Job]: IStaticJob }
 
 export interface IStaticJob {
   name: string;
+  description: string;
   produce: {[id in Consummable]: IStaticJobProduction | null };
   consume: {[id in Consummable]: IStaticJobProduction | null };
   interval: number;
@@ -129,6 +130,7 @@ export interface IStaticJobProduction {
 export const StaticJobInfo: IStaticJobInfo = {
   'woodGatherer': {
     name: 'Wood gatherer',
+    description: 'Wanders around finding wood',
     produce: {
       'population': null,
       'food': null,
@@ -153,6 +155,7 @@ export const StaticJobInfo: IStaticJobInfo = {
   },
   'berryGatherer': {
     name: 'Berry gatherer',
+    description: 'Wanders around finding food',
     produce: {
       'population': null,
       'wood': null,
@@ -174,6 +177,7 @@ export const StaticJobInfo: IStaticJobInfo = {
   },
   'explorer': {
     name: 'Explorer',
+    description: 'Discovers new ground to build on',
     produce: {
       'population': null,
       'wood': null,
@@ -195,6 +199,7 @@ export const StaticJobInfo: IStaticJobInfo = {
   },
   'scientist': {
     name: 'Scientist',
+    description: 'Allows to unlock new technology in the Research tab',
     produce: {
       'population': null,
       'wood': null,
@@ -216,12 +221,13 @@ export const StaticJobInfo: IStaticJobInfo = {
   },
   'farmer': {
     name: 'Farmer',
+    description: 'Produces food at the cost of wood',
     produce: {
       'population': null,
       'wood': null,
       'food': {
         probability: 1,
-        quantity: 8
+        quantity: 4
       },
       'stones': null,
       'coals': null,
@@ -230,16 +236,16 @@ export const StaticJobInfo: IStaticJobInfo = {
       'population': null,
       'food': {
         probability: 1,
-        quantity: 2
+        quantity: 1
       },
       'wood': {
         probability: 1,
-        quantity: 1
+        quantity: 0.5
       },
       'stones': null,
       'coals': null,
     },
-    interval: 10000,
+    interval: 5000,
     storage: {
       name: Storage.farms,
       capacity: 3
@@ -247,13 +253,14 @@ export const StaticJobInfo: IStaticJobInfo = {
   },
   'stoneGatherer': {
     name: 'Stone gatherer',
+    description: 'Wanders around finding stone',
     produce: {
       'population': null,
       'food': null,
       'wood': null,
       'stones': {
         probability: 1,
-        quantity: 1
+        quantity: 0.5
       },
       'coals': null,
     },
@@ -267,37 +274,38 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
     },
-    interval: 10000,
+    interval: 5000,
   },
   'miner': {
     name: 'Miner',
+    description: 'Extract coal and stone form the ground at the cost of wood',
     produce: {
       'population': null,
       'food': null,
       'wood': null,
       'stones': {
         probability: 1,
-        quantity: 1
+        quantity: 0.5
       },
       'coals': {
         probability: 1,
-        quantity: 2
+        quantity: 1
       },
     },
     consume: {
       'population': null,
       'food': {
         probability: 1,
-        quantity: 3
+        quantity: 1
       },
       'wood': {
         probability: 1,
-        quantity: 2
+        quantity: 1
       },
       'stones': null,
       'coals': null,
     },
-    interval: 15000,
+    interval: 5000,
     storage: {
       name: Storage.coalMines,
       capacity: 3
@@ -305,6 +313,7 @@ export const StaticJobInfo: IStaticJobInfo = {
   },
   'default':  {
     name: 'DEFAULT',
+    description: '',
     produce: {
       'population': {
         probability: 1,

@@ -242,6 +242,10 @@ export default class Map extends IdleGameVue {
         if (this.$store.state.map.map[coord.x][coord.y].environment == Environment.Water)
             return false;
 
+        // You must build coalMine on coalDeposite
+        if (building == Building.CoalMine && this.$store.state.map.map[coord.x][coord.y].environment !== Environment.CoalDeposite)
+            return false;
+
         return true;
     }
 

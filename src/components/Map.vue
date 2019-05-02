@@ -66,6 +66,7 @@ export default class Map extends IdleGameVue {
         barnImage: HTMLImageElement,
         farmImage: HTMLImageElement,
         coalMineImage: HTMLImageElement,
+        coalDepositeImage: HTMLImageElement
     } = {
         foretImage: new Image(),
         waterImage: new Image(),
@@ -74,6 +75,7 @@ export default class Map extends IdleGameVue {
         barnImage: new Image(),
         farmImage: new Image(),
         coalMineImage: new Image(),
+        coalDepositeImage: new Image(),
     }
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
@@ -123,6 +125,7 @@ export default class Map extends IdleGameVue {
         this.mapTileImages.foretImage.src = './img/foret.png';
         this.mapTileImages.waterImage.src = './img/water.png';
         this.mapTileImages.fieldImage.src = './img/field.png';
+        this.mapTileImages.coalDepositeImage.src = './img/coal-deposit.png';
         this.mapTileImages.villageImage.src = './img/village.png';
         this.mapTileImages.barnImage.src = './img/barn.png';
         this.mapTileImages.farmImage.src = './img/farm.png';
@@ -250,6 +253,8 @@ export default class Map extends IdleGameVue {
                 return this.mapTileImages.fieldImage;
             case Environment.Forest:
                 return this.mapTileImages.foretImage;
+            case Environment.CoalDeposite:
+                return this.mapTileImages.coalDepositeImage;
         }
 
         throw new Error(`could not find anything to display for environment ${environment}`);

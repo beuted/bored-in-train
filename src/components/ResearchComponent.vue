@@ -4,13 +4,13 @@
 
     <div class="flex-container">
       <button
-        v-for="(research, researchName) in researchInfos" v-bind:key="researchName"
+        v-for="researchName of availableResearchs" v-bind:key="researchName"
         class="research-item"
         v-bind:class="{ 'owned': isResearchOwned(researchName), 'cant-afford': cantAffordResearch(researchName) }"
         v-on:click="buyResearch(researchName)"
         :disabled="cantAffordResearch(researchName) || isResearchOwned(researchName)">
-        <div>{{ research.name }}</div>
-        <div class="price">Price: {{ research.price }} x 🔬</div>
+        <div>{{ getResearchInfo(researchName).name }}</div>
+        <div class="price">Price: {{ getResearchInfo(researchName).price }} x 🔬</div>
       </button>
     </div>
   </div>
@@ -29,8 +29,13 @@ import { Research } from '@/models/Research';
   },
 })
 export default class ResearchComponent extends IdleGameVue {
-  public get researchInfos() {
-    return ResearchInfo;
+  public get availableResearchs() {
+    console.log(this.$store.getters.availableResearchs);
+    return this.$store.getters.availableResearchs;
+  }
+
+  public getResearchInfo(research: Research) {
+    return ResearchInfo[research];
   }
 
   public isResearchOwned(researchName: Research) {

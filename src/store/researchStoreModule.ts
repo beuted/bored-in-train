@@ -37,6 +37,25 @@ export const ResearchModule: Module<IResearchState, IState> = {
     },
   },
   getters: {
+    availableResearchs(state) {
+      let availableResearchs: Research[] = [];
+
+      for (let research in Research) {
+        let allPrerequisitOwned = true;
+        for (let prerequisite of ResearchInfo[research as Research].prerequisite) {
+          if (!state.research[prerequisite as Research].owned) {
+            allPrerequisitOwned = false;
+            break;
+          }
+        }
+
+        if (allPrerequisitOwned)
+          availableResearchs.push(research as Research);
+      }
+
+      return availableResearchs;
+    },
+
     researchStorageKnown(state) {
       let storageKnown: any = {};
       for (let storage in Storage) {

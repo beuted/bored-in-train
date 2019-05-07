@@ -1,4 +1,4 @@
-import { StaticJobInfo, IStaticJob, IStaticJobProduction, StaticConsummableInfo, IStaticConsummable } from './GameEngine';
+import { StaticJobInfo, IStaticJob, IStaticJobProduction, StaticConsummableInfo, IStaticConsummable, GlobalConfig } from './GameEngine';
 import { Job } from '@/models/Job';
 import { IJobProductionEvent, EventBus } from '@/EventBus';
 import { Consummable } from '@/models/Consummable';
@@ -10,7 +10,7 @@ export class GameService {
   private readonly LackOfStorageFactor = 1.0; // Portion of disapearing goods when missing storage
 
   private hasBeenInit = false;
-  private TickInterval = 1000;
+
 
   public constructor() {
     if (this.hasBeenInit)
@@ -32,7 +32,7 @@ export class GameService {
       // Recursive setTimeout for precision
       setTimeout (() => {
         this.mainLoop()
-      }, this.TickInterval / store.state.controls.speed);
+      }, GlobalConfig.TickInterval / store.state.controls.speed);
       return;
     }
 
@@ -53,13 +53,6 @@ export class GameService {
           knowledge: 0
         }
       }
-
-      if (store.state.jobs[jobId as Job].remainingTime > 0) {
-        store.commit('TickInterval', { job: jobId });
-        continue;
-      }
-
-      store.commit('ResetInterval', { job: jobId });
 
       for (let consummableId in staticJob.produce) {
         let staticJobProduction: IStaticJobProduction | null = staticJob.produce[consummableId as Consummable];
@@ -121,7 +114,7 @@ export class GameService {
     // Recursive setTimeout for precision
     setTimeout (() => {
       this.mainLoop()
-    }, this.TickInterval / store.state.controls.speed);
+    }, GlobalConfig.TickInterval / store.state.controls.speed);
   }
 
   private discoveryLoop() {
@@ -140,6 +133,6 @@ export class GameService {
     // Recursive setTimeout for precision
     setTimeout (() => {
       this.discoveryLoop()
-    }, 10 * this.TickInterval / store.state.controls.speed);
+    }, 10 * GlobalConfig.TickInterval / store.state.controls.speed);
   }
 }

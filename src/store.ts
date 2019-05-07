@@ -26,7 +26,7 @@ export interface IState {
   debugMode: boolean;
   controls: { play: boolean, speed: number}
   consummable: { [id in Consummable]: { quantity: number } };
-  jobs: { [id in Job]: { quantity: number, remainingTime: number } };
+  jobs: { [id in Job]: { quantity: number } };
 }
 
 export default new Vuex.Store<IState>({
@@ -67,39 +67,30 @@ export default new Vuex.Store<IState>({
     jobs: {
       berryGatherer: {
         quantity: 1,
-        remainingTime: 5000,
       },
       woodGatherer: {
         quantity: 0,
-        remainingTime: 5000,
       },
       explorer: {
         quantity: 0,
-        remainingTime: 5000,
       },
       scientist: {
         quantity: 0,
-        remainingTime: 5000,
       },
       farmer: {
         quantity: 0,
-        remainingTime: 5000,
       },
       stoneGatherer: {
         quantity: 0,
-        remainingTime: 5000,
       },
       miner: {
         quantity: 0,
-        remainingTime: 5000,
       },
       coalStationEngineer: {
         quantity: 0,
-        remainingTime: 5000,
       },
       default: { //Job producing population
         quantity: 1,
-        remainingTime: 5000,
       }
     }
   },
@@ -128,15 +119,6 @@ export default new Vuex.Store<IState>({
       for (let consummable in event.produced) {
         state.consummable[consummable as Consummable].quantity += event.produced[consummable as Consummable];
       }
-    },
-    // Decremente the remaining time before a spawn of a consummable from 1 tick (1000 ms)
-    TickInterval(state, obj: { job: Job} ) {
-      state.jobs[obj.job].remainingTime -= 1000;
-      //TODO tick the default job ?
-    },
-    // Reset the interval of spawning/consumming of a consummable
-    ResetInterval(state, obj: { job: Job }) {
-      state.jobs[obj.job].remainingTime = StaticJobInfo[obj.job].interval;
     },
     //Add Job
     AddJob(state, obj: { jobName: Job, quantity: number }) {

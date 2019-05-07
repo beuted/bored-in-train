@@ -3,6 +3,11 @@ import { Job } from '@/models/Job';
 import { Storage } from '@/models/Storage';
 import { Research } from '@/models/Research';
 
+
+export const GlobalConfig = {
+  TickInterval: 5000
+}
+
 export type IStaticConsummableInfo = {[id in Consummable]: IStaticConsummable}
 export type IStaticStorageInfo = {[id in Storage]: IStaticStorage}
 
@@ -21,7 +26,6 @@ export interface IStaticStorage {
 export interface IConsuming {
   name: Consummable;
   consomation: number;
-  interval: number;
   probability: number;
 }
 
@@ -149,7 +153,6 @@ export interface IStaticJob {
   description: string;
   produce: {[id in Consummable]: IStaticJobProduction | null };
   consume: {[id in Consummable]: IStaticJobProduction | null };
-  interval: number;
   storage?: IStorage;
 }
 
@@ -186,7 +189,6 @@ export const StaticJobInfo: IStaticJobInfo = {
       'knowledge': null,
       'energy': null,
     },
-    interval: 5000,
   },
   'berryGatherer': {
     name: 'Berry gatherer',
@@ -212,7 +214,6 @@ export const StaticJobInfo: IStaticJobInfo = {
       'knowledge': null,
       'energy': null,
     },
-    interval: 5000,
   },
   'explorer': {
     name: 'Explorer',
@@ -238,7 +239,6 @@ export const StaticJobInfo: IStaticJobInfo = {
       'knowledge': null,
       'energy': null,
     },
-    interval: 5000,
   },
   'scientist': {
     name: 'Scientist',
@@ -267,7 +267,6 @@ export const StaticJobInfo: IStaticJobInfo = {
       'knowledge': null,
       'energy': null,
     },
-    interval: 5000,
   },
   'farmer': {
     name: 'Farmer',
@@ -299,7 +298,6 @@ export const StaticJobInfo: IStaticJobInfo = {
       'knowledge': null,
       'energy': null,
     },
-    interval: 5000,
     storage: {
       name: Storage.farms,
       capacity: 3
@@ -332,7 +330,6 @@ export const StaticJobInfo: IStaticJobInfo = {
       'knowledge': null,
       'energy': null,
     },
-    interval: 5000,
   },
   'miner': {
     name: 'Miner',
@@ -367,7 +364,6 @@ export const StaticJobInfo: IStaticJobInfo = {
       'knowledge': null,
       'energy': null,
     },
-    interval: 5000,
     storage: {
       name: Storage.coalMines,
       capacity: 3
@@ -403,7 +399,6 @@ export const StaticJobInfo: IStaticJobInfo = {
       'knowledge': null,
       'energy': null,
     },
-    interval: 5000,
     storage: {
       name: Storage.coalPowerStations,
       capacity: 3
@@ -415,7 +410,7 @@ export const StaticJobInfo: IStaticJobInfo = {
     produce: {
       'population': {
         probability: 1,
-        quantity: 1
+        quantity: 0.5
       },
       'food': null,
       'wood': null,
@@ -433,7 +428,6 @@ export const StaticJobInfo: IStaticJobInfo = {
       'knowledge': null,
       'energy': null,
     },
-    interval: 10000,
   },
 };
 

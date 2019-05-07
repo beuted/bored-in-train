@@ -15,7 +15,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
 import { Consummable } from '@/models/Consummable';
-import { StaticConsummableInfo, StaticJobInfo, IStorage } from '@/services/GameEngine';
+import { StaticConsummableInfo, StaticJobInfo, IStorage, GlobalConfig } from '@/services/GameEngine';
 
 @Component
 export default class Inventory extends IdleGameVue {
@@ -36,7 +36,6 @@ export default class Inventory extends IdleGameVue {
       let production = 0;
       for (let job in this.$store.state.jobs) {
           let quantity = this.$store.state.jobs[job as Job].quantity;
-          let interval = StaticJobInfo[job as Job].interval;
 
           let consumeObj = StaticJobInfo[job as Job].consume[consummable];
           let consume = consumeObj ? consumeObj.quantity : 0;
@@ -44,7 +43,7 @@ export default class Inventory extends IdleGameVue {
           let produceObj = StaticJobInfo[job as Job].produce[consummable];
           let produce = produceObj ? produceObj.quantity : 0;
 
-          production += (produce - consume) / (interval / 1000) * quantity;
+          production += (produce - consume) / (GlobalConfig.TickInterval / 1000) * quantity;
       }
       return production.toFixed(2);
     }

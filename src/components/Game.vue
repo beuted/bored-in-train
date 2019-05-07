@@ -2,6 +2,7 @@
   <div>
     <h1>{{ msg }} <button v-on:click="toggleDebug()">Debug</button> <button v-on:click="reset()">Reset</button></h1>
 
+    <Controls />
     <div class="flex-container">
       <div class="job-item">
         <Jobs />
@@ -30,6 +31,7 @@ import Jobs from '@/components/Jobs.vue';
 import Inventory from '@/components/Inventory.vue';
 import Storage from '@/components/Storage.vue';
 import Map from '@/components/Map.vue';
+import Controls from '@/components/Controls.vue';
 
 const gameService = new GameService();
 
@@ -39,6 +41,7 @@ const gameService = new GameService();
     Inventory,
     Storage,
     Map,
+    Controls
   },
 })
 export default class Game extends IdleGameVue {
@@ -57,7 +60,7 @@ export default class Game extends IdleGameVue {
   }
 
   public toggleDebug() {
-    gameService.toggleDebug();
+    this.$store.state.controls.speed = 10;
   }
 
   public reset() {

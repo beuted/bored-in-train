@@ -24,6 +24,7 @@ export interface IState {
   map: IMapState;
   research: IResearchState;
   debugMode: boolean;
+  controls: { play: boolean, speed: number}
   consummable: { [id in Consummable]: { quantity: number } };
   jobs: { [id in Job]: { quantity: number, remainingTime: number } };
 }
@@ -39,6 +40,7 @@ export default new Vuex.Store<IState>({
     map: <IMapState><any>null, // TODO: This hack is required to keep the type system happy
     research: <IResearchState><any>null, // TODO: This hack is required to keep the type system happy
     debugMode: false,
+    controls: { play: true, speed: 1 },
     consummable: {
       population: {
         quantity: 6,
@@ -102,9 +104,20 @@ export default new Vuex.Store<IState>({
     }
   },
   mutations: {
-    // Increment the value of a consummable from 'value'
+    // Toggle debug
     ToggleDebugMode(state) {
       state.debugMode = !state.debugMode
+    },
+    // Toggle play or pause
+    TogglePlay(state) {
+      state.controls.play = !state.controls.play
+    },
+    // Toggle fastforward
+    ToggleFastForward(state) {
+      if (state.controls.speed === 1)
+        state.controls.speed = 2;
+      else
+        state.controls.speed = 1;
     },
     // Increment the value of a consummable from 'value'
     IncrementConsummable(state, obj: { name: Consummable, value: number }) {

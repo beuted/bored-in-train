@@ -36,6 +36,15 @@ export class GameService {
   }
 
   private mainLoop() {
+    // in the case of pause nothing happens
+    if (!store.state.controls.play) {
+      // Recursive setTimeout for precision
+      setTimeout (() => {
+        this.mainLoop()
+      }, this.TickInterval / store.state.controls.speed);
+      return;
+    }
+
     // First the creation of ressources
     for (let jobId in StaticJobInfo) {
       let staticJob: IStaticJob = StaticJobInfo[jobId as Job]; //TODO: fix typeing weirdlness
@@ -121,13 +130,13 @@ export class GameService {
     // Recursive setTimeout for precision
     setTimeout (() => {
       this.mainLoop()
-    }, this.TickInterval);
+    }, this.TickInterval / store.state.controls.speed);
   }
 
   private discoveryLoop() {
     var nbExplorers = store.state.jobs.explorer.quantity;
 
-    if (nbExplorers > 0) {
+    if (nbExplorers > 0 && store.state.controls.play) {
       var nbLandFound = store.state.map.mapNbTileFound;
       // Probabilty in proba of at least 1 explorer out of nbExplorers to find a tile
       var probability = 1-Math.pow(1-2/nbLandFound, nbExplorers);
@@ -140,6 +149,6 @@ export class GameService {
     // Recursive setTimeout for precision
     setTimeout (() => {
       this.discoveryLoop()
-    }, 10 * this.TickInterval);
+    }, 10 * this.TickInterval / store.state.controls.speed);
   }
 }

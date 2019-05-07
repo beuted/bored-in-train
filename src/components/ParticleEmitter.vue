@@ -29,15 +29,7 @@ export default class ParticleEmitter extends IdleGameVue {
     @Prop() private jobName!: Job;
 
     //TODO: symboles could be deduced from GameEngine.ts
-    private shows: { [id in Consummable]: { positive: boolean, negative: boolean } } = {
-        population: { positive: false, negative: false },
-        food: { positive: false, negative: false },
-        wood: { positive: false, negative: false },
-        stones: { positive: false, negative: false },
-        coals: { positive: false, negative: false },
-        energy: { positive: false, negative: false },
-        knowledge: { positive: false, negative: false },
-    }
+    private shows!: { [id in Consummable]: { positive: boolean, negative: boolean } };
 
     public constructor() {
         super();
@@ -45,6 +37,11 @@ export default class ParticleEmitter extends IdleGameVue {
             if (event.job == this.jobName)
                 this.emitParticles(event)
         });
+
+        // Init the show array
+        for (let consummable in Consummable) {
+            this.shows[consummable as Consummable] = { positive: false, negative: false };
+        }
     }
 
     public get consummables() {

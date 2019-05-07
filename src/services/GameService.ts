@@ -26,15 +26,6 @@ export class GameService {
     console.log(`I'm bored in a train`);
   }
 
-  public toggleDebug() {
-    store.commit('ToggleDebugMode');
-    if (this.TickInterval == 1000) {
-      this.TickInterval = 50;
-    } else {
-      this.TickInterval = 1000
-    }
-  }
-
   private mainLoop() {
     // in the case of pause nothing happens
     if (!store.state.controls.play) {

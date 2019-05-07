@@ -1,43 +1,13 @@
 <template>
     <div class="particle-box"><div> <slot></slot> </div>
         <span class="particle particle-positive">
-            <transition name="bounce">
-                <div v-if="shows['food'].positive">🍗</div>
-            </transition>
-            <transition name="bounce">
-                <div v-if="shows['wood'].positive">🌲</div>
-            </transition>
-            <transition name="bounce">
-                <div v-if="shows['stones'].positive">⛏️</div>
-            </transition>
-            <transition name="bounce">
-                <div v-if="shows['coals'].positive">💎</div>
-            </transition>
-            <transition name="bounce">
-                <div v-if="shows['coals'].positive">⚡</div>
-            </transition>
-            <transition name="unbounce">
-                <div v-if="shows['knowledge'].positive">🔬</div>
+            <transition name="bounce" v-for="(value, key) in consummables" :key="key">
+                <div v-if="shows[value].positive">{{ getParticleEmoji(value) }}</div>
             </transition>
         </span>
         <span class="particle particle-negative">
-            <transition name="unbounce">
-                <div v-if="shows['food'].negative">🍗</div>
-            </transition>
-            <transition name="unbounce">
-                <div v-if="shows['wood'].negative">🌲</div>
-            </transition>
-            <transition name="unbounce">
-                <div v-if="shows['stones'].negative">⛏️</div>
-            </transition>
-            <transition name="unbounce">
-                <div v-if="shows['coals'].negative">💎</div>
-            </transition>
-            <transition name="unbounce">
-                <div v-if="shows['energy'].negative">⚡</div>
-            </transition>
-            <transition name="unbounce">
-                <div v-if="shows['knowledge'].negative">🔬</div>
+            <transition name="unbounce" v-for="(value, key) in consummables" :key="key">
+                <div v-if="shows[value].negative">{{ getParticleEmoji(value) }}</div>
             </transition>
         </span>
     </div>
@@ -47,7 +17,7 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
-import { StaticJobInfo } from '@/services/GameEngine';
+import { StaticJobInfo, StaticConsummableInfo } from '@/services/GameEngine';
 import { EventBus, IJobProductionEvent } from '@/EventBus';
 import { Consummable } from '@/models/Consummable';
 
@@ -75,6 +45,14 @@ export default class ParticleEmitter extends IdleGameVue {
             if (event.job == this.jobName)
                 this.emitParticles(event)
         });
+    }
+
+    public get consummables() {
+        return Consummable;
+    }
+
+    public getParticleEmoji(consummable: Consummable) {
+        return StaticConsummableInfo[consummable].icon;
     }
 
     private emitParticles(event: IJobProductionEvent) {

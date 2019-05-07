@@ -49,7 +49,7 @@ export default class Jobs extends IdleGameVue {
     public getJobDisplayName(jobName: Job) {
         return StaticJobInfo[jobName].name;
     }
-    
+
     public getJobMaxStorage(jobName: Job): string {
         var maxStorage = this.computeMaxStorage(jobName)
         return maxStorage != -1 ? String(maxStorage) : '∞'
@@ -89,7 +89,7 @@ export default class Jobs extends IdleGameVue {
     }
 
     public canAddJob(quantity: number, jobName: string): boolean {
-        if (this.unemployed <= 0)
+        if (this.unemployed < 1)
             return false
 
         var maxStorage = this.computeMaxStorage(jobName as Job);

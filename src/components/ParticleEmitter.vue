@@ -28,8 +28,7 @@ import { Consummable } from '@/models/Consummable';
 export default class ParticleEmitter extends IdleGameVue {
     @Prop() private jobName!: Job;
 
-    //TODO: symboles could be deduced from GameEngine.ts
-    private shows!: { [id in Consummable]: { positive: boolean, negative: boolean } };
+    private shows: { [id in Consummable]: { positive: boolean, negative: boolean } } = <any>{};
 
     public constructor() {
         super();

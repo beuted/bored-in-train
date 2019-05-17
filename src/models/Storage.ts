@@ -1,7 +1,0 @@
-export enum Storage {
-    villages = 'villages',
-    barns = 'barns',
-    farms = 'farms',
-    coalMines = 'coalMines',
-    coalPowerStations = 'coalPowerStations',
-}

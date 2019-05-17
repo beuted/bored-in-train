@@ -1,10 +1,10 @@
 import { Module } from 'vuex';
 
-import { Storage } from '@/models/Storage';
 import { ResearchInfo } from '../services/GameEngine';
 import { IState } from '../store';
 import { Research } from '@/models/Research';
 import { Consummable } from '@/models/Consummable';
+import { Building } from '@/models/Building';
 
 export interface IResearchState {
   research: { [id in Research]: { owned: boolean } },
@@ -56,21 +56,21 @@ export const ResearchModule: Module<IResearchState, IState> = {
       return availableResearchs;
     },
 
-    researchStorageKnown(state) {
-      let storageKnown: any = {};
-      for (let storage in Storage) {
+    researchBuildingsKnown(state) {
+      let buildingKnown: any = {};
+      for (let building in Building) {
         for (let research in Research) {
-          if (ResearchInfo[research as Research].unlocks.storages.findIndex(x => x == storage) != -1
+          if (ResearchInfo[research as Research].unlocks.buildings.findIndex(x => x == building) != -1
               && !state.research[research as Research].owned) {
-            storageKnown[storage] = false;
+            buildingKnown[building] = false;
             break;
           }
         }
 
-        if (storageKnown[storage] === undefined)
-          storageKnown[storage] = true;
+        if (buildingKnown[building] === undefined)
+          buildingKnown[building] = true;
       }
-      return storageKnown;
+      return buildingKnown;
     }
   }
 }

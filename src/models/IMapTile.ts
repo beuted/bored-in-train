@@ -2,7 +2,7 @@ import { Building } from './Building';
 import { Environment } from './Environment';
 
 export interface IMapTile {
-    building : Building;
+    building: Building | null;
     environment: Environment;
     discovered: boolean;
 }

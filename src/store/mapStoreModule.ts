@@ -1,9 +1,8 @@
 import { Module } from 'vuex';
 
-import { Building, BuildingToStorageMapping } from '@/models/Building';
+import { Building } from '@/models/Building';
 import { MapBuilder } from '../services/MapBuilder';
 import { Consummable } from '../models/Consummable';
-import { Storage } from '@/models/Storage';
 import { StaticConsummableInfo } from '../services/GameEngine';
 import { Environment } from '../models/Environment';
 import { IMapTile } from '../models/IMapTile';
@@ -13,27 +12,27 @@ import { IState } from '../store';
 export interface IMapState {
   mapNbTileFound: number,
   map: IMapTile[][],
-  storage: { [id in Storage]: { quantity: number } },
+  buildings: { [id in Building]: { quantity: number } },
 }
 
 export const MapModule: Module<IMapState, IState> = {
   state: {
     mapNbTileFound: 5,
     map: [],
-    storage: {
-      villages: {
+    buildings: {
+      village: {
         quantity: 1,
       },
-      barns: {
+      barn: {
         quantity: 1,
       },
-      farms: {
+      farm: {
         quantity: 0,
       },
-      coalMines: {
+      coalMine: {
         quantity: 0,
       },
-      coalPowerStations: {
+      coalPowerStation: {
         quantity: 0,
       },
     },
@@ -49,9 +48,8 @@ export const MapModule: Module<IMapState, IState> = {
 
       console.debug(`Changing tile ${obj.x}, ${obj.y} from ${previousTile.building} to ${obj.type}`);
 
-      let storageTypeToDestroy = (BuildingToStorageMapping as any)[previousTile.building]
-      if (storageTypeToDestroy != null) {
-        (state.storage as any)[storageTypeToDestroy].quantity--;
+      if (previousTile.building != null) {
+        state.buildings[previousTile.building].quantity--;
       }
 
       state.map[obj.x][obj.y].building = obj.type;
@@ -59,9 +57,8 @@ export const MapModule: Module<IMapState, IState> = {
       if (state.map[obj.x][obj.y].environment == Environment.Forest)
         state.map[obj.x][obj.y].environment = Environment.Field;
 
-      let storageTypeToBuild = (BuildingToStorageMapping as any)[obj.type]
-      if (storageTypeToBuild != null) {
-        (state.storage as any)[storageTypeToBuild].quantity++;
+      if (obj.type != null) {
+        state.buildings[obj.type].quantity++;
       }
     },
     DiscoverTile(state: IMapState) {
@@ -90,13 +87,13 @@ export const MapModule: Module<IMapState, IState> = {
         if (storage === undefined)
           return -1;
 
-        return state.storage[storage.name].quantity * storage.capacity;
+        return state.buildings[storage.name].quantity * storage.capacity;
       }
     },
     tiles(state): IMapTile[][] {
         return state.map.map((x, i) => x.map((y, j) => {
           if (!state.map[i] || !state.map[i][j])
-            return { building : Building.NoBuilding, environment: Environment.Field, discovered: false };
+            return { building : null, environment: Environment.Field, discovered: false };
           return state.map[i][j];
         }));
     },

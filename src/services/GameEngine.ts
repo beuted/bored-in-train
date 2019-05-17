@@ -1,6 +1,6 @@
 import { Consummable } from '@/models/Consummable';
 import { Job } from '@/models/Job';
-import { Storage } from '@/models/Storage';
+import { Building } from '@/models/Building';
 import { Research } from '@/models/Research';
 
 
@@ -9,7 +9,7 @@ export const GlobalConfig = {
 }
 
 export type IStaticConsummableInfo = {[id in Consummable]: IStaticConsummable}
-export type IStaticStorageInfo = {[id in Storage]: IStaticStorage}
+export type IStaticBuildingInfo = {[id in Building]: IStaticBuilding}
 
 export interface IStaticConsummable {
   name: string;
@@ -17,7 +17,7 @@ export interface IStaticConsummable {
   storage: IStorage | undefined;
 }
 
-export interface IStaticStorage {
+export interface IStaticBuilding {
   name: string;
   description: string;
   price: {[id in Consummable]: number};
@@ -30,12 +30,12 @@ export interface IConsuming {
 }
 
 export interface IStorage {
-  name: Storage;
+  name: Building;
   capacity: number;
 }
 
-export const StaticStorageInfo: IStaticStorageInfo = {
-  villages: {
+export const StaticBuildingInfo: IStaticBuildingInfo = {
+  village: {
     name: 'Village',
     description: 'Increases your maximum population by 10',
     price: {
@@ -48,7 +48,7 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       knowledge: 0
     },
   },
-  barns: {
+  barn: {
     name: 'Barns',
     description: 'Increases the quantity of food you can store by 20',
     price: {
@@ -61,7 +61,7 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       knowledge: 0
     }
   },
-  farms: {
+  farm: {
     name: 'Farm',
     description: 'Allows you to recruit 3 farmers',
     price: {
@@ -74,7 +74,7 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       knowledge: 0
     }
   },
-  coalMines: {
+  coalMine: {
     name: 'Coal Mine',
     description: 'Allows you to recruit 3 miners, must be built on a coal deposite',
     price: {
@@ -87,7 +87,7 @@ export const StaticStorageInfo: IStaticStorageInfo = {
       knowledge: 0
     }
   },
-  coalPowerStations: {
+  coalPowerStation: {
     name: 'Coal Power Station',
     description: 'Allows you to recruit 3 coal station engineer',
     price: {
@@ -107,7 +107,7 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
     name: 'Population',
     icon: '🙋‍♂️',
     storage: {
-      name: Storage.villages,
+      name: Building.village,
       capacity: 10
     },
   },
@@ -115,7 +115,7 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
     name: 'Food',
     icon: '🍗',
     storage: {
-      name: Storage.barns,
+      name: Building.barn,
       capacity: 20
     },
   },
@@ -299,7 +299,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'energy': null,
     },
     storage: {
-      name: Storage.farms,
+      name: Building.farm,
       capacity: 3
     },
   },
@@ -365,7 +365,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'energy': null,
     },
     storage: {
-      name: Storage.coalMines,
+      name: Building.coalMine,
       capacity: 3
     },
   },
@@ -400,7 +400,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'energy': null,
     },
     storage: {
-      name: Storage.coalPowerStations,
+      name: Building.coalPowerStation,
       capacity: 3
     },
   },
@@ -438,7 +438,7 @@ export interface IStaticResearch {
   description: string;
   price: number;
   prerequisite: Research[];
-  unlocks: { storages: Storage[] };
+  unlocks: { buildings: Building[] };
 }
 
 export const ResearchInfo: IResearchInfo = {
@@ -448,7 +448,7 @@ export const ResearchInfo: IResearchInfo = {
     price: 10,
     prerequisite: [],
     unlocks: {
-      storages: [Storage.farms]
+      buildings: [Building.farm]
     }
   },
   mining: {
@@ -457,7 +457,7 @@ export const ResearchInfo: IResearchInfo = {
     price: 100,
     prerequisite: [],
     unlocks: {
-      storages: [Storage.coalMines]
+      buildings: [Building.coalMine]
     }
   },
   steamLocomotive: {
@@ -466,7 +466,7 @@ export const ResearchInfo: IResearchInfo = {
     price: 200,
     prerequisite: [Research.mining],
     unlocks: {
-      storages: [Storage.coalPowerStations]
+      buildings: [Building.coalPowerStation]
     }
   },
 }

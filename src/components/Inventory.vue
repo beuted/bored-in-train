@@ -15,7 +15,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
 import { Consummable } from '@/models/Consummable';
-import { StaticConsummableInfo, StaticJobInfo, IStorage, GlobalConfig } from '@/services/GameEngine';
+import { StaticConsummableInfo, StaticJobInfo, GlobalConfig } from '@/services/GameEngine';
 
 @Component
 export default class Inventory extends IdleGameVue {

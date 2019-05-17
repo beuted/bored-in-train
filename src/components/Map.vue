@@ -1,46 +1,46 @@
 <template>
     <div>
         <div class="menu">
-            <span v-if="isKnown('villages')">
-                <input type="radio" id="village" value="villages" v-model="storageType">
+            <span v-if="isKnown('village')">
+                <input type="radio" id="village" value="village" v-model="buildingType">
                 <label for="village">
-                    <PriceTooltip building="villages" :consummables="consummables">
+                    <PriceTooltip building="village" :consummables="consummables">
                     <div v-once><img v-bind:src="mapTileImages.villageImage.src"></div>
                     </PriceTooltip> x {{ villages.quantity }}
                 </label>
             </span>
 
-            <span v-if="isKnown('barns')">
-                <input type="radio" id="barn" value="barns" v-model="storageType" >
+            <span v-if="isKnown('barn')">
+                <input type="radio" id="barn" value="barn" v-model="buildingType" >
                 <label for="barn">
-                    <PriceTooltip building="barns" :consummables="consummables">
+                    <PriceTooltip building="barn" :consummables="consummables">
                         <div v-once><img v-bind:src="mapTileImages.barnImage.src"></div>
                     </PriceTooltip> x {{ barns.quantity }}
                 </label>
             </span>
 
-            <span v-if="isKnown('farms')">
-                <input type="radio" id="farm" value="farms" v-model="storageType">
+            <span v-if="isKnown('farm')">
+                <input type="radio" id="farm" value="farm" v-model="buildingType">
                 <label for="farm">
-                    <PriceTooltip building="farms" :consummables="consummables">
+                    <PriceTooltip building="farm" :consummables="consummables">
                         <div v-once><img v-bind:src="mapTileImages.farmImage.src"></div>
                     </PriceTooltip> x {{ farms.quantity }}
                 </label>
             </span>
 
-            <span v-if="isKnown('coalMines')">
-                <input type="radio" id="coalMine" value="coalMines" v-model="storageType">
+            <span v-if="isKnown('coalMine')">
+                <input type="radio" id="coalMine" value="coalMine" v-model="buildingType">
                 <label for="coalMine">
-                    <PriceTooltip building="coalMines" :consummables="consummables">
+                    <PriceTooltip building="coalMine" :consummables="consummables">
                         <div v-once><img v-bind:src="mapTileImages.coalMineImage.src"></div>
                     </PriceTooltip> x {{ coalMines.quantity }}
                 </label>
             </span>
 
-            <span v-if="isKnown('coalPowerStations')">
-                <input type="radio" id="coalPowerStation" value="coalPowerStations" v-model="storageType">
+            <span v-if="isKnown('coalPowerStation')">
+                <input type="radio" id="coalPowerStation" value="coalPowerStation" v-model="buildingType">
                 <label for="coalPowerStation">
-                    <PriceTooltip building="coalPowerStations" :consummables="consummables">
+                    <PriceTooltip building="coalPowerStation" :consummables="consummables">
                         <div v-once><img v-bind:src="mapTileImages.coalPowerStationImage.src"></div>
                     </PriceTooltip> x {{ coalPowerStations.quantity }}
                 </label>
@@ -57,9 +57,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { Building, StorageToBuildingMapping } from '@/models/Building';
-import { Storage } from '@/models/Storage';
-import { StaticStorageInfo, ResearchInfo } from '@/services/GameEngine'
+import { Building } from '@/models/Building';
+import { StaticBuildingInfo, ResearchInfo } from '@/services/GameEngine'
 import { Environment } from '@/models/Environment';
 import { IMapTile } from '@/models/IMapTile';
 import { IState, IdleGameVue } from '@/store';
@@ -99,7 +98,7 @@ export default class Map extends IdleGameVue {
     }
 
     @Prop() private map!: IMapTile[][];
-    @Prop() private storage!: { [id in Storage]: { quantity: number } };
+    @Prop() private buildings!: { [id in Building]: { quantity: number } };
     @Prop() private consummables!: {[id in Consummable]: { quantity: number }};
 
     private ctx!: CanvasRenderingContext2D;
@@ -107,44 +106,44 @@ export default class Map extends IdleGameVue {
 
     private mouseTileCoord: { x: number, y: number } | null = null;
 
-    public storageType: Storage = Storage.villages;
+    public buildingType: Building = Building.village;
 
     // Buildings Info
     get villagesInfo() {
-        return StaticStorageInfo.villages;
+        return StaticBuildingInfo.village;
     }
 
     get barnsInfo() {
-        return StaticStorageInfo.barns;
+        return StaticBuildingInfo.barn;
     }
 
     get farmsInfo() {
-        return StaticStorageInfo.farms;
+        return StaticBuildingInfo.farm;
     }
 
     get coalMineInfo() {
-        return StaticStorageInfo.coalMines;
+        return StaticBuildingInfo.coalMine;
     }
 
     // Buildings
     get barns() {
-        return this.storage.barns;
+        return this.buildings.barn;
     }
 
     get villages() {
-        return this.storage.villages;
+        return this.buildings.village;
     }
 
     get farms() {
-        return this.storage.farms;
+        return this.buildings.farm;
     }
 
     get coalMines() {
-        return this.storage.coalMines;
+        return this.buildings.coalMine;
     }
 
     get coalPowerStations() {
-        return this.storage.coalPowerStations;
+        return this.buildings.coalPowerStation;
     }
 
     // TODO: I'm not sure why I need to watch this property since it's on the store
@@ -182,7 +181,7 @@ export default class Map extends IdleGameVue {
                     this.draw();
             }
         }
-    }       
+    }
 
     private draw() {
         this.ctx.clearRect(0, 0, this.tileSize * this.nbTilesOnRowOrColumn, this.tileSize * this.nbTilesOnRowOrColumn);
@@ -209,8 +208,8 @@ export default class Map extends IdleGameVue {
             }
         }
 
-        if (this.mouseTileCoord && this.canBeBuilt(this.mouseTileCoord, StorageToBuildingMapping[this.storageType])) {
-            let image = this.getBuildingImage(StorageToBuildingMapping[this.storageType]);
+        if (this.mouseTileCoord && this.canBeBuilt(this.mouseTileCoord, this.buildingType)) {
+            let image = this.getBuildingImage(this.buildingType);
             if (image) {
                 this.ctx.globalAlpha = 0.7;
                 this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize);
@@ -220,20 +219,19 @@ export default class Map extends IdleGameVue {
     }
 
     private handleMouseDown(event: MouseEvent) {
-        var buildingType = StorageToBuildingMapping[this.storageType];
         var coord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
 
-        if (!this.canBeBuilt(coord, buildingType))
+        if (!this.canBeBuilt(coord, this.buildingType))
             return;
 
         // Pay the price of your purchase
-        for (let consummable in StaticStorageInfo[this.storageType as Storage].price) {
-            let price = StaticStorageInfo[this.storageType as Storage].price[consummable as Consummable];
+        for (let consummable in StaticBuildingInfo[this.buildingType].price) {
+            let price = StaticBuildingInfo[this.buildingType].price[consummable as Consummable];
             if (price && price != 0)
                 this.$store.commit('IncrementConsummable', { name: consummable, value: -price });
         }
 
-        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: buildingType });
+        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: this.buildingType });
 
         this.draw();
     }
@@ -257,8 +255,8 @@ export default class Map extends IdleGameVue {
             return false;
 
         // Check if you can afford your purchase
-        for (let consummableId in StaticStorageInfo[this.storageType as Storage].price) {
-            let price = StaticStorageInfo[this.storageType].price[consummableId as Consummable];
+        for (let consummableId in StaticBuildingInfo[this.buildingType].price) {
+            let price = StaticBuildingInfo[this.buildingType].price[consummableId as Consummable];
 
             if (price && this.consummables[consummableId as Consummable].quantity < price)
                 return false;
@@ -277,14 +275,14 @@ export default class Map extends IdleGameVue {
             return false;
 
         // You must build coalMine on coalDeposite
-        if (building == Building.CoalMine && this.map[coord.x][coord.y].environment !== Environment.CoalDeposite)
+        if (building == Building.coalMine && this.map[coord.x][coord.y].environment !== Environment.CoalDeposite)
             return false;
 
         return true;
     }
 
-    private isKnown(storage: Storage) {
-        return this.$store.getters.researchStorageKnown[storage];
+    private isKnown(building: Building) {
+        return this.$store.getters.researchBuildingsKnown[building];
     }
 
     private getEnvironmentImage(environment: Environment): HTMLImageElement {
@@ -302,19 +300,19 @@ export default class Map extends IdleGameVue {
         throw new Error(`could not find anything to display for environment ${environment}`);
     }
 
-    private getBuildingImage(building: Building): HTMLImageElement | null {
+    private getBuildingImage(building: Building | null): HTMLImageElement | null {
         switch (building) {
-            case Building.NoBuilding:
+            case null:
                 return null;
-            case Building.Village:
+            case Building.village:
                 return this.mapTileImages.villageImage;
-            case Building.Barn:
+            case Building.barn:
                 return this.mapTileImages.barnImage;
-            case Building.Farm:
+            case Building.farm:
                 return this.mapTileImages.farmImage;
-            case Building.CoalMine:
+            case Building.coalMine:
                 return this.mapTileImages.coalMineImage;
-            case Building.CoalPowerStation:
+            case Building.coalPowerStation:
                 return this.mapTileImages.coalPowerStationImage;
         }
 

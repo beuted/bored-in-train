@@ -1,11 +1,11 @@
 <template>
     <div class="tooltip"><div v-bind:class="buildableClass"> <slot></slot> </div>
         <span class="tooltip-content">
-            <div class="tooltip-title">{{ storageInfo.name }}</div>
-            <div>{{ storageInfo.description }}</div>
+            <div class="tooltip-title">{{ buildingInfo.name }}</div>
+            <div>{{ buildingInfo.description }}</div>
             <br>
             <div class="tooltip-title">Price:</div>
-            <div v-for="(value, key) in storageInfo.price" :key="key">
+            <div v-for="(value, key) in buildingInfo.price" :key="key">
                 <span v-if="value != 0">{{ key }} x {{ value }}</span>
             </div>
         </span>
@@ -16,15 +16,15 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
 import { Consummable } from '@/models/Consummable';
-import { StaticStorageInfo } from '@/services/GameEngine';
-import { Storage } from '@/models/Storage';
+import { StaticBuildingInfo } from '@/services/GameEngine';
+import { Building } from '@/models/Building';
 
 @Component({
   components: {
   },
 })
 export default class PriceTooltip extends IdleGameVue {
-    @Prop() private building!: Storage;
+    @Prop() private building!: Building;
     @Prop() private consummables!: {[id in Consummable]: { quantity: number }};
 
     public get buildableClass() {
@@ -34,13 +34,13 @@ export default class PriceTooltip extends IdleGameVue {
         return 'buildable';
     }
 
-    public get storageInfo() {
-        return StaticStorageInfo[this.building];
+    public get buildingInfo() {
+        return StaticBuildingInfo[this.building];
     }
 
     private isBuildable() {
-        for (const key in StaticStorageInfo[this.building].price) {
-            var value = StaticStorageInfo[this.building].price[key as Consummable];
+        for (const key in StaticBuildingInfo[this.building].price) {
+            var value = StaticBuildingInfo[this.building].price[key as Consummable];
             if (this.consummables[key as Consummable].quantity < value)
                 return false;
         }

@@ -1,28 +1,7 @@
-import { Storage } from '@/models/Storage';
-
 export enum Building {
-    NoBuilding = 0,
-    Village = 1,
-    Barn = 2,
-    Farm = 3,
-    CoalMine = 4,
-    CoalPowerStation = 5,
-}
-
-export const StorageToBuildingMapping: {[id in Storage]: Building} = {
-    [Storage.villages]: Building.Village,
-    [Storage.barns]: Building.Barn,
-    [Storage.farms]: Building.Farm,
-    [Storage.coalMines]: Building.CoalMine,
-    [Storage.coalPowerStations]: Building.CoalPowerStation,
-}
-
-export const BuildingToStorageMapping: {[id in Building]: Storage | null} = {
-    [Building.NoBuilding]: null,
-    [Building.Village]: Storage.villages,
-    [Building.Barn]: Storage.barns,
-    [Building.Farm]: Storage.farms,
-    [Building.CoalMine]: Storage.coalMines,
-    [Building.CoalPowerStation]: Storage.coalPowerStations,
-
+    village = 'village',
+    barn = 'barn',
+    farm = 'farm',
+    coalMine = 'coalMine',
+    coalPowerStation = 'coalPowerStation',
 }

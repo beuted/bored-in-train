@@ -23,9 +23,9 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
-import { StaticJobInfo, IStorage } from '@/services/GameEngine';
+import { StaticJobInfo } from '@/services/GameEngine';
 import { Job } from '@/models/Job';
-import { Storage } from '@/models/Storage';
+import { Building } from '@/models/Building';
 
 import JobTooltip from '@/components/JobTooltip.vue';
 import ParticleEmitter from '@/components/ParticleEmitter.vue';
@@ -108,7 +108,7 @@ export default class Jobs extends IdleGameVue {
         var storageNeeded = StaticJobInfo[jobName].storage;
         if (!storageNeeded)
             return -1;
-        return this.$store.state.map.storage[storageNeeded.name as Storage].quantity * storageNeeded.capacity;
+        return this.$store.state.map.buildings[storageNeeded.name as Building].quantity * storageNeeded.capacity;
     }
 }
 </script>

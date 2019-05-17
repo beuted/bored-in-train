@@ -8,7 +8,7 @@
         <Jobs />
       </div>
       <div class="map-item">
-        <Map :map="map" :storage="storage" :consummables="consummables"/>
+        <Map :map="map" :buildings="buildings" :consummables="consummables"/>
       </div>
       <div class="inventory-item">
         <Inventory />
@@ -29,7 +29,6 @@ import { GameService } from '@/services/GameService';
 
 import Jobs from '@/components/Jobs.vue';
 import Inventory from '@/components/Inventory.vue';
-import Storage from '@/components/Storage.vue';
 import Map from '@/components/Map.vue';
 import Controls from '@/components/Controls.vue';
 
@@ -39,7 +38,6 @@ const gameService = new GameService();
   components: {
     Jobs,
     Inventory,
-    Storage,
     Map,
     Controls
   },
@@ -51,8 +49,8 @@ export default class Game extends IdleGameVue {
     return this.$store.state.map.map;
   }
 
-  private get storage() {
-    return this.$store.state.map.storage;
+  private get buildings() {
+    return this.$store.state.map.buildings;
   }
 
   private get consummables() {

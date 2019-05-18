@@ -1,49 +1,15 @@
 <template>
     <div>
         <div class="menu">
-            <span v-if="isKnown('village')">
-                <input type="radio" id="village" value="village" v-model="buildingType">
-                <label for="village">
-                    <PriceTooltip building="village" :consummables="consummables">
-                    <div v-once><img v-bind:src="mapTileImages.villageImage.src"></div>
-                    </PriceTooltip> x {{ villages.quantity }}
-                </label>
-            </span>
-
-            <span v-if="isKnown('barn')">
-                <input type="radio" id="barn" value="barn" v-model="buildingType" >
-                <label for="barn">
-                    <PriceTooltip building="barn" :consummables="consummables">
-                        <div v-once><img v-bind:src="mapTileImages.barnImage.src"></div>
-                    </PriceTooltip> x {{ barns.quantity }}
-                </label>
-            </span>
-
-            <span v-if="isKnown('farm')">
-                <input type="radio" id="farm" value="farm" v-model="buildingType">
-                <label for="farm">
-                    <PriceTooltip building="farm" :consummables="consummables">
-                        <div v-once><img v-bind:src="mapTileImages.farmImage.src"></div>
-                    </PriceTooltip> x {{ farms.quantity }}
-                </label>
-            </span>
-
-            <span v-if="isKnown('coalMine')">
-                <input type="radio" id="coalMine" value="coalMine" v-model="buildingType">
-                <label for="coalMine">
-                    <PriceTooltip building="coalMine" :consummables="consummables">
-                        <div v-once><img v-bind:src="mapTileImages.coalMineImage.src"></div>
-                    </PriceTooltip> x {{ coalMines.quantity }}
-                </label>
-            </span>
-
-            <span v-if="isKnown('coalPowerStation')">
-                <input type="radio" id="coalPowerStation" value="coalPowerStation" v-model="buildingType">
-                <label for="coalPowerStation">
-                    <PriceTooltip building="coalPowerStation" :consummables="consummables">
-                        <div v-once><img v-bind:src="mapTileImages.coalPowerStationImage.src"></div>
-                    </PriceTooltip> x {{ coalPowerStations.quantity }}
-                </label>
+            <span v-for="(building, key) in buildings" v-bind:key="key">
+                <span v-if="isKnown(key)">
+                    <input type="radio" :id="key" :value="key" v-model="buildingType">
+                    <label :for="key">
+                        <PriceTooltip :building="key" :consummables="consummables">
+                        <div v-once><img v-bind:src="mapBuildingImages[key].src"></div>
+                        </PriceTooltip> x {{ villages.quantity }}
+                    </label>
+                </span>
             </span>
         </div>
         <canvas id="canvas" class="map"
@@ -75,26 +41,19 @@ import { Research } from '../models/Research';
 export default class Map extends IdleGameVue {
     private readonly tileSize = 32;
     private readonly nbTilesOnRowOrColumn = 20;
-    private mapTileImages: {
-        foretImage: HTMLImageElement,
-        waterImage: HTMLImageElement,
-        fieldImage: HTMLImageElement,
-        villageImage: HTMLImageElement,
-        barnImage: HTMLImageElement,
-        farmImage: HTMLImageElement,
-        coalMineImage: HTMLImageElement,
-        coalDepositeImage: HTMLImageElement,
-        coalPowerStationImage: HTMLImageElement
-    } = {
-        foretImage: new Image(),
-        waterImage: new Image(),
-        fieldImage: new Image(),
-        villageImage: new Image(),
-        barnImage: new Image(),
-        farmImage: new Image(),
-        coalMineImage: new Image(),
-        coalDepositeImage: new Image(),
-        coalPowerStationImage: new Image(),
+    private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
+        [Environment.Forest]: new Image(),
+        [Environment.Water]: new Image(),
+        [Environment.Field]: new Image(),
+        [Environment.CoalDeposite]: new Image()
+    };
+
+    private mapBuildingImages: { [id in Building]: HTMLImageElement } = {
+        village: new Image(),
+        barn: new Image(),
+        farm: new Image(),
+        coalMine: new Image(),
+        coalPowerStation: new Image(),
     }
 
     @Prop() private map!: IMapTile[][];
@@ -109,6 +68,7 @@ export default class Map extends IdleGameVue {
     public buildingType: Building = Building.village;
 
     // Buildings Info
+
     get villagesInfo() {
         return StaticBuildingInfo.village;
     }
@@ -154,15 +114,15 @@ export default class Map extends IdleGameVue {
 
     constructor() {
         super();
-        this.mapTileImages.foretImage.src = './img/foret.png';
-        this.mapTileImages.waterImage.src = './img/water.png';
-        this.mapTileImages.fieldImage.src = './img/field.png';
-        this.mapTileImages.coalDepositeImage.src = './img/coal-deposit.png';
-        this.mapTileImages.villageImage.src = './img/village.png';
-        this.mapTileImages.barnImage.src = './img/barn.png';
-        this.mapTileImages.farmImage.src = './img/farm.png';
-        this.mapTileImages.coalMineImage.src = './img/coal-mine.png';
-        this.mapTileImages.coalPowerStationImage.src = './img/coal-power-station.png';
+        this.mapEnvironmentImages[Environment.Forest].src = './img/foret.png';
+        this.mapEnvironmentImages[Environment.Water].src = './img/water.png';
+        this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
+        this.mapEnvironmentImages[Environment.CoalDeposite].src = './img/coal-deposit.png';
+        this.mapBuildingImages[Building.village].src = './img/village.png';
+        this.mapBuildingImages[Building.barn].src = './img/barn.png';
+        this.mapBuildingImages[Building.farm].src = './img/farm.png';
+        this.mapBuildingImages[Building.coalMine].src = './img/coal-mine.png';
+        this.mapBuildingImages[Building.coalPowerStation].src = './img/coal-power-station.png';
     }
 
     private mounted() {
@@ -172,12 +132,23 @@ export default class Map extends IdleGameVue {
         if (this.map.length <= 0)
             this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
 
-        var nbImages = Object.keys(this.mapTileImages).length;
-        for (const key in this.mapTileImages)
+        let nbEnvImages = Object.keys(this.mapEnvironmentImages).length;
+        let nbBuildingImages = Object.keys(this.mapBuildingImages).length;
+
+        for (const key in this.mapBuildingImages)
         {
-            (this.mapTileImages as any)[key].onload = () => {
-                nbImages--;
-                if (nbImages == 0)
+            (this.mapBuildingImages as any)[key].onload = () => {
+                nbBuildingImages--;
+                if (nbBuildingImages == 0 && nbEnvImages == 0)
+                    this.draw();
+            }
+        }
+
+        for (const key in this.mapEnvironmentImages)
+        {
+            (this.mapEnvironmentImages as any)[key].onload = () => {
+                nbEnvImages--;
+                if (nbEnvImages == 0 && nbBuildingImages == 0)
                     this.draw();
             }
         }
@@ -286,37 +257,14 @@ export default class Map extends IdleGameVue {
     }
 
     private getEnvironmentImage(environment: Environment): HTMLImageElement {
-        switch (environment) {
-            case Environment.Water:
-                return this.mapTileImages.waterImage;
-            case Environment.Field:
-                return this.mapTileImages.fieldImage;
-            case Environment.Forest:
-                return this.mapTileImages.foretImage;
-            case Environment.CoalDeposite:
-                return this.mapTileImages.coalDepositeImage;
-        }
-
-        throw new Error(`could not find anything to display for environment ${environment}`);
+        return this.mapEnvironmentImages[environment];
     }
 
     private getBuildingImage(building: Building | null): HTMLImageElement | null {
-        switch (building) {
-            case null:
-                return null;
-            case Building.village:
-                return this.mapTileImages.villageImage;
-            case Building.barn:
-                return this.mapTileImages.barnImage;
-            case Building.farm:
-                return this.mapTileImages.farmImage;
-            case Building.coalMine:
-                return this.mapTileImages.coalMineImage;
-            case Building.coalPowerStation:
-                return this.mapTileImages.coalPowerStationImage;
-        }
-
-        throw new Error(`could not find anything to display for building ${building}`);
+        if (building == null)
+            return null;
+        
+        return this.mapBuildingImages[building];
     }
 
     private getTileFromCoordinate(x: number, y: number) {

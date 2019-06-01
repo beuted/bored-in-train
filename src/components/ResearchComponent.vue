@@ -73,7 +73,7 @@ export default class ResearchComponent extends IdleGameVue {
 .research-item {
   margin: 20px;
   padding: 20px;
-  border: 1px solid black;
+  border: 1px solid #2c3e50;
   cursor: pointer;
   flex-direction: column;
 }

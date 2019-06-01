@@ -6,12 +6,13 @@
                     <input type="radio" :id="key" :value="key" v-model="buildingType">
                     <label :for="key">
                         <PriceTooltip :building="key" :consummables="consummables">
-                        <div v-once><img v-bind:src="mapBuildingImages[key].src"></div>
+                            <div v-once><img v-bind:src="mapBuildingImages[key].src"></div>
                         </PriceTooltip> x {{ villages.quantity }}
                     </label>
                 </span>
             </span>
         </div>
+        <!--<TileTooltip :tile="map[0][0]"></TileTooltip>-->
         <canvas id="canvas" class="map"
             v-on:mousedown="handleMouseDown"
             v-on:mouseup="handleMouseUp"
@@ -29,13 +30,15 @@ import { Environment } from '@/models/Environment';
 import { IMapTile } from '@/models/IMapTile';
 import { IState, IdleGameVue } from '@/store';
 import { Consummable } from '@/models/Consummable';
+import { Research } from '../models/Research';
 
 import PriceTooltip from '@/components/PriceTooltip.vue';
-import { Research } from '../models/Research';
+import TileTooltip from '@/components/TileTooltip.vue';
 
 @Component({
   components: {
-      PriceTooltip
+      PriceTooltip,
+      TileTooltip
   },
 })
 export default class Map extends IdleGameVue {

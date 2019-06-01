@@ -11,8 +11,8 @@
                         <JobTooltip :jobName="jobName"><ParticleEmitter :jobName="jobName">{{ getJobDisplayName(jobName) }}:</ParticleEmitter></JobTooltip> {{ getJobQuantity(jobName) }} / {{ getJobMaxStorage(jobName) }}
                     </div>
                     <div>
-                        <button v-bind:disabled="!canAddJob(1, jobName)" v-on:click="addJob(1, jobName)">Add</button>
-                        <button v-bind:disabled="!canRemoveJob(1, jobName)" v-on:click="removeJob(1, jobName)">Remove</button>
+                        <button class="add-button" v-bind:disabled="!canRemoveJob(1, jobName)" v-on:click="removeJob(1, jobName)">-</button>
+                        <button class="add-button" v-bind:disabled="!canAddJob(1, jobName)" v-on:click="addJob(1, jobName)">+</button>
                     </div>
                 </span>
             </li>
@@ -129,7 +129,22 @@ ul {
 li {
   margin: 10px;
 }
-a {
-  color: #42b983;
+.add-button {
+    border: none;
+    border-radius: 10px;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    margin-left: 5px;
+    background-color: #2c3e50;
+    color: white;
+    cursor: pointer;
+}
+.add-button:hover {
+    opacity: 0.9;
+}
+.add-button:disabled {
+    opacity: 0.3;
+    cursor: default;
 }
 </style>

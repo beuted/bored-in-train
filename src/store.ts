@@ -98,6 +98,7 @@ export default new Vuex.Store<IState>({
     // Toggle debug
     ToggleDebugMode(state) {
       state.debugMode = !state.debugMode
+      state.controls.speed = 10;
     },
     // Toggle play or pause
     TogglePlay(state) {

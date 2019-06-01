@@ -1,4 +1,4 @@
-<template>
+  <template>
   <div>
     <h1>{{ msg }} <button v-on:click="toggleDebug()">Debug</button> <button v-on:click="reset()">Reset</button></h1>
 
@@ -58,7 +58,7 @@ export default class Game extends IdleGameVue {
   }
 
   public toggleDebug() {
-    this.$store.state.controls.speed = 10;
+    this.$store.commit('ToggleDebugMode');
   }
 
   public reset() {

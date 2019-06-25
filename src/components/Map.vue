@@ -131,6 +131,7 @@ export default class Map extends IdleGameVue {
     private mounted() {
         this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
         this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
+        this.ctx.imageSmoothingEnabled = false;
 
         if (this.map.length <= 0)
             this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
@@ -164,20 +165,20 @@ export default class Map extends IdleGameVue {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
                 if (this.map[i][j].discovered) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment)
-                    this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize);
+                    this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
 
                     let buildingImage = this.getBuildingImage(this.map[i][j].building)
                     if (buildingImage)
-                        this.ctx.drawImage(buildingImage, i*this.tileSize, j*this.tileSize);
+                        this.ctx.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
                 // The following statement is cached
                 } else if (this.$store.getters.tilesDiscoverability[i][j]) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
-                    this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize);
+                    this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
                     this.ctx.globalAlpha = 0.7;
-                    this.ctx.fillRect(i*this.tileSize, j*this.tileSize, i*this.tileSize + 32, j*this.tileSize + 32);
+                    this.ctx.fillRect(i*this.tileSize, j*this.tileSize, (i+1)*this.tileSize, (j+1)*this.tileSize);
                     this.ctx.globalAlpha = 1;
                 } else {
-                    this.ctx.fillRect(i*this.tileSize, j*this.tileSize, i*this.tileSize + 32, j*this.tileSize + 32);
+                    this.ctx.fillRect(i*this.tileSize, j*this.tileSize, (i+1)*this.tileSize, (j+1)*this.tileSize);
                 }
             }
         }
@@ -186,7 +187,7 @@ export default class Map extends IdleGameVue {
             let image = this.getBuildingImage(this.buildingType);
             if (image) {
                 this.ctx.globalAlpha = 0.7;
-                this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize);
+                this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize, this.tileSize, this.tileSize);
                 this.ctx.globalAlpha = 1.0;
             }
         }
@@ -266,7 +267,7 @@ export default class Map extends IdleGameVue {
     private getBuildingImage(building: Building | null): HTMLImageElement | null {
         if (building == null)
             return null;
-        
+
         return this.mapBuildingImages[building];
     }
 

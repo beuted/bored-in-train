@@ -104,8 +104,8 @@ export class GameService {
       let staticConsummable: IStaticConsummable = StaticConsummableInfo[consummableId as Consummable]; //TODO: fix typeing weirdlness
       // See if storage fits
       if (staticConsummable.storage && staticConsummable.storage.capacity * store.state.map.buildings[staticConsummable.storage.name].quantity < store.state.consummable[consummableId as Consummable].quantity) {
-        let quantityToRemove = Math.floor(this.LackOfStorageFactor *
-          (store.state.consummable[consummableId as Consummable].quantity - store.state.map.buildings[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity));
+        let quantityToRemove = this.LackOfStorageFactor *
+          (store.state.consummable[consummableId as Consummable].quantity - store.state.map.buildings[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity);
         store.commit('IncrementConsummable', { name: consummableId, value: -quantityToRemove });
         // Vue.toasted.error(`${quantityToRemove} ${consummableId} were thrown away due to lack of storage`);
       }

@@ -7,7 +7,7 @@
                     <label :for="key">
                         <PriceTooltip :building="key" :consummables="consummables">
                             <div v-once><img v-bind:src="mapBuildingImages[key].src"></div>
-                        </PriceTooltip> x {{ villages.quantity }}
+                        </PriceTooltip> x {{ building.quantity }}
                     </label>
                 </span>
             </span>
@@ -69,45 +69,6 @@ export default class Map extends IdleGameVue {
     private mouseTileCoord: { x: number, y: number } | null = null;
 
     public buildingType: Building = Building.village;
-
-    // Buildings Info
-
-    get villagesInfo() {
-        return StaticBuildingInfo.village;
-    }
-
-    get barnsInfo() {
-        return StaticBuildingInfo.barn;
-    }
-
-    get farmsInfo() {
-        return StaticBuildingInfo.farm;
-    }
-
-    get coalMineInfo() {
-        return StaticBuildingInfo.coalMine;
-    }
-
-    // Buildings
-    get barns() {
-        return this.buildings.barn;
-    }
-
-    get villages() {
-        return this.buildings.village;
-    }
-
-    get farms() {
-        return this.buildings.farm;
-    }
-
-    get coalMines() {
-        return this.buildings.coalMine;
-    }
-
-    get coalPowerStations() {
-        return this.buildings.coalPowerStation;
-    }
 
     // TODO: I'm not sure why I need to watch this property since it's on the store
     @Watch('map', { deep: true })

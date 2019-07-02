@@ -78,15 +78,15 @@ export default class Map extends IdleGameVue {
 
     constructor() {
         super();
-        this.mapEnvironmentImages[Environment.Forest].src = './img/foret.png';
-        this.mapEnvironmentImages[Environment.Water].src = './img/water.png';
+        this.mapEnvironmentImages[Environment.Forest].src = './img/foret-2.png';
+        this.mapEnvironmentImages[Environment.Water].src = './img/mer.png';
         this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
         this.mapEnvironmentImages[Environment.CoalDeposite].src = './img/coal-deposit.png';
-        this.mapBuildingImages[Building.village].src = './img/village.png';
-        this.mapBuildingImages[Building.barn].src = './img/barn.png';
+        this.mapBuildingImages[Building.village].src = './img/village-2.png';
+        this.mapBuildingImages[Building.barn].src = './img/entrepot.png';
         this.mapBuildingImages[Building.farm].src = './img/farm.png';
-        this.mapBuildingImages[Building.coalMine].src = './img/coal-mine.png';
-        this.mapBuildingImages[Building.coalPowerStation].src = './img/coal-power-station.png';
+        this.mapBuildingImages[Building.coalMine].src = './img/minecharbon.png';
+        this.mapBuildingImages[Building.coalPowerStation].src = './img/centralecharbon.png';
     }
 
     private mounted() {

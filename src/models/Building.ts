@@ -1,4 +1,5 @@
 export enum Building {
+    forest = 'forest',
     village = 'village',
     barn = 'barn',
     farm = 'farm',

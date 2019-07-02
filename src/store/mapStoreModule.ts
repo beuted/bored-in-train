@@ -35,6 +35,9 @@ export const MapModule: Module<IMapState, IState> = {
       coalPowerStation: {
         quantity: 0,
       },
+      forest: {
+        quantity: 30, //TODO: Put real value here retreived from MapBuilder
+      }
     },
   },
   mutations: {
@@ -53,9 +56,6 @@ export const MapModule: Module<IMapState, IState> = {
       }
 
       state.map[obj.x][obj.y].building = obj.type;
-      // Destroy Forest when building
-      if (state.map[obj.x][obj.y].environment == Environment.Forest)
-        state.map[obj.x][obj.y].environment = Environment.Field;
 
       if (obj.type != null) {
         state.buildings[obj.type].quantity++;

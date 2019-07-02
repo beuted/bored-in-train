@@ -99,6 +99,19 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     }
+  },
+  forest: {
+    name: 'Forest',
+    description: 'Just a bunch of trees',
+    price: {
+      population: 0,
+      food: 0,
+      wood: 50,
+      stones: 0,
+      coals: 0,
+      energy: 0,
+      knowledge: 0
+    }
   }
 }
 

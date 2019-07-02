@@ -45,13 +45,13 @@ export default class Map extends IdleGameVue {
     private readonly tileSize = 32;
     private readonly nbTilesOnRowOrColumn = 20;
     private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
-        [Environment.Forest]: new Image(),
         [Environment.Water]: new Image(),
         [Environment.Field]: new Image(),
         [Environment.CoalDeposite]: new Image()
     };
 
     private mapBuildingImages: { [id in Building]: HTMLImageElement } = {
+        forest: new Image(),
         village: new Image(),
         barn: new Image(),
         farm: new Image(),
@@ -78,10 +78,10 @@ export default class Map extends IdleGameVue {
 
     constructor() {
         super();
-        this.mapEnvironmentImages[Environment.Forest].src = './img/foret-2.png';
         this.mapEnvironmentImages[Environment.Water].src = './img/mer.png';
         this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
         this.mapEnvironmentImages[Environment.CoalDeposite].src = './img/coal-deposit.png';
+        this.mapBuildingImages[Building.forest].src = './img/foret-2.png';
         this.mapBuildingImages[Building.village].src = './img/village-2.png';
         this.mapBuildingImages[Building.barn].src = './img/entrepot.png';
         this.mapBuildingImages[Building.farm].src = './img/farm.png';

@@ -135,6 +135,11 @@ export default class Map extends IdleGameVue {
                 } else if (this.$store.getters.tilesDiscoverability[i][j]) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
                     this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+
+                    let buildingImage = this.getBuildingImage(this.map[i][j].building)
+                    if (buildingImage)
+                        this.ctx.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+
                     this.ctx.globalAlpha = 0.7;
                     this.ctx.fillRect(i*this.tileSize, j*this.tileSize, (i+1)*this.tileSize, (j+1)*this.tileSize);
                     this.ctx.globalAlpha = 1;

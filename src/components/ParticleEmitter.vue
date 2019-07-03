@@ -2,12 +2,12 @@
     <div class="particle-box"><div> <slot></slot> </div>
         <span class="particle particle-positive">
             <transition name="bounce" v-for="(value, key) in consummables" :key="key">
-                <div v-if="shows[value].positive">{{ getParticleEmoji(value) }}</div>
+                <div v-if="shows[value].positive"><img v-bind:src="getParticleEmoji(value)"/></div>
             </transition>
         </span>
         <span class="particle particle-negative">
             <transition name="unbounce" v-for="(value, key) in consummables" :key="key">
-                <div v-if="shows[value].negative">{{ getParticleEmoji(value) }}</div>
+                <div v-if="shows[value].negative"><img v-bind:src="getParticleEmoji(value)"/></div>
             </transition>
         </span>
     </div>

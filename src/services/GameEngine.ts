@@ -118,7 +118,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
 export const StaticConsummableInfo: IStaticConsummableInfo = {
   population: {
     name: 'Population',
-    icon: '🙋‍♂️',
+    icon: './img/steel.png',
     storage: {
       name: Building.village,
       capacity: 10
@@ -126,7 +126,7 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
   },
   food: {
     name: 'Food',
-    icon: '🍗',
+    icon: './img/steel.png',
     storage: {
       name: Building.barn,
       capacity: 20
@@ -134,27 +134,27 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
   },
   wood: {
     name: 'Wood',
-    icon: '🌲',
+    icon: './img/bois.png',
     storage: undefined,
   },
   stones: {
-    name: 'Stones',
-    icon: '⛏️' ,
+    name: 'Stone',
+    icon: './img/pierre.png' ,
     storage: undefined,
   },
   coals: {
     name: 'Coals',
-    icon: '💎',
+    icon: './img/steel.png',
     storage: undefined,
   },
   energy: {
     name: 'Energy',
-    icon: '⚡',
+    icon: './img/steel.png',
     storage: undefined,
   },
   knowledge: {
     name: 'Knowledge',
-    icon: '🔬',
+    icon: './img/steel.png',
     storage: undefined,
   }
 };

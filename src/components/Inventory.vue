@@ -3,7 +3,7 @@
         <h2>Inventory</h2>
         <ul>
             <li v-for="(consummable, key) in consummables" v-bind:key="key">
-                <div> {{ getName(key) }} {{ getIcon(key) }} {{ consummable.quantity }} / {{ getStorage(key) }}</div>
+                <div> {{ getName(key) }} <img v-bind:src="getIcon(key)"> {{ consummable.quantity }} / {{ getStorage(key) }}</div>
                 <div class="production" v-bind:class="{ negative: computeProduction(key) < 0 }"> ({{ computeProduction(key) }} /sec)</div>
             </li>
         </ul>

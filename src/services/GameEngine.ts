@@ -139,12 +139,12 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
   },
   stones: {
     name: 'Stone',
-    icon: './img/stone-deposit.png' ,
+    icon: './img/stone-particle.png' ,
     storage: undefined,
   },
   coals: {
     name: 'Coals',
-    icon: './img/coal-deposit.png',
+    icon: './img/coal-particle.png',
     storage: undefined,
   },
   energy: {

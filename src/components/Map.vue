@@ -47,7 +47,8 @@ export default class Map extends IdleGameVue {
     private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
         [Environment.Water]: new Image(),
         [Environment.Field]: new Image(),
-        [Environment.CoalDeposite]: new Image()
+        [Environment.CoalDeposite]: new Image(),
+        [Environment.Beach]: new Image(),
     };
 
     private mapBuildingImages: { [id in Building]: HTMLImageElement } = {
@@ -81,6 +82,7 @@ export default class Map extends IdleGameVue {
         this.mapEnvironmentImages[Environment.Water].src = './img/mer.png';
         this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
         this.mapEnvironmentImages[Environment.CoalDeposite].src = './img/coal-deposit.png';
+        this.mapEnvironmentImages[Environment.Beach].src = './img/beach.png';
         this.mapBuildingImages[Building.forest].src = './img/foret-2.png';
         this.mapBuildingImages[Building.village].src = './img/village-2.png';
         this.mapBuildingImages[Building.barn].src = './img/entrepot.png';

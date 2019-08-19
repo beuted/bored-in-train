@@ -74,7 +74,7 @@ export default new Vuex.Store<IState>({
       explorer: {
         quantity: 0,
       },
-      scientist: {
+      druid: {
         quantity: 0,
       },
       farmer: {

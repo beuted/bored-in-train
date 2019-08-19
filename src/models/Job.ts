@@ -3,7 +3,7 @@ export enum Job {
     berryGatherer = 'berryGatherer',
     woodGatherer = 'woodGatherer',
     explorer = 'explorer',
-    scientist = 'scientist',
+    druid = 'druid',
     farmer = 'farmer',
     stoneGatherer = 'stoneGatherer',
     coalMiner = 'coalMiner',

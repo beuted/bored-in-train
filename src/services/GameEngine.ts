@@ -266,8 +266,8 @@ export const StaticJobInfo: IStaticJobInfo = {
       'energy': null,
     },
   },
-  'scientist': {
-    name: 'Scientist',
+  'druid': {
+    name: 'Druid',
     description: 'Allows to unlock new technology in the Research tab',
     produce: {
       'population': null,

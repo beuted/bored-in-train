@@ -4,6 +4,7 @@ export enum Building {
     barn = 'barn',
     farm = 'farm',
     coalMine = 'coalMine',
+    stoneMine = 'stoneMine',
+    limestoneMine = 'limestoneMine',
     coalPowerStation = 'coalPowerStation',
-    stoneMine = 'stoneMine'
 }

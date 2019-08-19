@@ -44,6 +44,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       wood: 10,
       stones: 0,
       coals: 0,
+      limestone: 0,
       energy: 0,
       knowledge: 0
     },
@@ -57,6 +58,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       wood: 20,
       stones: 0,
       coals: 0,
+      limestone: 0,
       energy: 0,
       knowledge: 0
     }
@@ -70,45 +72,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       wood: 25,
       stones: 5,
       coals: 0,
-      energy: 0,
-      knowledge: 0
-    }
-  },
-  coalMine: {
-    name: 'Coal Mine',
-    description: 'Allows you to recruit 3 coal miners, must be built on a coal deposite',
-    price: {
-      population: 0,
-      food: 0,
-      wood: 50,
-      stones: 100,
-      coals: 0,
-      energy: 0,
-      knowledge: 0
-    }
-  },
-  coalPowerStation: {
-    name: 'Coal Power Station',
-    description: 'Allows you to recruit 3 coal station engineer',
-    price: {
-      population: 0,
-      food: 0,
-      wood: 25,
-      stones: 100,
-      coals: 0,
-      energy: 0,
-      knowledge: 0
-    }
-  },
-  forest: {
-    name: 'Forest',
-    description: 'Just a bunch of trees',
-    price: {
-      population: 0,
-      food: 0,
-      wood: 50,
-      stones: 0,
-      coals: 0,
+      limestone: 0,
       energy: 0,
       knowledge: 0
     }
@@ -122,6 +86,63 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       wood: 50,
       stones: 30,
       coals: 0,
+      limestone: 0,
+      energy: 0,
+      knowledge: 0
+    }
+  },
+  coalMine: {
+    name: 'Coal Mine',
+    description: 'Allows you to recruit 3 coal miners, must be built on a coal deposite',
+    price: {
+      population: 0,
+      food: 0,
+      wood: 50,
+      stones: 100,
+      coals: 0,
+      limestone: 0,
+      energy: 0,
+      knowledge: 0
+    }
+  },
+  limestoneMine: {
+    name: 'Limestone Mine',
+    description: 'Allows you to recruit 3 limestone miners, must be built on a limestone deposite',
+    price: {
+      population: 0,
+      food: 0,
+      wood: 100,
+      stones: 150,
+      coals: 0,
+      limestone: 0,
+      energy: 0,
+      knowledge: 0
+    }
+  },
+  coalPowerStation: {
+    name: 'Coal Power Station',
+    description: 'Allows you to recruit 3 coal station engineer',
+    price: {
+      population: 0,
+      food: 0,
+      wood: 25,
+      stones: 100,
+      coals: 0,
+      limestone: 0,
+      energy: 0,
+      knowledge: 0
+    }
+  },
+  forest: {
+    name: 'Forest',
+    description: 'Just a bunch of trees',
+    price: {
+      population: 0,
+      food: 0,
+      wood: 50,
+      stones: 0,
+      coals: 0,
+      limestone: 0,
       energy: 0,
       knowledge: 0
     }
@@ -158,6 +179,11 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
   coals: {
     name: 'Coals',
     icon: './img/coal-particle.png',
+    storage: undefined,
+  },
+  limestone: {
+    name: 'Limestones',
+    icon: './img/limestone-particle.png',
     storage: undefined,
   },
   energy: {
@@ -200,6 +226,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -212,6 +239,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -228,6 +256,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -237,6 +266,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -250,6 +280,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'food': null,
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -262,6 +293,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -275,6 +307,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'food': null,
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': {
         probability: 1,
         quantity: 1
@@ -290,6 +323,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -306,6 +340,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -321,6 +356,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -341,6 +377,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         quantity: 0.5
       },
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -353,46 +390,9 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
-    },
-  },
-  'coalMiner': {
-    name: 'Coal Miner',
-    description: 'Extract coal and stone from the ground at the cost of wood',
-    produce: {
-      'population': null,
-      'food': null,
-      'wood': null,
-      'stones': {
-        probability: 1,
-        quantity: 0.5
-      },
-      'coals': {
-        probability: 1,
-        quantity: 1
-      },
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': {
-        probability: 1,
-        quantity: 1
-      },
-      'stones': null,
-      'coals': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    storage: {
-      name: Building.coalMine,
-      capacity: 3
     },
   },
   'stoneMiner': {
@@ -407,6 +407,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         quantity: 1
       },
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -422,11 +423,86 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
     storage: {
       name: Building.stoneMine,
+      capacity: 3
+    },
+  },
+  'coalMiner': {
+    name: 'Coal Miner',
+    description: 'Extract coal and stone from the ground at the cost of wood',
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': {
+        probability: 1,
+        quantity: 1
+      },
+      'limestone': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': {
+        probability: 1,
+        quantity: 1
+      },
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    storage: {
+      name: Building.coalMine,
+      capacity: 3
+    },
+  },
+  'limestoneMiner': {
+    name: 'Limestone Miner',
+    description: 'Extract limestone from the ground at the cost of wood',
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': {
+        probability: 1,
+        quantity: 1
+      },
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': {
+        probability: 1,
+        quantity: 1
+      },
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    storage: {
+      name: Building.limestoneMine,
       capacity: 3
     },
   },
@@ -439,6 +515,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': {
         probability: 1,
@@ -457,6 +534,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 2
       },
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -477,6 +555,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -486,6 +565,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'wood': null,
       'stones': null,
       'coals': null,
+      'limestone': null,
       'knowledge': null,
       'energy': null,
     },
@@ -519,8 +599,8 @@ export const ResearchInfo: IResearchInfo = {
     price: 100,
     prerequisite: [],
     unlocks: {
-      buildings: [Building.coalMine, Building.stoneMine],
-      jobs: [Job.coalMiner, Job.stoneMiner]
+      buildings: [Building.coalMine, Building.stoneMine, Building.limestoneMine],
+      jobs: [Job.coalMiner, Job.stoneMiner, Job.limestoneMiner]
     }
   },
   steamLocomotive: {

@@ -49,6 +49,7 @@ export default class Map extends IdleGameVue {
         [Environment.Field]: new Image(),
         [Environment.CoalDeposite]: new Image(),
         [Environment.StoneDeposite]: new Image(),
+        [Environment.LimestoneDeposite]: new Image(),
         [Environment.Beach]: new Image(),
     };
 
@@ -57,9 +58,10 @@ export default class Map extends IdleGameVue {
         village: new Image(),
         barn: new Image(),
         farm: new Image(),
-        coalMine: new Image(),
-        coalPowerStation: new Image(),
         stoneMine: new Image(),
+        coalMine: new Image(),
+        limestoneMine: new Image(),
+        coalPowerStation: new Image(),
     }
 
     @Prop() private map!: IMapTile[][];
@@ -85,14 +87,16 @@ export default class Map extends IdleGameVue {
         this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
         this.mapEnvironmentImages[Environment.CoalDeposite].src = './img/coal-deposit.png';
         this.mapEnvironmentImages[Environment.StoneDeposite].src = './img/stone-deposit.png';
+        this.mapEnvironmentImages[Environment.LimestoneDeposite].src = './img/limestone-deposit.png';
         this.mapEnvironmentImages[Environment.Beach].src = './img/beach.png';
         this.mapBuildingImages[Building.forest].src = './img/foret-2.png';
         this.mapBuildingImages[Building.village].src = './img/village-2.png';
         this.mapBuildingImages[Building.barn].src = './img/entrepot.png';
         this.mapBuildingImages[Building.farm].src = './img/farm.png';
-        this.mapBuildingImages[Building.coalMine].src = './img/minecharbon.png';
-        this.mapBuildingImages[Building.coalPowerStation].src = './img/centralecharbon.png';
         this.mapBuildingImages[Building.stoneMine].src = './img/minecalcaire.png';
+        this.mapBuildingImages[Building.coalMine].src = './img/minecharbon.png';
+        this.mapBuildingImages[Building.limestoneMine].src = './img/minecalcaire.png';
+        this.mapBuildingImages[Building.coalPowerStation].src = './img/centralecharbon.png';
     }
 
     public isKnown(building: Building) {
@@ -231,6 +235,10 @@ export default class Map extends IdleGameVue {
 
         // You must build stoneMine on stoneDeposite
         if (building == Building.stoneMine && this.map[coord.x][coord.y].environment !== Environment.StoneDeposite)
+            return false;
+
+        // You must build limestoneMine on limestoneDeposite
+        if (building == Building.limestoneMine && this.map[coord.x][coord.y].environment !== Environment.LimestoneDeposite)
             return false;
 
         return true;

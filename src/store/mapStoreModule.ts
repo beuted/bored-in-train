@@ -29,8 +29,14 @@ export const MapModule: Module<IMapState, IState> = {
       farm: {
         quantity: 0,
       },
+      stoneMine: {
+        quantity: 0
+      },
       coalMine: {
         quantity: 0,
+      },
+      limestoneMine: {
+        quantity: 0
       },
       coalPowerStation: {
         quantity: 0,
@@ -38,9 +44,7 @@ export const MapModule: Module<IMapState, IState> = {
       forest: {
         quantity: 30, //TODO: Put real value here retreived from MapBuilder
       },
-      stoneMine: {
-        quantity: 0
-      }
+
     },
   },
   mutations: {

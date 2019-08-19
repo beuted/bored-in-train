@@ -4,6 +4,7 @@ export enum Consummable {
     wood = 'wood',
     stones = 'stones',
     coals = 'coals',
+    limestone = 'limestone',
     knowledge = 'knowledge',
     energy = 'energy',
 }

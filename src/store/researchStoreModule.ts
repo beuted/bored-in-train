@@ -5,6 +5,7 @@ import { IState } from '../store';
 import { Research } from '@/models/Research';
 import { Consummable } from '@/models/Consummable';
 import { Building } from '@/models/Building';
+import { Job } from '@/models/Job';
 
 export interface IResearchState {
   research: { [id in Research]: { owned: boolean } },
@@ -71,6 +72,23 @@ export const ResearchModule: Module<IResearchState, IState> = {
           buildingKnown[building] = true;
       }
       return buildingKnown;
+    },
+
+    researchJobsKnown(state) {
+      let jobKnown: any = {};
+      for (let job in Job) {
+        for (let research in Research) {
+          if (ResearchInfo[research as Research].unlocks.jobs.findIndex(x => x == job) != -1
+              && !state.research[research as Research].owned) {
+            jobKnown[job] = false;
+            break;
+          }
+        }
+
+        if (jobKnown[job] === undefined)
+          jobKnown[job] = true;
+      }
+      return jobKnown;
     }
   }
 }

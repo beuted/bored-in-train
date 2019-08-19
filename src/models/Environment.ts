@@ -3,4 +3,5 @@ export enum Environment {
     Field = 2,
     CoalDeposite = 3,
     Beach = 4,
+    StoneDeposite = 5,
 }

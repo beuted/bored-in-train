@@ -83,10 +83,13 @@ export default new Vuex.Store<IState>({
       stoneGatherer: {
         quantity: 0,
       },
-      miner: {
+      coalMiner: {
         quantity: 0,
       },
       coalStationEngineer: {
+        quantity: 0,
+      },
+      stoneMiner: {
         quantity: 0,
       },
       default: { //Job producing population

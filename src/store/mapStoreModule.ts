@@ -37,6 +37,9 @@ export const MapModule: Module<IMapState, IState> = {
       },
       forest: {
         quantity: 30, //TODO: Put real value here retreived from MapBuilder
+      },
+      stoneMine: {
+        quantity: 0
       }
     },
   },

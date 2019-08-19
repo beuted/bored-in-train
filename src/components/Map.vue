@@ -48,6 +48,7 @@ export default class Map extends IdleGameVue {
         [Environment.Water]: new Image(),
         [Environment.Field]: new Image(),
         [Environment.CoalDeposite]: new Image(),
+        [Environment.StoneDeposite]: new Image(),
         [Environment.Beach]: new Image(),
     };
 
@@ -58,6 +59,7 @@ export default class Map extends IdleGameVue {
         farm: new Image(),
         coalMine: new Image(),
         coalPowerStation: new Image(),
+        stoneMine: new Image(),
     }
 
     @Prop() private map!: IMapTile[][];
@@ -82,6 +84,7 @@ export default class Map extends IdleGameVue {
         this.mapEnvironmentImages[Environment.Water].src = './img/mer.png';
         this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
         this.mapEnvironmentImages[Environment.CoalDeposite].src = './img/coal-deposit.png';
+        this.mapEnvironmentImages[Environment.StoneDeposite].src = './img/stone-deposit.png';
         this.mapEnvironmentImages[Environment.Beach].src = './img/beach.png';
         this.mapBuildingImages[Building.forest].src = './img/foret-2.png';
         this.mapBuildingImages[Building.village].src = './img/village-2.png';
@@ -89,6 +92,11 @@ export default class Map extends IdleGameVue {
         this.mapBuildingImages[Building.farm].src = './img/farm.png';
         this.mapBuildingImages[Building.coalMine].src = './img/minecharbon.png';
         this.mapBuildingImages[Building.coalPowerStation].src = './img/centralecharbon.png';
+        this.mapBuildingImages[Building.stoneMine].src = './img/minecalcaire.png';
+    }
+
+    public isKnown(building: Building) {
+        return this.$store.getters.researchBuildingsKnown[building];
     }
 
     private mounted() {
@@ -221,11 +229,11 @@ export default class Map extends IdleGameVue {
         if (building == Building.coalMine && this.map[coord.x][coord.y].environment !== Environment.CoalDeposite)
             return false;
 
-        return true;
-    }
+        // You must build stoneMine on stoneDeposite
+        if (building == Building.stoneMine && this.map[coord.x][coord.y].environment !== Environment.StoneDeposite)
+            return false;
 
-    private isKnown(building: Building) {
-        return this.$store.getters.researchBuildingsKnown[building];
+        return true;
     }
 
     private getEnvironmentImage(environment: Environment): HTMLImageElement {

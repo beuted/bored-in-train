@@ -6,6 +6,7 @@ export enum Job {
     scientist = 'scientist',
     farmer = 'farmer',
     stoneGatherer = 'stoneGatherer',
-    miner = 'miner',
+    coalMiner = 'coalMiner',
     coalStationEngineer = 'coalStationEngineer',
+    stoneMiner = 'stoneMiner',
 }

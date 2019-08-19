@@ -76,12 +76,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   },
   coalMine: {
     name: 'Coal Mine',
-    description: 'Allows you to recruit 3 miners, must be built on a coal deposite',
+    description: 'Allows you to recruit 3 coal miners, must be built on a coal deposite',
     price: {
       population: 0,
       food: 0,
       wood: 50,
-      stones: 50,
+      stones: 100,
       coals: 0,
       energy: 0,
       knowledge: 0
@@ -108,6 +108,19 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       food: 0,
       wood: 50,
       stones: 0,
+      coals: 0,
+      energy: 0,
+      knowledge: 0
+    }
+  },
+  stoneMine: {
+    name: 'Stone Mine',
+    description: 'Allows you to recruit 3 stoneminers, must be built on a stone deposite',
+    price: {
+      population: 0,
+      food: 0,
+      wood: 50,
+      stones: 30,
       coals: 0,
       energy: 0,
       knowledge: 0
@@ -344,9 +357,9 @@ export const StaticJobInfo: IStaticJobInfo = {
       'energy': null,
     },
   },
-  'miner': {
-    name: 'Miner',
-    description: 'Extract coal and stone form the ground at the cost of wood',
+  'coalMiner': {
+    name: 'Coal Miner',
+    description: 'Extract coal and stone from the ground at the cost of wood',
     produce: {
       'population': null,
       'food': null,
@@ -379,6 +392,41 @@ export const StaticJobInfo: IStaticJobInfo = {
     },
     storage: {
       name: Building.coalMine,
+      capacity: 3
+    },
+  },
+  'stoneMiner': {
+    name: 'Stone Miner',
+    description: 'Extract stone from the ground at the cost of wood',
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': {
+        probability: 1,
+        quantity: 1
+      },
+      'coals': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': {
+        probability: 1,
+        quantity: 1
+      },
+      'stones': null,
+      'coals': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    storage: {
+      name: Building.stoneMine,
       capacity: 3
     },
   },
@@ -451,7 +499,7 @@ export interface IStaticResearch {
   description: string;
   price: number;
   prerequisite: Research[];
-  unlocks: { buildings: Building[] };
+  unlocks: { buildings: Building[], jobs: Job[] };
 }
 
 export const ResearchInfo: IResearchInfo = {
@@ -461,7 +509,8 @@ export const ResearchInfo: IResearchInfo = {
     price: 10,
     prerequisite: [],
     unlocks: {
-      buildings: [Building.farm]
+      buildings: [Building.farm],
+      jobs: [Job.farmer]
     }
   },
   mining: {
@@ -470,7 +519,8 @@ export const ResearchInfo: IResearchInfo = {
     price: 100,
     prerequisite: [],
     unlocks: {
-      buildings: [Building.coalMine]
+      buildings: [Building.coalMine, Building.stoneMine],
+      jobs: [Job.coalMiner, Job.stoneMiner]
     }
   },
   steamLocomotive: {
@@ -479,7 +529,8 @@ export const ResearchInfo: IResearchInfo = {
     price: 200,
     prerequisite: [Research.mining],
     unlocks: {
-      buildings: [Building.coalPowerStation]
+      buildings: [Building.coalPowerStation],
+      jobs: [Job.coalStationEngineer]
     }
   },
 }

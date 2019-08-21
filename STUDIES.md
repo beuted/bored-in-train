@@ -41,3 +41,13 @@ Source: https://www.archdaily.com/476252/infographic-materials-in-architecture-a
 Sources:
 * https://fr.wikipedia.org/wiki/Histoire_de_l%27agriculture#Comment_l'agriculture_est_apparue
 * https://en.wikipedia.org/wiki/Timeline_of_agriculture_and_food_technology
+
+
+## Missing images:
+
+* brick factory
+* stone mine
+* population icon
+* food icon
+* knowledge icon
+* energy icon

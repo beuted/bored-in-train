@@ -60,7 +60,7 @@ export class MapBuilder {
                 map[i][j] = {
                     building: (MapBuilder.Forest[i][j] === 1 && (MapBuilder.Environments[i][j] == 2 || MapBuilder.Environments[i][j] == 4)) ? Building.forest: null,
                     environment: MapBuilder.Environments[i][j],
-                    discovered: true
+                    discovered: false
                 };
             }
         }

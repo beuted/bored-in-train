@@ -165,11 +165,20 @@ export default class Map extends IdleGameVue {
             }
         }
 
-        if (this.mouseTileCoord && this.canBeBuilt(this.mouseTileCoord, this.buildingType)) {
+        if (this.mouseTileCoord) {
             let image = this.getBuildingImage(this.buildingType);
             if (image) {
                 this.ctx.globalAlpha = 0.7;
+                if (!this.canBeBuilt(this.mouseTileCoord, this.buildingType)) {
+                    // Show a red bg when a building can't be built
+                    this.ctx.fillStyle = '#FF0000';
+                    this.ctx.fillRect(this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize, this.tileSize, this.tileSize);
+                    this.ctx.fillStyle = '#000';
+                    //this.ctx.globalCompositeOperation = "destination-in";
+                }
                 this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize, this.tileSize, this.tileSize);
+                //this.ctx.globalCompositeOperation = "source-over";
+
                 this.ctx.globalAlpha = 1.0;
             }
         }

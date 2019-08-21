@@ -50,6 +50,7 @@ export class GameService {
           stones: 0,
           coals: 0,
           limestone: 0,
+          limestoneBrick: 0,
           energy: 0,
           knowledge: 0
         }

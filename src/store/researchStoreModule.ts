@@ -20,6 +20,9 @@ export const ResearchModule: Module<IResearchState, IState> = {
       mining: {
         owned: false
       },
+      factory: {
+        owned: false
+      },
       steamLocomotive: {
         owned: false
       },

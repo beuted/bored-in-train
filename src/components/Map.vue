@@ -61,6 +61,7 @@ export default class Map extends IdleGameVue {
         stoneMine: new Image(),
         coalMine: new Image(),
         limestoneMine: new Image(),
+        limestoneBrickFactory: new Image(),
         coalPowerStation: new Image(),
     }
 
@@ -96,6 +97,7 @@ export default class Map extends IdleGameVue {
         this.mapBuildingImages[Building.stoneMine].src = './img/minecalcaire.png';
         this.mapBuildingImages[Building.coalMine].src = './img/minecharbon.png';
         this.mapBuildingImages[Building.limestoneMine].src = './img/minecalcaire.png';
+        this.mapBuildingImages[Building.limestoneBrickFactory].src = './img/limestone-brick-factory.png';
         this.mapBuildingImages[Building.coalPowerStation].src = './img/centralecharbon.png';
     }
 

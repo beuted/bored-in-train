@@ -45,6 +45,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       stones: 0,
       coals: 0,
       limestone: 0,
+      limestoneBrick: 0,
       energy: 0,
       knowledge: 0
     },
@@ -59,6 +60,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       stones: 0,
       coals: 0,
       limestone: 0,
+      limestoneBrick: 0,
       energy: 0,
       knowledge: 0
     }
@@ -73,6 +75,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       stones: 5,
       coals: 0,
       limestone: 0,
+      limestoneBrick: 0,
       energy: 0,
       knowledge: 0
     }
@@ -87,6 +90,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       stones: 30,
       coals: 0,
       limestone: 0,
+      limestoneBrick: 0,
       energy: 0,
       knowledge: 0
     }
@@ -101,6 +105,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       stones: 100,
       coals: 0,
       limestone: 0,
+      limestoneBrick: 0,
       energy: 0,
       knowledge: 0
     }
@@ -115,6 +120,22 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       stones: 150,
       coals: 0,
       limestone: 0,
+      limestoneBrick: 0,
+      energy: 0,
+      knowledge: 0
+    }
+  },
+  limestoneBrickFactory: {
+    name: 'Limestone Brick Factory',
+    description: 'Allows you to recruit 3 limestone brick workers',
+    price: {
+      population: 0,
+      food: 0,
+      wood: 200,
+      stones: 200,
+      coals: 0,
+      limestone: 0,
+      limestoneBrick: 0,
       energy: 0,
       knowledge: 0
     }
@@ -125,10 +146,11 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     price: {
       population: 0,
       food: 0,
-      wood: 25,
-      stones: 100,
+      wood: 200,
+      stones: 50,
       coals: 0,
       limestone: 0,
+      limestoneBrick: 150,
       energy: 0,
       knowledge: 0
     }
@@ -143,6 +165,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       stones: 0,
       coals: 0,
       limestone: 0,
+      limestoneBrick: 0,
       energy: 0,
       knowledge: 0
     }
@@ -186,6 +209,11 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
     icon: './img/limestone-particle.png',
     storage: undefined,
   },
+  limestoneBrick: {
+    name: 'Limestone Bricks',
+    icon: './img/limestone-brick.png',
+    storage: undefined,
+  },
   energy: {
     name: 'Energy',
     icon: './img/steel.png',
@@ -227,6 +255,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -240,6 +269,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -257,6 +287,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -267,6 +298,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -281,6 +313,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -294,6 +327,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -308,6 +342,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': {
         probability: 1,
         quantity: 1
@@ -324,6 +359,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -341,6 +377,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -357,6 +394,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -378,6 +416,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -391,6 +430,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -408,6 +448,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       },
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -424,6 +465,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -445,6 +487,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         quantity: 1
       },
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -461,6 +504,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -482,6 +526,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         probability: 1,
         quantity: 1
       },
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -498,11 +543,54 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
     storage: {
       name: Building.limestoneMine,
+      capacity: 3
+    },
+  },
+  'limestoneBrickWorker': {
+    name: 'Limestone brick worker',
+    description: 'Create limestone brick out of limestone and coal',
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': {
+        probability: 1,
+        quantity: 1
+      },
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': {
+        probability: 1,
+        quantity: 1
+      },
+      'limestone': {
+        probability: 1,
+        quantity: 2
+      },
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    storage: {
+      name: Building.limestoneBrickFactory,
       capacity: 3
     },
   },
@@ -516,6 +604,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': {
         probability: 1,
@@ -535,6 +624,7 @@ export const StaticJobInfo: IStaticJobInfo = {
         quantity: 2
       },
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -556,6 +646,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -566,6 +657,7 @@ export const StaticJobInfo: IStaticJobInfo = {
       'stones': null,
       'coals': null,
       'limestone': null,
+      'limestoneBrick': null,
       'knowledge': null,
       'energy': null,
     },
@@ -595,7 +687,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   mining: {
     name: 'Mining',
-    description: 'Allows you to build coal mines',
+    description: 'Allows you to build mines',
     price: 100,
     prerequisite: [],
     unlocks: {
@@ -603,10 +695,20 @@ export const ResearchInfo: IResearchInfo = {
       jobs: [Job.coalMiner, Job.stoneMiner, Job.limestoneMiner]
     }
   },
+  factory: {
+    name: 'Factory',
+    description: 'Allows you to build factories',
+    price: 200,
+    prerequisite: [],
+    unlocks: {
+      buildings: [Building.limestoneBrickFactory],
+      jobs: [Job.limestoneBrickWorker]
+    }
+  },
   steamLocomotive: {
     name: 'Steam Locomotive',
     description: 'Allows you to build coal powered factories',
-    price: 200,
+    price: 400,
     prerequisite: [Research.mining],
     unlocks: {
       buildings: [Building.coalPowerStation],

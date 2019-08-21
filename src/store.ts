@@ -60,6 +60,9 @@ export default new Vuex.Store<IState>({
       limestone: {
         quantity: 0,
       },
+      limestoneBrick: {
+        quantity: 0,
+      },
       knowledge: {
         quantity: 0,
       },
@@ -93,6 +96,9 @@ export default new Vuex.Store<IState>({
         quantity: 0,
       },
       limestoneMiner: {
+        quantity: 0,
+      },
+      limestoneBrickWorker: {
         quantity: 0,
       },
       coalStationEngineer: {

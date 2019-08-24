@@ -77,10 +77,10 @@ export default class Map extends IdleGameVue {
     public buildingType: Building = Building.village;
 
     // TODO: I'm not sure why I need to watch this property since it's on the store
-    @Watch('map', { deep: true })
-    onPropertyChanged(value: string, oldValue: string) {
-        this.draw();
-    }
+    //@Watch('map', { deep: true })
+    //onPropertyChanged(value: string, oldValue: string) {
+    //    this.draw();
+    //}
 
     constructor() {
         super();
@@ -121,7 +121,7 @@ export default class Map extends IdleGameVue {
             (this.mapBuildingImages as any)[key].onload = () => {
                 nbBuildingImages--;
                 if (nbBuildingImages == 0 && nbEnvImages == 0)
-                    this.draw();
+                    window.requestAnimationFrame(this.mapLoop);
             }
         }
 
@@ -130,9 +130,17 @@ export default class Map extends IdleGameVue {
             (this.mapEnvironmentImages as any)[key].onload = () => {
                 nbEnvImages--;
                 if (nbEnvImages == 0 && nbBuildingImages == 0)
-                    this.draw();
+                    window.requestAnimationFrame(this.mapLoop);
             }
         }
+
+        
+    }
+
+    public mapLoop() {
+        window.requestAnimationFrame(this.mapLoop);
+
+        this.draw();
     }
 
     private draw() {
@@ -185,35 +193,34 @@ export default class Map extends IdleGameVue {
     }
 
     private handleMouseDown(event: MouseEvent) {
-        var coord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
 
-        if (!this.canBeBuilt(coord, this.buildingType))
-            return;
-
-        // Pay the price of your purchase
-        for (let consummable in StaticBuildingInfo[this.buildingType].price) {
-            let price = StaticBuildingInfo[this.buildingType].price[consummable as Consummable];
-            if (price && price != 0)
-                this.$store.commit('IncrementConsummable', { name: consummable, value: -price });
-        }
-
-        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: this.buildingType });
-
-        this.draw();
     }
 
-    private handleMouseUp() {
-
+    private handleMouseUp(event: MouseEvent) {
+        var coord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
+        this.tryBuild(coord, this.buildingType);
     }
 
     private handleMouseOut() {
         this.mouseTileCoord = null;
-        this.draw();
     }
 
     private handleMouseMove(event: MouseEvent) {
         this.mouseTileCoord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
-        this.draw();
+    }
+
+    private tryBuild(coord: { x: number, y: number }, building: Building) {
+        if (!this.canBeBuilt(coord, building))
+            return;
+
+        // Pay the price of your purchase
+        for (let consummable in StaticBuildingInfo[building].price) {
+            let price = StaticBuildingInfo[building].price[consummable as Consummable];
+            if (price && price != 0)
+                this.$store.commit('IncrementConsummable', { name: consummable, value: -price });
+        }
+
+        this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: building });
     }
 
     private canBeBuilt(coord: { x: number, y: number }, building: Building) {

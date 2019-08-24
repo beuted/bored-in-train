@@ -72,7 +72,7 @@ export class GameService {
           continue;
 
         var nbConsummer = store.state.jobs[jobId as Job].quantity;
-        if (store.state.consummable[consummableId as Consummable].quantity >= nbConsummer * staticJobConsumption.quantity) {
+        if (store.state.consummable[consummableId as Consummable].quantity + event.produced[consummableId as Consummable] >= nbConsummer * staticJobConsumption.quantity) {
           event.produced[consummableId as Consummable] -= nbConsummer * staticJobConsumption.quantity;
         } else {
           // Do not produce if needs not fulfilled!

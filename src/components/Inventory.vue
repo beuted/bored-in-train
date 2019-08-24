@@ -79,5 +79,6 @@ a {
 }
 .negative {
     color: red;
+    background-color: rgba(255, 0, 0, 0.5);
 }
 </style>

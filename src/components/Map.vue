@@ -73,6 +73,10 @@ export default class Map extends IdleGameVue {
     private canvas!: HTMLCanvasElement;
 
     private mouseTileCoord: { x: number, y: number } | null = null;
+    private mapOffset: { x: number, y: number } = { x: 0, y: 0 };
+    private isMouseDown = false;
+    private draggingStartPoint!: { x: number, y: number };
+    private isDragging = true;
 
     public buildingType: Building = Building.village;
 
@@ -133,8 +137,6 @@ export default class Map extends IdleGameVue {
                     window.requestAnimationFrame(this.mapLoop);
             }
         }
-
-        
     }
 
     public mapLoop() {
@@ -150,25 +152,25 @@ export default class Map extends IdleGameVue {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
                 if (this.map[i][j].discovered) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment)
-                    this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                    this.ctx.drawImage(environmentImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
 
                     let buildingImage = this.getBuildingImage(this.map[i][j].building)
                     if (buildingImage)
-                        this.ctx.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                        this.ctx.drawImage(buildingImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                 // The following statement is cached
                 } else if (this.$store.getters.tilesDiscoverability[i][j]) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
-                    this.ctx.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                    this.ctx.drawImage(environmentImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
 
                     let buildingImage = this.getBuildingImage(this.map[i][j].building)
                     if (buildingImage)
-                        this.ctx.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                        this.ctx.drawImage(buildingImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
 
                     this.ctx.globalAlpha = 0.7;
-                    this.ctx.fillRect(i*this.tileSize, j*this.tileSize, (i+1)*this.tileSize, (j+1)*this.tileSize);
+                    this.ctx.fillRect(i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                     this.ctx.globalAlpha = 1;
                 } else {
-                    this.ctx.fillRect(i*this.tileSize, j*this.tileSize, (i+1)*this.tileSize, (j+1)*this.tileSize);
+                    this.ctx.fillRect(i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                 }
             }
         }
@@ -180,11 +182,11 @@ export default class Map extends IdleGameVue {
                 if (!this.canBeBuilt(this.mouseTileCoord, this.buildingType)) {
                     // Show a red bg when a building can't be built
                     this.ctx.fillStyle = '#FF0000';
-                    this.ctx.fillRect(this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize, this.tileSize, this.tileSize);
+                    this.ctx.fillRect(this.mouseTileCoord.x*this.tileSize + this.mapOffset.x, this.mouseTileCoord.y*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                     this.ctx.fillStyle = '#000';
                     //this.ctx.globalCompositeOperation = "destination-in";
                 }
-                this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize, this.mouseTileCoord.y*this.tileSize, this.tileSize, this.tileSize);
+                this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize + this.mapOffset.x, this.mouseTileCoord.y*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                 //this.ctx.globalCompositeOperation = "source-over";
 
                 this.ctx.globalAlpha = 1.0;
@@ -193,20 +195,43 @@ export default class Map extends IdleGameVue {
     }
 
     private handleMouseDown(event: MouseEvent) {
-
+        var canvasSize = this.tileSize*this.nbTilesOnRowOrColumn;
+        if (event.pageX < canvasSize + this.canvas.offsetLeft && event.pageX > this.canvas.offsetLeft
+            && event.pageY < canvasSize + this.canvas.offsetTop && event.pageY >  this.canvas.offsetTop) {
+                this.isMouseDown = true;
+                this.isDragging = true;
+                this.draggingStartPoint = { x: event.pageX - this.mapOffset.x, y: event.pageY - this.mapOffset.y }
+        }
     }
 
     private handleMouseUp(event: MouseEvent) {
         var coord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
-        this.tryBuild(coord, this.buildingType);
+        this.isMouseDown = false;
+
+        //Check if this was a drag or a click
+        if (this.isDragging) {
+            this.tryBuild(coord, this.buildingType);
+        }
+
+        this.isDragging = true;
+        this.isMouseDown = false;
     }
 
     private handleMouseOut() {
         this.mouseTileCoord = null;
+        this.isMouseDown = false;
     }
 
+    // TODO: could be gathered in the mainLoop
     private handleMouseMove(event: MouseEvent) {
         this.mouseTileCoord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
+        if (this.isMouseDown) {
+            //var prevMapOffeset = Object.assign({}, this.mapOffset);
+            this.mapOffset.x = event.pageX - this.draggingStartPoint.x;
+            this.mapOffset.y = event.pageY - this.draggingStartPoint.y;
+            // Of a drag happened do not consider it as a click
+            this.isDragging = false;
+        }
     }
 
     private tryBuild(coord: { x: number, y: number }, building: Building) {
@@ -275,8 +300,8 @@ export default class Map extends IdleGameVue {
 
     private getTileFromCoordinate(x: number, y: number) {
         return {
-            x: Math.floor(x/this.tileSize),
-            y: Math.floor(y/this.tileSize)
+            x: Math.floor((x-this.mapOffset.x)/this.tileSize),
+            y: Math.floor((y-this.mapOffset.y)/this.tileSize)
         }
     }
 }

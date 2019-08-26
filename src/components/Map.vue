@@ -18,7 +18,7 @@
             v-on:mouseup="handleMouseUp"
             v-on:mousemove="handleMouseMove"
             v-on:mouseout="handleMouseOut"
-            :width="nbTilesOnRowOrColumn*tileSize+'px'" :height="nbTilesOnRowOrColumn*tileSize+'px'"></canvas>
+            :width="nbTilesOnRowOrColumnOnScreen*tileSize+'px'" :height="nbTilesOnRowOrColumnOnScreen*tileSize+'px'"></canvas>
     </div>
 </template>
 
@@ -43,7 +43,8 @@ import TileTooltip from '@/components/TileTooltip.vue';
 })
 export default class Map extends IdleGameVue {
     private readonly tileSize = 32;
-    private readonly nbTilesOnRowOrColumn = 20;
+    private readonly nbTilesOnRowOrColumn = 60;
+    private readonly nbTilesOnRowOrColumnOnScreen = 20;
     private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
         [Environment.Water]: new Image(),
         [Environment.Field]: new Image(),
@@ -146,7 +147,8 @@ export default class Map extends IdleGameVue {
     }
 
     private draw() {
-        this.ctx.clearRect(0, 0, this.tileSize * this.nbTilesOnRowOrColumn, this.tileSize * this.nbTilesOnRowOrColumn);
+        this.ctx.fillStyle= '#000';
+        this.ctx.fillRect(0, 0, this.tileSize * this.nbTilesOnRowOrColumn, this.tileSize * this.nbTilesOnRowOrColumn);
 
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
@@ -169,8 +171,6 @@ export default class Map extends IdleGameVue {
                     this.ctx.globalAlpha = 0.7;
                     this.ctx.fillRect(i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                     this.ctx.globalAlpha = 1;
-                } else {
-                    this.ctx.fillRect(i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                 }
             }
         }

@@ -30,7 +30,6 @@ import { Research } from '@/models/Research';
 })
 export default class ResearchComponent extends IdleGameVue {
   public get availableResearchs() {
-    console.log(this.$store.getters.availableResearchs);
     return this.$store.getters.availableResearchs;
   }
 

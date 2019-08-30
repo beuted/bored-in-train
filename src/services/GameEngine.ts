@@ -126,8 +126,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     }
   },
   limestoneBrickFactory: {
-    name: 'Limestone Brick Factory',
-    description: 'Allows you to recruit 3 limestone brick workers',
+    name: 'Brick Factory',
+    description: 'Allows you to recruit 3 brick workers',
     price: {
       population: 0,
       food: 0,
@@ -192,27 +192,42 @@ export const StaticConsummableInfo: IStaticConsummableInfo = {
   wood: {
     name: 'Wood',
     icon: './img/bois.png',
-    storage: undefined,
+    storage: {
+      name: Building.barn,
+      capacity: 20
+    },
   },
   stones: {
     name: 'Stone',
     icon: './img/stone-particle.png' ,
-    storage: undefined,
+    storage: {
+      name: Building.barn,
+      capacity: 20
+    },
   },
   coals: {
     name: 'Coals',
     icon: './img/coal-particle.png',
-    storage: undefined,
+    storage: {
+      name: Building.barn,
+      capacity: 20
+    },
   },
   limestone: {
     name: 'Limestones',
     icon: './img/limestone-particle.png',
-    storage: undefined,
+    storage: {
+      name: Building.barn,
+      capacity: 20
+    },
   },
   limestoneBrick: {
-    name: 'Limestone Bricks',
+    name: 'Bricks',
     icon: './img/limestone-brick.png',
-    storage: undefined,
+    storage: {
+      name: Building.barn,
+      capacity: 20
+    },
   },
   energy: {
     name: 'Energy',
@@ -553,8 +568,8 @@ export const StaticJobInfo: IStaticJobInfo = {
     },
   },
   'limestoneBrickWorker': {
-    name: 'Limestone brick worker',
-    description: 'Create limestone brick out of limestone and coal',
+    name: 'brick worker',
+    description: 'Create bricks out of limestone and coal',
     produce: {
       'population': null,
       'food': null,

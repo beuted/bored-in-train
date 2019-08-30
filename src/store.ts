@@ -3,7 +3,6 @@ import Vuex, { Store, Module } from 'vuex';
 
 import { Consummable } from './models/Consummable';
 import { Job } from './models/Job';
-import { StaticJobInfo } from './services/GameEngine';
 import { IJobProductionEvent } from './EventBus';
 import VuexPersist from 'vuex-persist'
 import { MapModule, IMapState } from './store/mapStoreModule';

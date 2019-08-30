@@ -51,3 +51,31 @@ Sources:
 * food icon
 * knowledge icon
 * energy icon
+
+## Technologic plan
+
+*Farms => wood = food
+*Stone mine => wood = stone
+*Coal mine => wood = coal
+*Linestone mine => wood = limestone
+Animal powered central (something like this) => energy (not a lot, just to unlock bricks)
+*Brick (Limestone) factory => energy + limestone = brick
+*Coal central => coal = energy
+Concrete factory => sand + energy = concrete
+Glass factory => sand + energy = glass
+Iron mine => wood = iron
+Iron factory => iron + energy = iron bar
+Plastic factory => petrol + energy = platic
+Reinforced concrete => concrete + iron = reinforced concrete
+Windmill => free energy
+Microchip factory => iron + platic + energy = microchip
+Solar panel => free energy
+Spaceship launcher => restart the game
+
+
+## Ideas:
+
+Trees are just a "balance of C02"
+OGM farms ? What could be the twist on agriculture ?
+Fishing Harbour ? WHat could be the twist on fishing ?
+All unlocks are on a "respectful to the environment" path, so even if the path is boring you get the unlocks

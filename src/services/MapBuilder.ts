@@ -29,7 +29,6 @@ export class MapBuilder {
                         env = Environment.LimestoneDeposite
                 }
 
-
                 let isForest = env == Environment.Field && MapBuilder.NoiseTrees(simplexTrees, i, j) > 0.5;
 
                 map[i][j] = {

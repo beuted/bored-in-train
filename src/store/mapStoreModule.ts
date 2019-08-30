@@ -50,6 +50,25 @@ export const MapModule: Module<IMapState, IState> = {
 
     },
   },
+  actions: {
+    DiscoverTile({ getters, commit }) {
+      let map = getters.tiles;
+      var xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(map.length));
+      var ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(map.length));
+      for (const x of xSuite) {
+        for (const y of ySuite) {
+          if (!map[x][y].discovered && (
+            (map[x][y+1] && map[x][y+1].discovered) ||
+            (map[x][y-1] && map[x][y-1].discovered) ||
+            (map[x+1] && map[x+1][y] && map[x+1][y].discovered) ||
+            (map[x-1] && map[x-1][y] && map[x-1][y].discovered))) {
+              commit('MakeTileDiscovered', {x: x, y: y });
+              return;
+            }
+        }
+      }
+    },
+  },
   mutations: {
     // Init the map
     InitMap(state: IMapState, size: number) {
@@ -71,24 +90,10 @@ export const MapModule: Module<IMapState, IState> = {
         state.buildings[obj.type].quantity++;
       }
     },
-    DiscoverTile(state: IMapState) {
-      var xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(state.map.length));
-      var ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(state.map.length));
-      for (const x of xSuite) {
-        for (const y of ySuite) {
-          if (!state.map[x][y].discovered && (
-            (state.map[x][y+1] && state.map[x][y+1].discovered) ||
-            (state.map[x][y-1] && state.map[x][y-1].discovered) ||
-            (state.map[x+1] && state.map[x+1][y] && state.map[x+1][y].discovered) ||
-            (state.map[x-1] && state.map[x-1][y] && state.map[x-1][y].discovered))) {
-              state.map[x][y].discovered = true;
-              state.mapNbTileFound++;
-              return;
-            }
-        }
-      }
-      console.error('DiscoverTile: No tile left to discover!')
-    },
+    MakeTileDiscovered(state: IMapState, obj: { x: number, y: number }) {
+      state.map[obj.x][obj.y].discovered = true;
+      state.mapNbTileFound++;
+    }
   },
   getters: {
     getRessourceStorage(state): (id: Consummable) => number {
@@ -108,14 +113,23 @@ export const MapModule: Module<IMapState, IState> = {
         }));
     },
     tilesDiscoverability(state) {
-      return state.map.map((x, i) => x.map((y, j) => {
-        return !state.map[i][j].discovered && (
-          (state.map[i][j+1] && state.map[i][j+1].discovered) ||
-          (state.map[i][j-1] && state.map[i][j-1].discovered) ||
-          (state.map[i+1] && state.map[i+1][j] && state.map[i+1][j].discovered) ||
-          (state.map[i-1] && state.map[i-1][j] && state.map[i-1][j].discovered)
-        )
-      }));
+      console.log('tilesDiscoverability');
+      let result = new Array(state.map.length);
+      for (let i=0; i < state.map.length; i++) {
+        result[i] = new Array(state.map[i].length);
+      }
+
+      for (let i=0; i < state.map.length; i++) {
+        for (let j=0; j < state.map[i].length; j++) {
+          if (state.map[i][j].discovered) {
+            if (j < state.map[i].length -1 && state.map[i][j+1].discovered !== true) result[i][j+1] = true;
+            if (j > 0 && state.map[i][j-1].discovered !== true) result[i][j-1] = true;
+            if (i < state.map.length -1 && state.map[i+1][j].discovered !== true) result[i+1][j] = true;
+            if (i > 0 && state.map[i-1][j].discovered !== true) result[i-1][j] = true;
+          }
+        }
+      }
+      return result;
     },
   }
 }

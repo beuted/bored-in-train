@@ -128,7 +128,7 @@ export class GameService {
       var probability = 1-Math.pow(1-2/nbLandFound, nbExplorers);
       if (Math.random() <= probability) {
         Vue.toasted.success(`Land Found! (Probability was: ${probability.toPrecision(2)})`);
-        store.commit('DiscoverTile');
+        store.dispatch('DiscoverTile');
       }
     }
 

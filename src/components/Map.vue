@@ -80,6 +80,7 @@ export default class Map extends IdleGameVue {
     private isDragging = true;
 
     public buildingType: Building = Building.village;
+    private tilesDiscoverability: boolean[][] = [];
 
     // TODO: I'm not sure why I need to watch this property since it's on the store
     //@Watch('map', { deep: true })
@@ -126,7 +127,7 @@ export default class Map extends IdleGameVue {
             (this.mapBuildingImages as any)[key].onload = () => {
                 nbBuildingImages--;
                 if (nbBuildingImages == 0 && nbEnvImages == 0)
-                    window.requestAnimationFrame(this.mapLoop);
+                    window.requestAnimationFrame(() => this.mapLoop());
             }
         }
 
@@ -135,15 +136,20 @@ export default class Map extends IdleGameVue {
             (this.mapEnvironmentImages as any)[key].onload = () => {
                 nbEnvImages--;
                 if (nbEnvImages == 0 && nbBuildingImages == 0)
-                    window.requestAnimationFrame(this.mapLoop);
+                    window.requestAnimationFrame(() => this.mapLoop());
             }
         }
     }
 
     public mapLoop() {
-        window.requestAnimationFrame(this.mapLoop);
+        window.requestAnimationFrame(() => this.mapLoop());
 
+        this.compute();
         this.draw();
+    }
+
+    private compute() {
+        this.tilesDiscoverability = this.$store.getters.tilesDiscoverability;
     }
 
     private draw() {
@@ -160,7 +166,7 @@ export default class Map extends IdleGameVue {
                     if (buildingImage)
                         this.ctx.drawImage(buildingImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                 // The following statement is cached
-                } else if (this.$store.getters.tilesDiscoverability[i][j]) {
+                } else if (this.tilesDiscoverability[i][j]) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
                     this.ctx.drawImage(environmentImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
 
@@ -174,6 +180,7 @@ export default class Map extends IdleGameVue {
                 }
             }
         }
+
 
         if (this.mouseTileCoord) {
             let image = this.getBuildingImage(this.buildingType);

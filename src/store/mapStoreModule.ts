@@ -52,17 +52,16 @@ export const MapModule: Module<IMapState, IState> = {
   },
   actions: {
     DiscoverTile({ getters, commit }) {
-      let map = getters.tiles;
-      var xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(map.length));
-      var ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(map.length));
+     console.log('DiscoverTile start...');
+     var startTime = Date.now();
+      let tilesDiscoverability = getters.tilesDiscoverability;
+      var xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(tilesDiscoverability.length));
+      var ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(tilesDiscoverability.length));
       for (const x of xSuite) {
         for (const y of ySuite) {
-          if (!map[x][y].discovered && (
-            (map[x][y+1] && map[x][y+1].discovered) ||
-            (map[x][y-1] && map[x][y-1].discovered) ||
-            (map[x+1] && map[x+1][y] && map[x+1][y].discovered) ||
-            (map[x-1] && map[x-1][y] && map[x-1][y].discovered))) {
+          if (tilesDiscoverability[x][y]) {
               commit('MakeTileDiscovered', {x: x, y: y });
+              console.log('DiscoverTile stop, elapsed time:', Date.now() - startTime, 'ms');
               return;
             }
         }
@@ -112,23 +111,27 @@ export const MapModule: Module<IMapState, IState> = {
           return state.map[i][j];
         }));
     },
+    //TODO: this should not be recomputed entirely, only one cell needs to be recomputed in fact
     tilesDiscoverability(state) {
-      console.log('tilesDiscoverability');
-      let result = new Array(state.map.length);
-      for (let i=0; i < state.map.length; i++) {
-        result[i] = new Array(state.map[i].length);
+      console.log('tilesDiscoverability start...');
+      var startTime = Date.now();
+      const mapLength = state.map.length;
+      let result = new Array(mapLength);
+      for (let i=0; i < mapLength; i++) {
+        result[i] = new Array(mapLength);
       }
 
-      for (let i=0; i < state.map.length; i++) {
-        for (let j=0; j < state.map[i].length; j++) {
+      for (let i=0; i < mapLength; i++) {
+        for (let j=0; j < mapLength; j++) {
           if (state.map[i][j].discovered) {
-            if (j < state.map[i].length -1 && state.map[i][j+1].discovered !== true) result[i][j+1] = true;
+            if (j < mapLength -1 && state.map[i][j+1].discovered !== true) result[i][j+1] = true;
             if (j > 0 && state.map[i][j-1].discovered !== true) result[i][j-1] = true;
-            if (i < state.map.length -1 && state.map[i+1][j].discovered !== true) result[i+1][j] = true;
+            if (i < mapLength -1 && state.map[i+1][j].discovered !== true) result[i+1][j] = true;
             if (i > 0 && state.map[i-1][j].discovered !== true) result[i-1][j] = true;
           }
         }
       }
+      console.log('tilesDiscoverability stop, elapsed time:', Date.now() - startTime, 'ms');
       return result;
     },
   }

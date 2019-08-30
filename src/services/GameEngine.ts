@@ -671,7 +671,7 @@ export interface IStaticResearch {
   description: string;
   price: number;
   prerequisite: Research[];
-  unlocks: { buildings: Building[], jobs: Job[] };
+  unlocks: { buildings: Building[] };
 }
 
 export const ResearchInfo: IResearchInfo = {
@@ -682,7 +682,6 @@ export const ResearchInfo: IResearchInfo = {
     prerequisite: [],
     unlocks: {
       buildings: [Building.farm],
-      jobs: [Job.farmer]
     }
   },
   mining: {
@@ -692,27 +691,24 @@ export const ResearchInfo: IResearchInfo = {
     prerequisite: [],
     unlocks: {
       buildings: [Building.coalMine, Building.stoneMine, Building.limestoneMine],
-      jobs: [Job.coalMiner, Job.stoneMiner, Job.limestoneMiner]
     }
   },
   factory: {
     name: 'Factory',
     description: 'Allows you to build factories',
     price: 200,
-    prerequisite: [],
+    prerequisite: [Research.mining],
     unlocks: {
       buildings: [Building.limestoneBrickFactory],
-      jobs: [Job.limestoneBrickWorker]
     }
   },
   steamLocomotive: {
     name: 'Steam Locomotive',
     description: 'Allows you to build coal powered factories',
     price: 400,
-    prerequisite: [Research.mining],
+    prerequisite: [Research.factory],
     unlocks: {
       buildings: [Building.coalPowerStation],
-      jobs: [Job.coalStationEngineer]
     }
   },
 }

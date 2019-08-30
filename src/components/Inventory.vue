@@ -33,19 +33,23 @@ export default class Inventory extends IdleGameVue {
     }
 
     public computeProduction(consummable: Consummable) {
-      let production = 0;
-      for (let job in this.$store.state.jobs) {
-          let quantity = this.$store.state.jobs[job as Job].quantity;
+        let production = 0;
+        for (let job in this.$store.state.jobs) {
+            let quantity = this.$store.state.jobs[job as Job].quantity;
 
-          let consumeObj = StaticJobInfo[job as Job].consume[consummable];
-          let consume = consumeObj ? consumeObj.quantity : 0;
+            let consumeObj = StaticJobInfo[job as Job].consume[consummable];
+            let consume = consumeObj ? consumeObj.quantity : 0;
 
-          let produceObj = StaticJobInfo[job as Job].produce[consummable];
-          let produce = produceObj ? produceObj.quantity : 0;
+            let produceObj = StaticJobInfo[job as Job].produce[consummable];
+            let produce = produceObj ? produceObj.quantity : 0;
 
-          production += (produce - consume) / (GlobalConfig.TickInterval / 1000) * quantity;
-      }
-      return production.toFixed(2);
+            production += (produce - consume) / (GlobalConfig.TickInterval / 1000) * quantity;
+        }
+        var result = production.toFixed(2);
+        // Avoid "negative zero"
+        if (result == '-0.00')
+            return '0.00';
+        return result
     }
 
     get debugMode() {

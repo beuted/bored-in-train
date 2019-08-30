@@ -76,22 +76,5 @@ export const ResearchModule: Module<IResearchState, IState> = {
       }
       return buildingKnown;
     },
-
-    researchJobsKnown(state) {
-      let jobKnown: any = {};
-      for (let job in Job) {
-        for (let research in Research) {
-          if (ResearchInfo[research as Research].unlocks.jobs.findIndex(x => x == job) != -1
-              && !state.research[research as Research].owned) {
-            jobKnown[job] = false;
-            break;
-          }
-        }
-
-        if (jobKnown[job] === undefined)
-          jobKnown[job] = true;
-      }
-      return jobKnown;
-    }
   }
 }

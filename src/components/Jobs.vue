@@ -6,7 +6,7 @@
                 <span>Unemployed: {{ unemployed }}</span>
             </li>
             <li v-for="jobName in jobs" v-bind:key="jobName">
-                <span class="jobs" v-if="isKnown(jobName)">
+                <span class="jobs" v-if="getJobMaxStorage(jobName) != 0">
                     <div>
                         <JobTooltip :jobName="jobName"><ParticleEmitter :jobName="jobName">{{ getJobDisplayName(jobName) }}:</ParticleEmitter></JobTooltip> {{ getJobQuantity(jobName) }} / {{ getJobMaxStorage(jobName) }}
                     </div>
@@ -102,10 +102,6 @@ export default class Jobs extends IdleGameVue {
 
     public canRemoveJob(quantity: number, jobName: string) {
          return this.$store.state.jobs[jobName as Job].quantity >= quantity;
-    }
-
-    public isKnown(job: Job) {
-        return this.$store.getters.researchJobsKnown[job];
     }
 
     private computeMaxStorage(jobName: Job): number {

@@ -62,7 +62,7 @@ export const MapModule: Module<IMapState, IState> = {
         for (const y of ySuite) {
           const tilesDisco = tilesDiscoverability[x][y];
           const tile = getters.tiles[x][y];
-          if (tilesDisco > maxDisco.value && tile.environment != Environment.Water) {
+          if (tilesDisco > maxDisco.value && (tile.environment != Environment.Water || getters.canSail)) {
             maxDisco = { value: tilesDisco, x: x, y: y };
           }
           if (maxDisco.value > 0 && Math.random() < 0.001) {

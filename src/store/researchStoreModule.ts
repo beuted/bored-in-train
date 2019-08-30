@@ -23,6 +23,9 @@ export const ResearchModule: Module<IResearchState, IState> = {
       factory: {
         owned: false
       },
+      navigation: {
+        owned: false
+      },
       steamLocomotive: {
         owned: false
       },
@@ -76,5 +79,9 @@ export const ResearchModule: Module<IResearchState, IState> = {
       }
       return buildingKnown;
     },
+
+    canSail(state) {
+      return state.research[Research.navigation].owned;
+    }
   }
 }

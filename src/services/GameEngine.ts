@@ -702,6 +702,15 @@ export const ResearchInfo: IResearchInfo = {
       buildings: [Building.limestoneBrickFactory],
     }
   },
+  navigation: {
+    name: 'Navigation',
+    description: 'Let you discover lands across the sea',
+    price: 400,
+    prerequisite: [Research.factory],
+    unlocks: {
+      buildings: [],
+    }
+  },
   steamLocomotive: {
     name: 'Steam Locomotive',
     description: 'Allows you to build coal powered factories',

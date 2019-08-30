@@ -74,7 +74,11 @@ export default class Map extends IdleGameVue {
     private canvas!: HTMLCanvasElement;
 
     private mouseTileCoord: { x: number, y: number } | null = null;
-    private mapOffset: { x: number, y: number } = { x: 0, y: 0 };
+    // TODO: this should not be init with a neg value... I have screwed up somewhere
+    private mapOffset: { x: number, y: number } = {
+        x: -Math.floor(this.nbTilesOnRowOrColumn/2 - this.nbTilesOnRowOrColumnOnScreen/2) * this.tileSize,
+        y: -Math.floor(this.nbTilesOnRowOrColumn/2 - this.nbTilesOnRowOrColumnOnScreen/2) * this.tileSize
+    };
     private isMouseDown = false;
     private draggingStartPoint!: { x: number, y: number };
     private isDragging = true;
@@ -82,14 +86,9 @@ export default class Map extends IdleGameVue {
     public buildingType: Building = Building.village;
     private tilesDiscoverability: boolean[][] = [];
 
-    // TODO: I'm not sure why I need to watch this property since it's on the store
-    //@Watch('map', { deep: true })
-    //onPropertyChanged(value: string, oldValue: string) {
-    //    this.draw();
-    //}
-
     constructor() {
         super();
+
         this.mapEnvironmentImages[Environment.Water].src = './img/mer.png';
         this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
         this.mapEnvironmentImages[Environment.CoalDeposite].src = './img/coal-deposit.png';

@@ -4,7 +4,6 @@ import { IMapTile } from '@/models/IMapTile';
 import SimplexNoise from 'simplex-noise';
 
 export class MapBuilder {
-
     public static InitMap(size: number): IMapTile[][] {
         let simplexHeight = new SimplexNoise();
         let simplexTrees = new SimplexNoise();
@@ -16,7 +15,7 @@ export class MapBuilder {
         for (let i = 0; i < mapSize; i++) {
             map[i] = [];
             for (let j = 0; j < mapSize; j++) {
-                let height = MapBuilder.Mask(i,j) * MapBuilder.NoiseHeight(simplexHeight, i, j);
+                let height = MapBuilder.Mask(i,j, size) * MapBuilder.NoiseHeight(simplexHeight, i, j);
                 let env = height <= 0 ? Environment.Water : (height > 0.08 ? Environment.Field : Environment.Beach);
 
                 if ((env == Environment.Field || env == Environment.Beach) && Math.random() > 0.97) {
@@ -55,13 +54,12 @@ export class MapBuilder {
         return map;
     }
 
-    private static Mask(x: number, y: number) {
-        let island_size = 60;
-        let distance_x = Math.abs(x - island_size * 0.5);
-        let distance_y = Math.abs(y - island_size * 0.5);
+    private static Mask(x: number, y: number, size: number) {
+        let distance_x = Math.abs(x - size * 0.5);
+        let distance_y = Math.abs(y - size * 0.5);
         let distance = Math.sqrt(distance_x*distance_x + distance_y*distance_y); // square mask
 
-        let max_width = island_size * 0.5 - 2.0;
+        let max_width = size * 0.5 - 2.0;
         let delta = distance / max_width;
         let gradient = delta * delta;
 

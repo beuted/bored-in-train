@@ -52,20 +52,29 @@ export const MapModule: Module<IMapState, IState> = {
   },
   actions: {
     DiscoverTile({ getters, commit }) {
-     console.log('DiscoverTile start...');
-     var startTime = Date.now();
+      console.log('DiscoverTile start...');
+      let startTime = Date.now();
       let tilesDiscoverability = getters.tilesDiscoverability;
-      var xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(tilesDiscoverability.length));
-      var ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(tilesDiscoverability.length));
+      let xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(tilesDiscoverability.length));
+      let ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(tilesDiscoverability.length));
+      let maxDisco = { value: 0, x: 0, y: 0 };
       for (const x of xSuite) {
         for (const y of ySuite) {
-          if (tilesDiscoverability[x][y]) {
-              commit('MakeTileDiscovered', {x: x, y: y });
-              console.log('DiscoverTile stop, elapsed time:', Date.now() - startTime, 'ms');
-              return;
-            }
+          const tilesDisco = tilesDiscoverability[x][y];
+          const tile = getters.tiles[x][y];
+          if (tilesDisco > maxDisco.value && tile.environment != Environment.Water) {
+            maxDisco = { value: tilesDisco, x: x, y: y };
+          }
+          if (maxDisco.value > 0 && Math.random() < 0.001) {
+            commit('MakeTileDiscovered', { x: maxDisco.x, y: maxDisco.y });
+            console.log('DiscoverTile stop early, elapsed time:', Date.now() - startTime, 'ms');
+            return;
+          }
         }
       }
+
+      commit('MakeTileDiscovered', {x: maxDisco.x, y: maxDisco.y });
+      console.log('DiscoverTile stop, elapsed time:', Date.now() - startTime, 'ms');
     },
   },
   mutations: {
@@ -118,16 +127,17 @@ export const MapModule: Module<IMapState, IState> = {
       const mapLength = state.map.length;
       let result = new Array(mapLength);
       for (let i=0; i < mapLength; i++) {
-        result[i] = new Array(mapLength);
+        // Efficient way to fill an array with 0
+        (result[i] = []).length = mapLength; result[i].fill(0);
       }
 
       for (let i=0; i < mapLength; i++) {
         for (let j=0; j < mapLength; j++) {
           if (state.map[i][j].discovered) {
-            if (j < mapLength -1 && state.map[i][j+1].discovered !== true) result[i][j+1] = true;
-            if (j > 0 && state.map[i][j-1].discovered !== true) result[i][j-1] = true;
-            if (i < mapLength -1 && state.map[i+1][j].discovered !== true) result[i+1][j] = true;
-            if (i > 0 && state.map[i-1][j].discovered !== true) result[i-1][j] = true;
+            if (j < mapLength -1 && state.map[i][j+1].discovered !== true) result[i][j+1]++;
+            if (j > 0 && state.map[i][j-1].discovered !== true) result[i][j-1]++;
+            if (i < mapLength -1 && state.map[i+1][j].discovered !== true) result[i+1][j]++;
+            if (i > 0 && state.map[i-1][j].discovered !== true) result[i-1][j]++;
           }
         }
       }

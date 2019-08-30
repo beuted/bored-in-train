@@ -125,7 +125,7 @@ export class GameService {
     if (nbExplorers > 0 && store.state.controls.play) {
       var nbLandFound = store.state.map.mapNbTileFound;
       // Probabilty in proba of at least 1 explorer out of nbExplorers to find a tile
-      var probability = 1-Math.pow(1-2/nbLandFound, nbExplorers);
+      var probability = 1-Math.pow(1-2/nbLandFound, nbExplorers*2);
       if (Math.random() <= probability) {
         Vue.toasted.success(`Land Found! (Probability was: ${probability.toPrecision(2)})`);
         store.dispatch('DiscoverTile');

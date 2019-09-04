@@ -43,7 +43,7 @@ import TileTooltip from '@/components/TileTooltip.vue';
 })
 export default class Map extends IdleGameVue {
     private readonly tileSize = 32;
-    private readonly nbTilesOnRowOrColumn = 60;
+    private readonly nbTilesOnRowOrColumn = 100;
     private readonly nbTilesOnRowOrColumnOnScreen = 20;
     private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
         [Environment.Water]: new Image(),
@@ -84,7 +84,7 @@ export default class Map extends IdleGameVue {
     private isDragging = true;
 
     public buildingType: Building = Building.village;
-    private tilesDiscoverability: number[][] = [];
+    private tilesDiscoverability!: {[id: string]: number};
 
     constructor() {
         super();
@@ -125,8 +125,10 @@ export default class Map extends IdleGameVue {
         {
             (this.mapBuildingImages as any)[key].onload = () => {
                 nbBuildingImages--;
-                if (nbBuildingImages == 0 && nbEnvImages == 0)
+                if (nbBuildingImages == 0 && nbEnvImages == 0) {
+                    console.log('starting map loop');
                     window.requestAnimationFrame(() => this.mapLoop());
+                }
             }
         }
 
@@ -134,8 +136,10 @@ export default class Map extends IdleGameVue {
         {
             (this.mapEnvironmentImages as any)[key].onload = () => {
                 nbEnvImages--;
-                if (nbEnvImages == 0 && nbBuildingImages == 0)
+                if (nbEnvImages == 0 && nbBuildingImages == 0) {
+                    console.log('starting map loop');
                     window.requestAnimationFrame(() => this.mapLoop());
+                }
             }
         }
     }
@@ -165,7 +169,7 @@ export default class Map extends IdleGameVue {
                     if (buildingImage)
                         this.ctx.drawImage(buildingImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                 // The following statement is cached
-                } else if (this.tilesDiscoverability[i][j] > 0) {
+                } else if (this.tilesDiscoverability[i + ',' +j] > 0) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
                     this.ctx.drawImage(environmentImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
 

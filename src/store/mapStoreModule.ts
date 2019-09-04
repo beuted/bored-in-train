@@ -131,7 +131,7 @@ export const MapModule: Module<IMapState, IState> = {
         (result[i] = []).length = mapLength; result[i].fill(0);
       }
 
-      for (let i=0; i < mapLength; i++) {
+      /*for (let i=0; i < mapLength; i++) {
         for (let j=0; j < mapLength; j++) {
           if (state.map[i][j].discovered) {
             if (j < mapLength -1 && state.map[i][j+1].discovered !== true) result[i][j+1]++;
@@ -140,9 +140,67 @@ export const MapModule: Module<IMapState, IState> = {
             if (i > 0 && state.map[i-1][j].discovered !== true) result[i-1][j]++;
           }
         }
+      }*/
+
+      // Kind of Floodfill algo
+      const center = Math.floor(mapLength/2);
+      let originCell = { x: center, y: center, tile: state.map[center][center] };
+      let cells: { x: number, y: number, tile: IMapTile }[] = [originCell];
+      var visitedCells: Set<string> = new Set([getCellHash(originCell)]);
+      var discoverableCells: { [id: string]: number } = {};
+
+      let cell = cells.shift();
+      while (cell !== undefined) {
+        if (!cell.tile.discovered) {
+          if (discoverableCells.hasOwnProperty(getCellHash(cell))) {
+            discoverableCells[getCellHash(cell)]++;
+          } else {
+            discoverableCells[getCellHash(cell)] = 1;
+          }
+        } else {
+          //TODO: les +1 -1 ca va faire chier
+          if (cell.y < mapLength-1) {
+            var rightCell = { x: cell.x, y: cell.y+1, tile: state.map[cell.x][cell.y+1] };
+            if (!visitedCells.has(getCellHash(rightCell))) {
+              cells.push(rightCell);
+              visitedCells.add(getCellHash(rightCell));
+            }
+          }
+
+          if (cell.y > 0) {
+            var leftCell = { x: cell.x, y: cell.y-1, tile: state.map[cell.x][cell.y-1] };
+            if (!visitedCells.has(getCellHash(leftCell))) {
+              cells.push(leftCell);
+              visitedCells.add(getCellHash(leftCell));
+            }
+          }
+
+          if (cell.x < mapLength-1) {
+            var bottomCell = { x: cell.x+1, y: cell.y, tile: state.map[cell.x+1][cell.y] };
+            if (!visitedCells.has(getCellHash(bottomCell))) {
+              cells.push(bottomCell);
+              visitedCells.add(getCellHash(bottomCell));
+            }
+          }
+
+          if (cell.x > 0) {
+            var topCell = { x: cell.x-1, y: cell.y, tile: state.map[cell.x-1][cell.y] };
+            if (!visitedCells.has(getCellHash(topCell))) {
+              cells.push(topCell);
+              visitedCells.add(getCellHash(topCell));
+            }
+          }
+        }
+
+        cell = cells.shift();
       }
+
       console.log('tilesDiscoverability stop, elapsed time:', Date.now() - startTime, 'ms');
-      return result;
+      return discoverableCells;
+
+      function getCellHash(pos: { x: number, y: number }) {
+        return pos.x + ',' + pos.y;
+      }
     },
   }
 }

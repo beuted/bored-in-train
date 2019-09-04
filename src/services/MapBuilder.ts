@@ -4,10 +4,10 @@ import { IMapTile } from '@/models/IMapTile';
 import SimplexNoise from 'simplex-noise';
 
 export class MapBuilder {
-    public static InitMap(size: number): IMapTile[][] {
-        let simplexHeight = new SimplexNoise();
-        let simplexTrees = new SimplexNoise();
+    private static simplexHeight = new SimplexNoise();
+    private static simplexTrees = new SimplexNoise();
 
+    public static InitMap(size: number): IMapTile[][] {
         var center = Math.floor(size/2);
         const mapSize = size;
         // Build Environment and natural Buildings (forests, ...)
@@ -15,25 +15,17 @@ export class MapBuilder {
         for (let i = 0; i < mapSize; i++) {
             map[i] = [];
             for (let j = 0; j < mapSize; j++) {
-                let height = MapBuilder.Mask(i,j, size) * MapBuilder.NoiseHeight(simplexHeight, i, j);
-                let env = height <= 0 ? Environment.Water : (height > 0.08 ? Environment.Field : Environment.Beach);
+                let env = MapBuilder.GetHeightEnvironment(i, j, size);
 
-                if ((env == Environment.Field || env == Environment.Beach) && Math.random() > 0.97) {
-                    var seed = Math.random();
-                    if (seed < 0.33)
-                        env = Environment.CoalDeposite;
-                    else if (seed < 0.66)
-                        env = Environment.StoneDeposite
-                    else
-                        env = Environment.LimestoneDeposite
-                }
+                if ((env == Environment.Field || env == Environment.Beach) && Math.random() > 0.97)
+                    env = MapBuilder.GetDepositeEnvironment();
 
-                let isForest = env == Environment.Field && MapBuilder.NoiseTrees(simplexTrees, i, j) > 0.5;
+                let building = MapBuilder.GetBuilding(env, i, j);
 
                 map[i][j] = {
-                    building: isForest ? Building.forest: null,
+                    building: building,
                     environment: env,
-                    discovered: false
+                    discovered: true
                 };
             }
         }
@@ -54,6 +46,28 @@ export class MapBuilder {
         return map;
     }
 
+    private static GetBuilding(env: Environment, i: number, j: number): Building | null {
+        if (env == Environment.Field && MapBuilder.NoiseTrees(i, j) > 0.5) {
+            return Building.forest;
+        }
+        return null;
+    }
+
+    private static GetDepositeEnvironment(): Environment {
+        var seed = Math.random();
+        if (seed < 0.33)
+            return Environment.CoalDeposite;
+        else if (seed < 0.66)
+            return Environment.StoneDeposite;
+        else
+            return Environment.LimestoneDeposite;
+    }
+
+    private static GetHeightEnvironment(i: number, j: number, size: number) : Environment {
+        let height = MapBuilder.Mask(i, j, size) * MapBuilder.NoiseHeight(i, j);
+        return height <= 0 ? Environment.Water : (height > 0.08 ? Environment.Field : Environment.Beach);
+    }
+
     private static Mask(x: number, y: number, size: number) {
         let distance_x = Math.abs(x - size * 0.5);
         let distance_y = Math.abs(y - size * 0.5);
@@ -66,11 +80,11 @@ export class MapBuilder {
         return Math.max(0.0, 1.0 - gradient);
     }
 
-    private static NoiseHeight(simplex: SimplexNoise, x: number, y: number) {
-        return 0.5 + 1 * simplex.noise2D(x*0.05, y*0.05) + 0.25 * simplex.noise2D(x*5, y*5);
+    private static NoiseHeight(x: number, y: number) {
+        return 0.5 + 1 * MapBuilder.simplexHeight.noise2D(x*0.05, y*0.05) + 0.25 * MapBuilder.simplexHeight.noise2D(x*5, y*5);
     }
 
-    private static NoiseTrees(simplex: SimplexNoise, x: number, y: number) {
-        return 0.5 + 1 * simplex.noise2D(x*0.05, y*0.05) ;
+    private static NoiseTrees(x: number, y: number) {
+        return 0.5 + 1 * MapBuilder.simplexTrees.noise2D(x*0.05, y*0.05) ;
     }
 }

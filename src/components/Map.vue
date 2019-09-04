@@ -235,6 +235,17 @@ export default class Map extends IdleGameVue {
             //var prevMapOffeset = Object.assign({}, this.mapOffset);
             this.mapOffset.x = event.pageX - this.draggingStartPoint.x;
             this.mapOffset.y = event.pageY - this.draggingStartPoint.y;
+
+            if (this.mapOffset.x < (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize)
+                this.mapOffset.x = (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize;
+            if (this.mapOffset.x > 0)
+                this.mapOffset.x = 0;
+
+            if (this.mapOffset.y < (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize)
+                this.mapOffset.y = (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize;
+            if (this.mapOffset.y > 0)
+                this.mapOffset.y = 0;
+
             // Of a drag happened do not consider it as a click
             this.isDragging = false;
         }

@@ -84,7 +84,6 @@ export default class Map extends IdleGameVue {
     private isDragging = true;
 
     public buildingType: Building = Building.village;
-    private tilesDiscoverability!: {[id: string]: number};
 
     constructor() {
         super();
@@ -152,7 +151,6 @@ export default class Map extends IdleGameVue {
     }
 
     private compute() {
-        this.tilesDiscoverability = this.$store.getters.tilesDiscoverability;
     }
 
     private draw() {
@@ -169,7 +167,7 @@ export default class Map extends IdleGameVue {
                     if (buildingImage)
                         this.ctx.drawImage(buildingImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                 // The following statement is cached
-                } else if (this.tilesDiscoverability[i + ',' +j] > 0) {
+                } else if (this.$store.getters.tiles[i][j].discoverable > 0) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
                     this.ctx.drawImage(environmentImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
 

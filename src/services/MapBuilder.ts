@@ -25,7 +25,8 @@ export class MapBuilder {
                 map[i][j] = {
                     building: building,
                     environment: env,
-                    discovered: true
+                    discovered: false,
+                    discoverable: 0,
                 };
             }
         }
@@ -38,10 +39,10 @@ export class MapBuilder {
 
         // Set discovered
         map[center][center].discovered = true;
-        map[center][center + 1].discovered = true;
-        map[center][center - 1].discovered = true;
-        map[center + 1][center].discovered = true;
-        map[center - 1][center].discovered = true;
+        map[center][center + 1].discoverable = 1;
+        map[center][center - 1].discoverable = 1;
+        map[center + 1][center].discoverable = 1;
+        map[center - 1][center].discoverable = 1;
 
         return map;
     }

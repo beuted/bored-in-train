@@ -54,16 +54,15 @@ export const MapModule: Module<IMapState, IState> = {
     DiscoverTile({ getters, commit }) {
       console.log('DiscoverTile start...');
       let startTime = Date.now();
-      let tilesDiscoverability = getters.tilesDiscoverability;
-      let xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(tilesDiscoverability.length));
-      let ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(tilesDiscoverability.length));
+      let mapLength = getters.tiles.length;
+      let xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(mapLength));
+      let ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(mapLength));
       let maxDisco = { value: 0, x: 0, y: 0 };
       for (const x of xSuite) {
         for (const y of ySuite) {
-          const tilesDisco = tilesDiscoverability[x][y];
-          const tile = getters.tiles[x][y];
-          if (tilesDisco > maxDisco.value && (tile.environment != Environment.Water || getters.canSail)) {
-            maxDisco = { value: tilesDisco, x: x, y: y };
+          const tile: IMapTile = getters.tiles[x][y];
+          if (tile.discoverable > maxDisco.value && (tile.environment != Environment.Water || getters.canSail)) {
+            maxDisco = { value: tile.discoverable, x: x, y: y };
           }
           if (maxDisco.value > 0 && Math.random() < 0.001) {
             commit('MakeTileDiscovered', { x: maxDisco.x, y: maxDisco.y });
@@ -100,7 +99,33 @@ export const MapModule: Module<IMapState, IState> = {
     },
     MakeTileDiscovered(state: IMapState, obj: { x: number, y: number }) {
       state.map[obj.x][obj.y].discovered = true;
+      state.map[obj.x][obj.y].discoverable = 0;
       state.mapNbTileFound++;
+
+      const mapLength = state.map.length;
+      if (obj.y < mapLength-1) {
+        if (!state.map[obj.x][obj.y+1].discovered) {
+          state.map[obj.x][obj.y+1].discoverable++;
+        }
+      }
+
+      if (obj.y > 0) {
+        if (!state.map[obj.x][obj.y-1].discovered) {
+          state.map[obj.x][obj.y-1].discoverable++;
+        }
+      }
+
+      if (obj.x < mapLength-1) {
+        if (!state.map[obj.x+1][obj.y].discovered) {
+          state.map[obj.x+1][obj.y].discoverable++;
+        }
+      }
+
+      if (obj.x > 0) {
+        if (!state.map[obj.x-1][obj.y].discovered) {
+          state.map[obj.x-1][obj.y].discoverable++;
+        }
+      }
     }
   },
   getters: {
@@ -116,91 +141,9 @@ export const MapModule: Module<IMapState, IState> = {
     tiles(state): IMapTile[][] {
         return state.map.map((x, i) => x.map((y, j) => {
           if (!state.map[i] || !state.map[i][j])
-            return { building : null, environment: Environment.Field, discovered: false };
+            return { building : null, environment: Environment.Field, discovered: false, discoverable: 0 };
           return state.map[i][j];
         }));
-    },
-    //TODO: this should not be recomputed entirely, only one cell needs to be recomputed in fact
-    tilesDiscoverability(state) {
-      console.log('tilesDiscoverability start...');
-      var startTime = Date.now();
-      const mapLength = state.map.length;
-      let result = new Array(mapLength);
-      for (let i=0; i < mapLength; i++) {
-        // Efficient way to fill an array with 0
-        (result[i] = []).length = mapLength; result[i].fill(0);
-      }
-
-      /*for (let i=0; i < mapLength; i++) {
-        for (let j=0; j < mapLength; j++) {
-          if (state.map[i][j].discovered) {
-            if (j < mapLength -1 && state.map[i][j+1].discovered !== true) result[i][j+1]++;
-            if (j > 0 && state.map[i][j-1].discovered !== true) result[i][j-1]++;
-            if (i < mapLength -1 && state.map[i+1][j].discovered !== true) result[i+1][j]++;
-            if (i > 0 && state.map[i-1][j].discovered !== true) result[i-1][j]++;
-          }
-        }
-      }*/
-
-      // Kind of Floodfill algo
-      const center = Math.floor(mapLength/2);
-      let originCell = { x: center, y: center, tile: state.map[center][center] };
-      let cells: { x: number, y: number, tile: IMapTile }[] = [originCell];
-      var visitedCells: Set<string> = new Set([getCellHash(originCell)]);
-      var discoverableCells: { [id: string]: number } = {};
-
-      let cell = cells.shift();
-      while (cell !== undefined) {
-        if (!cell.tile.discovered) {
-          if (discoverableCells.hasOwnProperty(getCellHash(cell))) {
-            discoverableCells[getCellHash(cell)]++;
-          } else {
-            discoverableCells[getCellHash(cell)] = 1;
-          }
-        } else {
-          //TODO: les +1 -1 ca va faire chier
-          if (cell.y < mapLength-1) {
-            var rightCell = { x: cell.x, y: cell.y+1, tile: state.map[cell.x][cell.y+1] };
-            if (!visitedCells.has(getCellHash(rightCell))) {
-              cells.push(rightCell);
-              visitedCells.add(getCellHash(rightCell));
-            }
-          }
-
-          if (cell.y > 0) {
-            var leftCell = { x: cell.x, y: cell.y-1, tile: state.map[cell.x][cell.y-1] };
-            if (!visitedCells.has(getCellHash(leftCell))) {
-              cells.push(leftCell);
-              visitedCells.add(getCellHash(leftCell));
-            }
-          }
-
-          if (cell.x < mapLength-1) {
-            var bottomCell = { x: cell.x+1, y: cell.y, tile: state.map[cell.x+1][cell.y] };
-            if (!visitedCells.has(getCellHash(bottomCell))) {
-              cells.push(bottomCell);
-              visitedCells.add(getCellHash(bottomCell));
-            }
-          }
-
-          if (cell.x > 0) {
-            var topCell = { x: cell.x-1, y: cell.y, tile: state.map[cell.x-1][cell.y] };
-            if (!visitedCells.has(getCellHash(topCell))) {
-              cells.push(topCell);
-              visitedCells.add(getCellHash(topCell));
-            }
-          }
-        }
-
-        cell = cells.shift();
-      }
-
-      console.log('tilesDiscoverability stop, elapsed time:', Date.now() - startTime, 'ms');
-      return discoverableCells;
-
-      function getCellHash(pos: { x: number, y: number }) {
-        return pos.x + ',' + pos.y;
-      }
     },
   }
 }

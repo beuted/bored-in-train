@@ -5,4 +5,5 @@ export interface IMapTile {
     building: Building | null;
     environment: Environment;
     discovered: boolean;
+    discoverable: number;
 }

@@ -167,7 +167,7 @@ export default class Map extends IdleGameVue {
                     if (buildingImage)
                         this.ctx.drawImage(buildingImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
                 // The following statement is cached
-                } else if (this.$store.getters.tiles[i][j].discoverable > 0) {
+                } else if (this.$store.state.map.map[i][j].discoverable > 0) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
                     this.ctx.drawImage(environmentImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
 

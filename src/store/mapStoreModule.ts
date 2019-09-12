@@ -51,16 +51,16 @@ export const MapModule: Module<IMapState, IState> = {
     },
   },
   actions: {
-    DiscoverTile({ getters, commit }) {
+    DiscoverTile({ getters, commit, state }) {
       console.log('DiscoverTile start...');
       let startTime = Date.now();
-      let mapLength = getters.tiles.length;
+      let mapLength = state.map.length;
       let xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(mapLength));
       let ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(mapLength));
       let maxDisco = { value: 0, x: 0, y: 0 };
       for (const x of xSuite) {
         for (const y of ySuite) {
-          const tile: IMapTile = getters.tiles[x][y];
+          const tile: IMapTile = state.map[x][y];
           if (tile.discoverable > maxDisco.value && (tile.environment != Environment.Water || getters.canSail)) {
             maxDisco = { value: tile.discoverable, x: x, y: y };
           }
@@ -137,13 +137,6 @@ export const MapModule: Module<IMapState, IState> = {
 
         return state.buildings[storage.name].quantity * storage.capacity;
       }
-    },
-    tiles(state): IMapTile[][] {
-        return state.map.map((x, i) => x.map((y, j) => {
-          if (!state.map[i] || !state.map[i][j])
-            return { building : null, environment: Environment.Field, discovered: false, discoverable: 0 };
-          return state.map[i][j];
-        }));
     },
   }
 }

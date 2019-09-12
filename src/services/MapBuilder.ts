@@ -17,7 +17,7 @@ export class MapBuilder {
             for (let j = 0; j < mapSize; j++) {
                 let env = MapBuilder.GetHeightEnvironment(i, j, size);
 
-                if ((env == Environment.Field || env == Environment.Beach) && Math.random() > 0.97)
+                if ((env == Environment.Field || env == Environment.Beach || env == Environment.Concrete) && Math.random() > 0.97)
                     env = MapBuilder.GetDepositeEnvironment();
 
                 let building = MapBuilder.GetBuilding(env, i, j);
@@ -48,7 +48,7 @@ export class MapBuilder {
     }
 
     private static GetBuilding(env: Environment, i: number, j: number): Building | null {
-        if (env == Environment.Field && MapBuilder.NoiseTrees(i, j) > 0.5) {
+        if ((env == Environment.Field || env == Environment.Concrete) && MapBuilder.NoiseTrees(i, j) > 0.5) {
             return Building.forest;
         }
         return null;
@@ -66,7 +66,16 @@ export class MapBuilder {
 
     private static GetHeightEnvironment(i: number, j: number, size: number) : Environment {
         let height = MapBuilder.Mask(i, j, size) * MapBuilder.NoiseHeight(i, j);
-        return height <= 0 ? Environment.Water : (height > 0.08 ? Environment.Field : Environment.Beach);
+        if (height <= 0)
+            return Environment.Water;
+        if (height <= 0.08)
+            return Environment.Beach;
+        if (height <= 0.75)
+            return Environment.Field;
+        if (height <= 0.95)
+            return Environment.Concrete;
+
+        return Environment.Snow;
     }
 
     private static Mask(x: number, y: number, size: number) {
@@ -82,7 +91,7 @@ export class MapBuilder {
     }
 
     private static NoiseHeight(x: number, y: number) {
-        return 0.5 + 1 * MapBuilder.simplexHeight.noise2D(x*0.05, y*0.05) + 0.25 * MapBuilder.simplexHeight.noise2D(x*5, y*5);
+        return 0.5 + 1 * MapBuilder.simplexHeight.noise2D(x*0.05, y*0.05) + 0.25 * MapBuilder.simplexHeight.noise2D(x*0.5, y*0.5);
     }
 
     private static NoiseTrees(x: number, y: number) {

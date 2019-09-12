@@ -52,6 +52,8 @@ export default class Map extends IdleGameVue {
         [Environment.StoneDeposite]: new Image(),
         [Environment.LimestoneDeposite]: new Image(),
         [Environment.Beach]: new Image(),
+        [Environment.Snow]: new Image(),
+        [Environment.Concrete]: new Image(),
     };
 
     private mapBuildingImages: { [id in Building]: HTMLImageElement } = {
@@ -94,6 +96,8 @@ export default class Map extends IdleGameVue {
         this.mapEnvironmentImages[Environment.StoneDeposite].src = './img/stone-deposit.png';
         this.mapEnvironmentImages[Environment.LimestoneDeposite].src = './img/limestone-deposit.png';
         this.mapEnvironmentImages[Environment.Beach].src = './img/beach.png';
+        this.mapEnvironmentImages[Environment.Snow].src = './img/snow.png';
+        this.mapEnvironmentImages[Environment.Concrete].src = './img/concrete.png';
         this.mapBuildingImages[Building.forest].src = './img/foret-2.png';
         this.mapBuildingImages[Building.village].src = './img/village-2.png';
         this.mapBuildingImages[Building.barn].src = './img/entrepot.png';

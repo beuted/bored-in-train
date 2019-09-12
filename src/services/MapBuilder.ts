@@ -66,9 +66,9 @@ export class MapBuilder {
 
     private static GetHeightEnvironment(i: number, j: number, size: number) : Environment {
         let height = MapBuilder.Mask(i, j, size) * MapBuilder.NoiseHeight(i, j);
-        if (height <= 0)
+        if (height <= 0.01)
             return Environment.Water;
-        if (height <= 0.08)
+        if (height <= 0.20)
             return Environment.Beach;
         if (height <= 0.75)
             return Environment.Field;
@@ -81,7 +81,7 @@ export class MapBuilder {
     private static Mask(x: number, y: number, size: number) {
         let distance_x = Math.abs(x - size * 0.5);
         let distance_y = Math.abs(y - size * 0.5);
-        let distance = Math.sqrt(distance_x*distance_x + distance_y*distance_y); // square mask
+        let distance = Math.sqrt(distance_x*distance_x + distance_y*distance_y); // circle mask
 
         let max_width = size * 0.5 - 2.0;
         let delta = distance / max_width;
@@ -91,7 +91,7 @@ export class MapBuilder {
     }
 
     private static NoiseHeight(x: number, y: number) {
-        return 0.5 + 1 * MapBuilder.simplexHeight.noise2D(x*0.05, y*0.05) + 0.25 * MapBuilder.simplexHeight.noise2D(x*0.5, y*0.5);
+        return Math.pow(0.5 + 0.90 * MapBuilder.simplexHeight.noise2D(x*0.05, y*0.05) + 0.10 * MapBuilder.simplexHeight.noise2D(x*0.3, y*0.3), 2);
     }
 
     private static NoiseTrees(x: number, y: number) {

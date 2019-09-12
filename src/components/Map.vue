@@ -42,9 +42,9 @@ import TileTooltip from '@/components/TileTooltip.vue';
   },
 })
 export default class Map extends IdleGameVue {
-    private readonly tileSize = 32;
+    private readonly tileSize = 16;
     private readonly nbTilesOnRowOrColumn = 100;
-    private readonly nbTilesOnRowOrColumnOnScreen = 20;
+    private readonly nbTilesOnRowOrColumnOnScreen = 40;
     private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
         [Environment.Water]: new Image(),
         [Environment.Field]: new Image(),

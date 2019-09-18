@@ -25,7 +25,7 @@ export class MapBuilder {
                 map[i][j] = {
                     building: building,
                     environment: env,
-                    discovered: true,
+                    discovered: false,
                     discoverable: 0,
                 };
             }

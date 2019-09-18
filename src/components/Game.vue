@@ -1,6 +1,11 @@
   <template>
   <div>
-    <h1>{{ msg }} <button v-on:click="toggleDebug()">Debug</button> <button v-on:click="reset()">Reset</button></h1>
+    <h1>
+      {{ msg }}
+      <button v-on:click="toggleDebug()">Debug</button>
+      <button v-on:click="reset()">Reset</button>
+      <button v-on:click="save()">Save</button>
+    </h1>
 
     <Controls />
     <div class="flex-container">
@@ -31,6 +36,7 @@ import Jobs from '@/components/Jobs.vue';
 import Inventory from '@/components/Inventory.vue';
 import Map from '@/components/Map.vue';
 import Controls from '@/components/Controls.vue';
+import { StoreSaver } from '../store/storeSaver';
 
 const gameService = new GameService();
 
@@ -62,8 +68,11 @@ export default class Game extends IdleGameVue {
   }
 
   public reset() {
-    window.localStorage.removeItem('boring-idle-game');
-    location.reload();
+    StoreSaver.Reset();
+  }
+
+  public save() {
+    StoreSaver.Save();
   }
 
   public mounted() {

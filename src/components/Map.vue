@@ -141,8 +141,7 @@ export default class Map extends IdleGameVue {
         let nbEnvImages = Object.keys(this.mapEnvironmentImages).length;
         let nbBuildingImages = Object.keys(this.mapBuildingImages).length;
 
-        for (const key in this.mapBuildingImages)
-        {
+        for (const key in this.mapBuildingImages) {
             (this.mapBuildingImages as any)[key].onload = () => {
                 nbBuildingImages--;
                 if (nbBuildingImages == 0 && nbEnvImages == 0) {

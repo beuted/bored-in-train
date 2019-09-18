@@ -7,6 +7,7 @@ import { IJobProductionEvent } from './EventBus';
 import VuexPersist from 'vuex-persist'
 import { MapModule, IMapState } from './store/mapStoreModule';
 import { IResearchState, ResearchModule } from './store/researchStoreModule';
+import { StoreSaver } from './store/storeSaver';
 
 const vuexPersist = new VuexPersist({
   key: 'boring-idle-game',
@@ -19,7 +20,14 @@ export abstract class IdleGameVue extends Vue {
   public $store!: Store<IState>;
 }
 
+export enum SaveStatus {
+  Unsaved = 0,
+  Saved = 1,
+  Saving = 2,
+}
+
 export interface IState {
+  saveStatus: SaveStatus;
   map: IMapState;
   research: IResearchState;
   debugMode: boolean;
@@ -29,13 +37,14 @@ export interface IState {
 }
 
 export default new Vuex.Store<IState>({
-  plugins: [vuexPersist.plugin],
+  plugins: [],
   strict: true,
   modules: {
     map: MapModule,
     research: ResearchModule
   },
   state: {
+    saveStatus: SaveStatus.Unsaved,
     map: <IMapState><any>null, // TODO: This hack is required to keep the type system happy
     research: <IResearchState><any>null, // TODO: This hack is required to keep the type system happy
     debugMode: false,
@@ -109,6 +118,16 @@ export default new Vuex.Store<IState>({
     }
   },
   mutations: {
+    // For storeSaverPlugin
+    StoreSaverRestore: function (state: IState, restoredState: IState) {
+      for (let key of Object.keys(restoredState)) {
+        (<any>state)[key] = (<any>restoredState)[key];
+      }
+    },
+    // For storeSaverPlugin
+    StoreSaverSetSaveStatus: function (state: IState, newSaveStatus: SaveStatus) {
+      state.saveStatus = newSaveStatus
+    },
     // Toggle debug
     ToggleDebugMode(state) {
       state.debugMode = !state.debugMode

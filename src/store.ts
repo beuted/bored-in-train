@@ -4,15 +4,10 @@ import Vuex, { Store, Module } from 'vuex';
 import { Consummable } from './models/Consummable';
 import { Job } from './models/Job';
 import { IJobProductionEvent } from './EventBus';
-import VuexPersist from 'vuex-persist'
 import { MapModule, IMapState } from './store/mapStoreModule';
 import { IResearchState, ResearchModule } from './store/researchStoreModule';
 import { StoreSaver } from './store/storeSaver';
 
-const vuexPersist = new VuexPersist({
-  key: 'boring-idle-game',
-  storage: localStorage
-});
 
 Vue.use(Vuex);
 

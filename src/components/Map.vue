@@ -42,9 +42,9 @@ import TileTooltip from '@/components/TileTooltip.vue';
   },
 })
 export default class Map extends IdleGameVue {
-    private readonly tileSize = 16;
+    private readonly tileSize = 32;
     private readonly nbTilesOnRowOrColumn = 100;
-    private readonly nbTilesOnRowOrColumnOnScreen = 40;
+    private readonly nbTilesOnRowOrColumnOnScreen = 20;
     private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
         [Environment.Water]: new Image(),
         [Environment.Field]: new Image(),
@@ -74,6 +74,11 @@ export default class Map extends IdleGameVue {
 
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
+    private mapCanvas!: HTMLCanvasElement;
+    private mapContext!: CanvasRenderingContext2D;
+    private mouseCanvas!: HTMLCanvasElement;
+    private mouseContext!: CanvasRenderingContext2D;
+
 
     private mouseTileCoord: { x: number, y: number } | null = null;
     // TODO: this should not be init with a neg value... I have screwed up somewhere
@@ -118,6 +123,18 @@ export default class Map extends IdleGameVue {
         this.ctx = <CanvasRenderingContext2D>this.canvas.getContext('2d');
         this.ctx.imageSmoothingEnabled = false;
 
+        this.mapCanvas = document.createElement('canvas');
+        this.mapCanvas.width = this.tileSize * this.nbTilesOnRowOrColumn;
+        this.mapCanvas.height = this.tileSize * this.nbTilesOnRowOrColumn;
+        this.mapContext = <CanvasRenderingContext2D>this.mapCanvas.getContext('2d');
+        this.mapContext.imageSmoothingEnabled = false;
+
+        this.mouseCanvas = document.createElement('canvas');
+        this.mouseCanvas.width = this.tileSize;
+        this.mouseCanvas.height =  this.tileSize;
+        this.mouseContext = <CanvasRenderingContext2D>this.mouseCanvas.getContext('2d');
+        this.mouseContext.imageSmoothingEnabled = false;
+
         if (this.map.length <= 0)
             this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
 
@@ -130,7 +147,7 @@ export default class Map extends IdleGameVue {
                 nbBuildingImages--;
                 if (nbBuildingImages == 0 && nbEnvImages == 0) {
                     console.log('starting map loop');
-                    window.requestAnimationFrame(() => this.mapLoop());
+                    window.requestAnimationFrame(() => { this.draw(true); this.mapLoop(); });
                 }
             }
         }
@@ -141,7 +158,7 @@ export default class Map extends IdleGameVue {
                 nbEnvImages--;
                 if (nbEnvImages == 0 && nbBuildingImages == 0) {
                     console.log('starting map loop');
-                    window.requestAnimationFrame(() => this.mapLoop());
+                    window.requestAnimationFrame(() => { this.draw(true); this.mapLoop(); });
                 }
             }
         }
@@ -151,59 +168,77 @@ export default class Map extends IdleGameVue {
         window.requestAnimationFrame(() => this.mapLoop());
 
         this.compute();
-        this.draw();
+        this.draw(false);
     }
 
     private compute() {
     }
 
-    private draw() {
-        this.ctx.fillStyle= '#000';
-        this.ctx.fillRect(0, 0, this.tileSize * this.nbTilesOnRowOrColumn, this.tileSize * this.nbTilesOnRowOrColumn);
-
+    private drawMap() {
+        this.mapContext.clearRect(0, 0, this.tileSize * this.nbTilesOnRowOrColumn, this.tileSize * this.nbTilesOnRowOrColumn);
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
                 if (this.map[i][j].discovered) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment)
-                    this.ctx.drawImage(environmentImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
+                    this.mapContext.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
 
                     let buildingImage = this.getBuildingImage(this.map[i][j].building)
                     if (buildingImage)
-                        this.ctx.drawImage(buildingImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
+                        this.mapContext.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
                 // The following statement is cached
                 } else if (this.$store.state.map.map[i][j].discoverable > 0) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
-                    this.ctx.drawImage(environmentImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
+                    this.mapContext.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
 
                     let buildingImage = this.getBuildingImage(this.map[i][j].building)
                     if (buildingImage)
-                        this.ctx.drawImage(buildingImage, i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
+                        this.mapContext.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
 
-                    this.ctx.globalAlpha = 0.7;
-                    this.ctx.fillRect(i*this.tileSize + this.mapOffset.x, j*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
-                    this.ctx.globalAlpha = 1;
+                    this.mapContext.globalAlpha = 0.7;
+                    this.mapContext.fillRect(i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                    this.mapContext.globalAlpha = 1;
                 }
             }
         }
+    }
 
-
+    private drawMouse() {
         if (this.mouseTileCoord) {
+            this.mouseContext.clearRect(0, 0, this.tileSize, this.tileSize);
             let image = this.getBuildingImage(this.buildingType);
             if (image) {
-                this.ctx.globalAlpha = 0.7;
+                this.mouseContext.globalAlpha = 0.7;
                 if (!this.canBeBuilt(this.mouseTileCoord, this.buildingType)) {
                     // Show a red bg when a building can't be built
-                    this.ctx.fillStyle = '#FF0000';
-                    this.ctx.fillRect(this.mouseTileCoord.x*this.tileSize + this.mapOffset.x, this.mouseTileCoord.y*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
-                    this.ctx.fillStyle = '#000';
-                    //this.ctx.globalCompositeOperation = "destination-in";
+                    this.mouseContext.fillStyle = '#FF0000';
+                    this.mouseContext.fillRect(0, 0, this.tileSize, this.tileSize);
+                    this.mouseContext.fillStyle = '#000';
+                    //this.mouseContext.globalCompositeOperation = "destination-in";
                 }
-                this.ctx.drawImage(image, this.mouseTileCoord.x*this.tileSize + this.mapOffset.x, this.mouseTileCoord.y*this.tileSize + this.mapOffset.y, this.tileSize, this.tileSize);
-                //this.ctx.globalCompositeOperation = "source-over";
+                this.mouseContext.drawImage(image, 0, 0, this.tileSize, this.tileSize);
+                //this.mouseContext.globalCompositeOperation = "source-over";
 
-                this.ctx.globalAlpha = 1.0;
+                this.mouseContext.globalAlpha = 1.0;
             }
         }
+    }
+
+    private draw(forced: boolean) {
+        this.ctx.fillStyle = '#000';
+        this.ctx.fillRect(0, 0, this.tileSize * this.nbTilesOnRowOrColumn, this.tileSize * this.nbTilesOnRowOrColumn);
+
+        if (forced || this.$store.state.map.mapNeedsUpdate) {
+            this.drawMap();
+            this.$store.commit('MapHaveBeenUpdated');
+        }
+
+        if (forced || true /*TODO*/) {
+            this.drawMouse();
+        }
+
+        this.ctx.drawImage(this.mapCanvas, this.mapOffset.x, this.mapOffset.y);
+        if (this.mouseTileCoord)
+            this.ctx.drawImage(this.mouseCanvas, this.mouseTileCoord.x*this.tileSize + this.mapOffset.x, this.mouseTileCoord.y*this.tileSize + this.mapOffset.y);
     }
 
     private handleMouseDown(event: MouseEvent) {

@@ -12,6 +12,7 @@ import { IState } from '../store';
 export interface IMapState {
   mapNbTileFound: number,
   map: IMapTile[][],
+  mapNeedsUpdate: boolean,
   buildings: { [id in Building]: { quantity: number } },
 }
 
@@ -19,6 +20,7 @@ export const MapModule: Module<IMapState, IState> = {
   state: {
     mapNbTileFound: 5,
     map: [],
+    mapNeedsUpdate: true,
     buildings: {
       village: {
         quantity: 1,
@@ -80,6 +82,8 @@ export const MapModule: Module<IMapState, IState> = {
     // Init the map
     InitMap(state: IMapState, size: number) {
       state.map = MapBuilder.InitMap(size);
+
+      state.mapNeedsUpdate = true;
     },
     // Change a tile of a map giving it a certain type
     ChangeTile(state: IMapState, obj: { x: number, y: number, type: Building }) {
@@ -96,6 +100,8 @@ export const MapModule: Module<IMapState, IState> = {
       if (obj.type != null) {
         state.buildings[obj.type].quantity++;
       }
+
+      state.mapNeedsUpdate = true;
     },
     MakeTileDiscovered(state: IMapState, obj: { x: number, y: number }) {
       state.map[obj.x][obj.y].discovered = true;
@@ -126,6 +132,11 @@ export const MapModule: Module<IMapState, IState> = {
           state.map[obj.x-1][obj.y].discoverable++;
         }
       }
+
+      state.mapNeedsUpdate = true;
+    },
+    MapHaveBeenUpdated(state: IMapState) {
+      state.mapNeedsUpdate = false;
     }
   },
   getters: {

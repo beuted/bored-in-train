@@ -6,8 +6,8 @@
                     <input type="radio" :id="key" :value="key" v-model="buildingType">
                     <label :for="key">
                         <PriceTooltip :building="key" :consummables="consummables">
-                            <div v-once><img v-bind:src="mapBuildingImages[key].src"></div>
-                        </PriceTooltip> x {{ building.quantity }}
+                            <span v-once><img v-bind:src="mapBuildingImages[key].src"></span> x {{ building.quantity }}
+                        </PriceTooltip>
                     </label>
                 </span>
             </span>

@@ -36,12 +36,14 @@ export class GameService {
       return;
     }
 
+    let newConsummables = JSON.parse(JSON.stringify(store.state.consummable)); // TODO: Dirty deepcopy because Object.assign isn't enought
+
     // First the creation of ressources
     for (let jobId in StaticJobInfo) {
       let staticJob: IStaticJob = StaticJobInfo[jobId as Job]; //TODO: fix typeing weirdlness
 
       // Create ProductionEvent
-      var event: IJobProductionEvent = {
+      let event: IJobProductionEvent = {
         job: jobId as Job,
         produced: {
           population: 0,
@@ -61,8 +63,8 @@ export class GameService {
         if (staticJobProduction == null)
           continue;
 
-        var nbProducers = store.state.jobs[jobId as Job].quantity;
-        event.produced[consummableId as Consummable] += nbProducers * staticJobProduction.quantity;
+        let nbProducers = store.state.jobs[jobId as Job].quantity;
+        newConsummables[consummableId as Consummable].quantity += nbProducers * staticJobProduction.quantity;
       }
 
       let nbUnfullfiledWorkers = 0; // Nb workers that have not been receiving ressources therefore will be deduced from production
@@ -71,16 +73,16 @@ export class GameService {
         if (staticJobConsumption == null)
           continue;
 
-        var nbConsummer = store.state.jobs[jobId as Job].quantity;
-        if (store.state.consummable[consummableId as Consummable].quantity + event.produced[consummableId as Consummable] >= nbConsummer * staticJobConsumption.quantity) {
-          event.produced[consummableId as Consummable] -= nbConsummer * staticJobConsumption.quantity;
+        let nbConsummer = store.state.jobs[jobId as Job].quantity;
+        if (newConsummables[consummableId as Consummable].quantity >= nbConsummer * staticJobConsumption.quantity) {
+          newConsummables[consummableId as Consummable].quantity -= nbConsummer * staticJobConsumption.quantity;
         } else {
           // Do not produce if needs not fulfilled!
           const whatCanBeconsummed = store.state.consummable[consummableId as Consummable].quantity;
-          let nbUnfullfiledWorkersOnConsummable = Math.floor((nbConsummer - store.state.consummable[consummableId as Consummable].quantity) / staticJobConsumption.quantity);
+          let nbUnfullfiledWorkersOnConsummable = Math.floor((nbConsummer * staticJobConsumption.quantity - store.state.consummable[consummableId as Consummable].quantity) / staticJobConsumption.quantity);
           nbUnfullfiledWorkers = Math.max(nbUnfullfiledWorkers, nbUnfullfiledWorkersOnConsummable);
 
-          event.produced[consummableId as Consummable] -= whatCanBeconsummed;
+          newConsummables[consummableId as Consummable].quantity -= whatCanBeconsummed;
         }
       }
 
@@ -93,25 +95,26 @@ export class GameService {
           if (staticJobProduction == null)
             continue;
 
-          event.produced[consummableId as Consummable] -= nbUnfullfiledWorkers * staticJobProduction.quantity;
+          newConsummables[consummableId as Consummable].quantity -= nbUnfullfiledWorkers * staticJobProduction.quantity;
         }
       }
 
-      store.commit('IncrementConsummables', event);
-      EventBus.$emit('job-production', event);
+      //EventBus.$emit('job-production', event); //TODO: To be reviewed
     }
 
     // After operation checks (storage, ...)
     for (let consummableId in StaticConsummableInfo) {
       let staticConsummable: IStaticConsummable = StaticConsummableInfo[consummableId as Consummable]; //TODO: fix typeing weirdlness
       // See if storage fits
-      if (staticConsummable.storage && staticConsummable.storage.capacity * store.state.map.buildings[staticConsummable.storage.name].quantity < store.state.consummable[consummableId as Consummable].quantity) {
+      if (staticConsummable.storage && staticConsummable.storage.capacity * store.state.map.buildings[staticConsummable.storage.name].quantity < newConsummables[consummableId as Consummable].quantity) {
         let quantityToRemove = this.LackOfStorageFactor *
-          (store.state.consummable[consummableId as Consummable].quantity - store.state.map.buildings[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity);
-        store.commit('IncrementConsummable', { name: consummableId, value: -quantityToRemove });
-        // Vue.toasted.error(`${quantityToRemove} ${consummableId} were thrown away due to lack of storage`);
+          (newConsummables[consummableId as Consummable].quantity - store.state.map.buildings[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity);
+          newConsummables[consummableId as Consummable].quantity -= quantityToRemove;
       }
     }
+
+    let production = GameService.getProductionDiff(newConsummables, store.state.consummable);
+    store.commit('IncrementConsummables', production);
 
     // Recursive setTimeout for precision
     setTimeout (() => {
@@ -120,12 +123,12 @@ export class GameService {
   }
 
   private discoveryLoop() {
-    var nbExplorers = store.state.jobs.explorer.quantity;
+    let nbExplorers = store.state.jobs.explorer.quantity;
 
     if (nbExplorers > 0 && store.state.controls.play) {
-      var nbLandFound = store.state.map.mapNbTileFound;
+      let nbLandFound = store.state.map.mapNbTileFound;
       // Probabilty in proba of at least 1 explorer out of nbExplorers to find a tile
-      var probability = 1-Math.pow(1-2/nbLandFound, nbExplorers*2);
+      let probability = 1-Math.pow(1-2/nbLandFound, nbExplorers*2);
       if (Math.random() <= probability) {
         Vue.toasted.success(`Land Found! (Probability was: ${probability.toPrecision(2)})`);
         store.dispatch('DiscoverTile');
@@ -136,5 +139,15 @@ export class GameService {
     setTimeout (() => {
       this.discoveryLoop()
     }, 10 * GlobalConfig.TickInterval / store.state.controls.speed);
+  }
+
+  private static getProductionDiff(newConsummables: { [id in Consummable]: { quantity: number } }, oldConsummables: { [id in Consummable]: { quantity: number } }) {
+    let production = <{ [id in Consummable]: number }>{}
+
+    for (let consummableId in StaticConsummableInfo) {
+      production[consummableId as Consummable] = newConsummables[consummableId as Consummable].quantity - oldConsummables[consummableId as Consummable].quantity;
+    }
+
+    return production;
   }
 }

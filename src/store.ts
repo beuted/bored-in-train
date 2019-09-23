@@ -115,9 +115,7 @@ export default new Vuex.Store<IState>({
   mutations: {
     // For storeSaverPlugin
     StoreSaverRestore: function (state: IState, restoredState: IState) {
-      for (let key of Object.keys(restoredState)) {
-        (<any>state)[key] = (<any>restoredState)[key];
-      }
+      Object.assign(state, restoredState);
     },
     // For storeSaverPlugin
     StoreSaverSetSaveStatus: function (state: IState, newSaveStatus: SaveStatus) {
@@ -144,9 +142,9 @@ export default new Vuex.Store<IState>({
       state.consummable[obj.name].quantity += obj.value;
     },
     // Increment the value of a consummable from 'value'
-    IncrementConsummables(state, event: IJobProductionEvent) {
-      for (let consummable in event.produced) {
-        state.consummable[consummable as Consummable].quantity += event.produced[consummable as Consummable];
+    IncrementConsummables(state, production: { [id in Consummable]: number }) {
+      for (let consummable in production) {
+        state.consummable[consummable as Consummable].quantity += production[consummable as Consummable];
       }
     },
     //Add Job

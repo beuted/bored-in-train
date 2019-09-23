@@ -17,15 +17,15 @@ export class MapBuilder {
             for (let j = 0; j < mapSize; j++) {
                 let env = MapBuilder.GetHeightEnvironment(i, j, size);
 
-                if ((env == Environment.Field || env == Environment.Beach || env == Environment.Concrete) && Math.random() > 0.97)
-                    env = MapBuilder.GetDepositeEnvironment();
+                //if ((env == Environment.Field || env == Environment.Beach || env == Environment.Concrete) && Math.random() > 0.97)
+                    //env = MapBuilder.GetDepositeEnvironment();
 
-                let building = MapBuilder.GetBuilding(env, i, j);
+                let building = null;//MapBuilder.GetBuilding(env, i, j);
 
                 map[i][j] = {
                     building: building,
                     environment: env,
-                    discovered: false,
+                    discovered: true,
                     discoverable: 0,
                 };
             }
@@ -65,7 +65,7 @@ export class MapBuilder {
     }
 
     private static GetHeightEnvironment(i: number, j: number, size: number) : Environment {
-        let height = MapBuilder.Mask(i, j, size) * MapBuilder.NoiseHeight(i, j);
+        let height = /*MapBuilder.Mask(i, j, size) **/ MapBuilder.NoiseHeight(i, j);
         if (height <= 0.01)
             return Environment.Water;
         if (height <= 0.20)
@@ -91,7 +91,7 @@ export class MapBuilder {
     }
 
     private static NoiseHeight(x: number, y: number) {
-        return Math.pow(0.5 + 0.90 * MapBuilder.simplexHeight.noise2D(x*0.05, y*0.05) + 0.10 * MapBuilder.simplexHeight.noise2D(x*0.3, y*0.3), 2);
+        return 0.5;/*Math.pow(0.5 + */ /*0.90 * MapBuilder.simplexHeight.noise2D(x*0.05, y*0.05)*/ /* + 0.10 * MapBuilder.simplexHeight.noise2D(x*0.3, y*0.3)*/ /*, 2)*/;
     }
 
     private static NoiseTrees(x: number, y: number) {

@@ -19,7 +19,6 @@ export class GameService {
     // NASTY HACK: This timeout is here to let all services init before starting the game.
     setTimeout (() => {
       this.mainLoop();
-      this.discoveryLoop();
       this.hasBeenInit = true;
     }, 1000);
 
@@ -116,6 +115,7 @@ export class GameService {
     store.commit('IncrementConsummables', production);
     EventBus.$emit('consummable-production', production); //TODO: To be reviewed
 
+    this.tryDiscoverLand();
 
     // Recursive setTimeout for precision
     setTimeout (() => {
@@ -123,7 +123,7 @@ export class GameService {
     }, GlobalConfig.TickInterval / store.state.controls.speed);
   }
 
-  private discoveryLoop() {
+  private tryDiscoverLand() {
     let nbExplorers = store.state.jobs.explorer.quantity;
 
     if (nbExplorers > 0 && store.state.controls.play) {
@@ -135,11 +135,6 @@ export class GameService {
         store.dispatch('DiscoverTile');
       }
     }
-
-    // Recursive setTimeout for precision
-    setTimeout (() => {
-      this.discoveryLoop()
-    }, 10 * GlobalConfig.TickInterval / store.state.controls.speed);
   }
 
   private static getProductionDiff(newConsummables: { [id in Consummable]: { quantity: number } }, oldConsummables: { [id in Consummable]: { quantity: number } }) {

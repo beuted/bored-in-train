@@ -8,7 +8,7 @@
             <li v-for="jobName in jobs" v-bind:key="jobName">
                 <span class="jobs" v-if="getJobMaxStorage(jobName) != 0">
                     <div>
-                        <JobTooltip :jobName="jobName"><ParticleEmitter :jobName="jobName">{{ getJobDisplayName(jobName) }}:</ParticleEmitter></JobTooltip> {{ getJobQuantity(jobName) }} / {{ getJobMaxStorage(jobName) }}
+                        <JobTooltip :jobName="jobName">{{ getJobDisplayName(jobName) }}:</JobTooltip> {{ getJobQuantity(jobName) }} / {{ getJobMaxStorage(jobName) }}
                     </div>
                     <div>
                         <button class="add-button" v-bind:disabled="!canRemoveJob(1, jobName)" v-on:click="removeJob(1, jobName)">-</button>
@@ -28,13 +28,10 @@ import { Job } from '@/models/Job';
 import { Building } from '@/models/Building';
 
 import JobTooltip from '@/components/JobTooltip.vue';
-import ParticleEmitter from '@/components/ParticleEmitter.vue';
-
 
 @Component({
   components: {
-      JobTooltip,
-      ParticleEmitter
+      JobTooltip
   },
 })
 export default class Jobs extends IdleGameVue {

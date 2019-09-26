@@ -99,7 +99,6 @@ export class GameService {
         }
       }
 
-      //EventBus.$emit('job-production', event); //TODO: To be reviewed
     }
 
     // After operation checks (storage, ...)
@@ -115,6 +114,8 @@ export class GameService {
 
     let production = GameService.getProductionDiff(newConsummables, store.state.consummable);
     store.commit('IncrementConsummables', production);
+    EventBus.$emit('consummable-production', production); //TODO: To be reviewed
+
 
     // Recursive setTimeout for precision
     setTimeout (() => {

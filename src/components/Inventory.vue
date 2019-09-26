@@ -3,7 +3,9 @@
         <h2>Inventory</h2>
         <ul>
             <li v-for="(consummable, key) in consummables" v-bind:key="key">
-                <div> {{ getName(key) }} <img v-bind:src="getIcon(key)"> {{ consummable.quantity }} / {{ getStorage(key) }}</div>
+                <ParticleEmitter :consummable="key">
+                    <div> {{ getName(key) }} <img v-bind:src="getIcon(key)"> {{ consummable.quantity }} / {{ getStorage(key) }}</div>
+                </ParticleEmitter>
                 <div class="production" v-bind:class="{ negative: computeProduction(key) < 0 }"> ({{ computeProduction(key) }} /sec)</div>
             </li>
         </ul>
@@ -17,7 +19,13 @@ import { Job } from '@/models/Job';
 import { Consummable } from '@/models/Consummable';
 import { StaticConsummableInfo, StaticJobInfo, GlobalConfig } from '@/services/GameEngine';
 
-@Component
+import ParticleEmitter from '@/components/ParticleEmitter.vue';
+
+@Component({
+  components: {
+      ParticleEmitter
+  },
+})
 export default class Inventory extends IdleGameVue {
 
     get consummables() {

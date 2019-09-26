@@ -26,15 +26,15 @@ import { Consummable } from '@/models/Consummable';
   },
 })
 export default class ParticleEmitter extends IdleGameVue {
-    @Prop() private jobName!: Job;
+    @Prop() private consummable!: Consummable;
 
     private shows: { [id in Consummable]: { positive: boolean, negative: boolean } } = <any>{};
 
     public constructor() {
         super();
-        EventBus.$on('job-production', (event: IJobProductionEvent) => {
-            if (event.job == this.jobName)
-                this.emitParticles(event)
+        EventBus.$on('consummable-production', (event: { [id in Consummable]: number }) => {
+            if (event[this.consummable])
+                this.emitParticles(event[this.consummable], this.consummable)
         });
 
         // Init the show array
@@ -51,15 +51,13 @@ export default class ParticleEmitter extends IdleGameVue {
         return StaticConsummableInfo[consummable].icon;
     }
 
-    private emitParticles(event: IJobProductionEvent) {
-        for (let consummable in Consummable) {
-            if (event.produced[consummable as Consummable] > 0) {
-                this.shows[consummable as Consummable].positive = true;
-                setTimeout(() => { this.shows[consummable as Consummable].positive = false; }, 800);
-            } else if (event.produced[consummable as Consummable] < 0) {
-                this.shows[consummable as Consummable].negative = true;
-                setTimeout(() => { this.shows[consummable as Consummable].negative = false; }, 800);
-            }
+    private emitParticles(nbConsummable: number, consummable: Consummable) {
+        if (nbConsummable > 0) {
+            this.shows[consummable as Consummable].positive = true;
+            setTimeout(() => { this.shows[consummable as Consummable].positive = false; }, 800);
+        } else if (nbConsummable < 0) {
+            this.shows[consummable as Consummable].negative = true;
+            setTimeout(() => { this.shows[consummable as Consummable].negative = false; }, 800);
         }
     }
 }

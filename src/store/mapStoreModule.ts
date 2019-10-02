@@ -138,6 +138,9 @@ export const MapModule: Module<IMapState, IState> = {
     },
     MapHaveBeenUpdated(state: IMapState) {
       state.mapNeedsUpdate = false;
+    },
+    MapNeedsUpdate(state: IMapState) {
+      state.mapNeedsUpdate = true;
     }
   },
   getters: {

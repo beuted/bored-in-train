@@ -31,6 +31,7 @@ import { IMapTile } from '@/models/IMapTile';
 import { IState, IdleGameVue } from '@/store';
 import { Consummable } from '@/models/Consummable';
 import { Research } from '../models/Research';
+import { Keycodes } from '../models/Keycodes';
 
 import PriceTooltip from '@/components/PriceTooltip.vue';
 import TileTooltip from '@/components/TileTooltip.vue';
@@ -42,9 +43,9 @@ import TileTooltip from '@/components/TileTooltip.vue';
   },
 })
 export default class Map extends IdleGameVue {
-    private readonly tileSize = 32;
+    private tileSize = 32;
     private readonly nbTilesOnRowOrColumn = 100;
-    private readonly nbTilesOnRowOrColumnOnScreen = 20;
+    private nbTilesOnRowOrColumnOnScreen = 20;
     private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
         [Environment.Water]: new Image(),
         [Environment.Field]: new Image(),
@@ -89,6 +90,8 @@ export default class Map extends IdleGameVue {
     private isMouseDown = false;
     private draggingStartPoint!: { x: number, y: number };
     private isDragging = true;
+    private keyPressed: {[key: number]: boolean } = {};
+    private wheelDelta: number = 0;
 
     public buildingType: Building = Building.village;
 
@@ -138,6 +141,17 @@ export default class Map extends IdleGameVue {
         if (this.map.length <= 0)
             this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
 
+        // Mouse / Keyboard events
+        window.onkeyup = ((that: any) => {
+            return (e: KeyboardEvent) => { that.keyPressed[e.keyCode] = false; };
+        })(this);
+        window.onkeydown = ((that: any) => {
+            return (e: KeyboardEvent) => { that.keyPressed[e.keyCode] = true; };
+        })(this);
+        window.onwheel = ((that: any) => {
+            return (e: WheelEvent) => { that.wheelDelta = e.deltaY; };
+        })(this);
+
         let nbEnvImages = Object.keys(this.mapEnvironmentImages).length;
         let nbBuildingImages = Object.keys(this.mapBuildingImages).length;
 
@@ -171,6 +185,27 @@ export default class Map extends IdleGameVue {
     }
 
     private compute() {
+        const keyBoardMapMoveSpeed = 3;
+        if (this.keyPressed[Keycodes.UP_ARROW])
+            this.mapOffset.y+=keyBoardMapMoveSpeed;
+        else if (this.keyPressed[Keycodes.DOWN_ARROW])
+            this.mapOffset.y-=keyBoardMapMoveSpeed;
+
+        if (this.keyPressed[Keycodes.RIGHT_ARROW])
+            this.mapOffset.x-=keyBoardMapMoveSpeed;
+        else if (this.keyPressed[Keycodes.LEFT_ARROW])
+            this.mapOffset.x+=keyBoardMapMoveSpeed;
+
+        if (this.wheelDelta > 0) {
+            this.nbTilesOnRowOrColumnOnScreen /= 2;
+            this.tileSize *= 2;
+            this.$store.commit('MapNeedsUpdate');
+        } else if (this.wheelDelta < 0) {
+            this.nbTilesOnRowOrColumnOnScreen *= 2;
+            this.tileSize /= 2;
+            this.$store.commit('MapNeedsUpdate');
+        }
+        this.wheelDelta = 0;
     }
 
     private drawMap() {

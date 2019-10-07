@@ -8,4 +8,6 @@ export interface IMapTile {
     habitat: Habitat | null;
     discovered: boolean;
     discoverable: number;
+    pollution: number; // from 0 to 100
+    temperature: number; // In celcius
 }

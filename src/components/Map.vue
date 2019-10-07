@@ -11,6 +11,7 @@
                     </label>
                 </span>
             </span>
+            <span v-on:click="showPollution = !showPollution">Pollution</span>
         </div>
         <!--<TileTooltip :tile="map[0][0]"></TileTooltip>-->
         <canvas id="canvas" class="map"
@@ -99,6 +100,7 @@ export default class Map extends IdleGameVue {
     private isMouseDown = false;
     private draggingStartPoint!: { x: number, y: number };
     private isDragging = true;
+    private showPollution = false;
 
     public buildingType: Building = Building.village;
 
@@ -246,6 +248,16 @@ export default class Map extends IdleGameVue {
                         let habitatImage = this.getHabitatImage(habitat)
                         this.mapContext.drawImage(habitatImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
                     }
+
+                    // Pollution
+                    if (this.showPollution && this.map[i][j].pollution > 0) {
+                        this.mapContext.fillStyle = '#FF0000';
+
+                        this.mapContext.globalAlpha = Math.min(this.map[i][j].pollution / 100, 1);
+                        this.mapContext.fillRect(i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                        this.mapContext.globalAlpha = 1;
+                    }
+
                 // The following statement is cached
                 } else if (this.$store.state.map.map[i][j].discoverable > 0) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);

@@ -41,22 +41,6 @@ export class GameService {
     for (let jobId in StaticJobInfo) {
       let staticJob: IStaticJob = StaticJobInfo[jobId as Job]; //TODO: fix typeing weirdlness
 
-      // Create ProductionEvent
-      let event: IJobProductionEvent = {
-        job: jobId as Job,
-        produced: {
-          population: 0,
-          food: 0,
-          wood: 0,
-          stones: 0,
-          coals: 0,
-          limestone: 0,
-          limestoneBrick: 0,
-          energy: 0,
-          knowledge: 0
-        }
-      }
-
       for (let consummableId in staticJob.produce) {
         let staticJobProduction: IStaticJobProduction | null = staticJob.produce[consummableId as Consummable];
         if (staticJobProduction == null)
@@ -113,9 +97,11 @@ export class GameService {
 
     let production = GameService.getProductionDiff(newConsummables, store.state.consummable);
     store.commit('IncrementConsummables', production);
-    EventBus.$emit('consummable-production', production); //TODO: To be reviewed
+    EventBus.$emit('consummable-production', production);
 
     this.tryDiscoverLand();
+
+    this.handlePollution();
 
     // Recursive setTimeout for precision
     setTimeout (() => {
@@ -135,6 +121,13 @@ export class GameService {
         store.dispatch('DiscoverTile');
       }
     }
+  }
+
+  private handlePollution() {
+    // Add and remove pollution
+    store.commit('ApplyPollution');
+
+    // Spread pollution
   }
 
   private static getProductionDiff(newConsummables: { [id in Consummable]: { quantity: number } }, oldConsummables: { [id in Consummable]: { quantity: number } }) {

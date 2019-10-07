@@ -104,35 +104,38 @@ export const MapModule: Module<IMapState, IState> = {
       console.log('MakeTileDiscovered start...');
       let startTime = Date.now();
 
-      state.map[obj.x][obj.y].discovered = true;
-      state.map[obj.x][obj.y].discoverable = 0;
+      let mapCopy = JSON.parse(JSON.stringify(state.map)); // TODO: better way to clone T[][] ?
+
+      mapCopy[obj.x][obj.y].discovered = true;
+      mapCopy[obj.x][obj.y].discoverable = 0;
       state.mapNbTileFound++;
 
-      let mapLength = state.map.length;
+      let mapLength = mapCopy.length;
       if (obj.y < mapLength-1) {
-        if (!state.map[obj.x][obj.y+1].discovered) {
-          state.map[obj.x][obj.y+1].discoverable++;
+        if (!mapCopy[obj.x][obj.y+1].discovered) {
+          mapCopy[obj.x][obj.y+1].discoverable++;
         }
       }
 
       if (obj.y > 0) {
-        if (!state.map[obj.x][obj.y-1].discovered) {
-          state.map[obj.x][obj.y-1].discoverable++;
+        if (!mapCopy[obj.x][obj.y-1].discovered) {
+          mapCopy[obj.x][obj.y-1].discoverable++;
         }
       }
 
       if (obj.x < mapLength-1) {
-        if (!state.map[obj.x+1][obj.y].discovered) {
-          state.map[obj.x+1][obj.y].discoverable++;
+        if (!mapCopy[obj.x+1][obj.y].discovered) {
+          mapCopy[obj.x+1][obj.y].discoverable++;
         }
       }
 
       if (obj.x > 0) {
-        if (!state.map[obj.x-1][obj.y].discovered) {
-          state.map[obj.x-1][obj.y].discoverable++;
+        if (!mapCopy[obj.x-1][obj.y].discovered) {
+          mapCopy[obj.x-1][obj.y].discoverable++;
         }
       }
 
+      state.map = mapCopy;
       state.mapNeedsUpdate = true;
       console.log('MakeTileDiscovered stop, elapsed time:', Date.now() - startTime, 'ms');
     },
@@ -140,6 +143,30 @@ export const MapModule: Module<IMapState, IState> = {
       state.mapNeedsUpdate = false;
     },
     MapNeedsUpdate(state: IMapState) {
+      state.mapNeedsUpdate = true;
+    },
+    ApplyPollution(state: IMapState) {
+      let mapLength = state.map.length;
+      let mapCopy = JSON.parse(JSON.stringify(state.map)); // TODO: better way to clone T[][] ?
+      for (let i = 0; i < mapLength; i++) {
+        for (let j = 0; j < mapLength; j++) {
+          if (mapCopy[i][j].building == Building.forest && mapCopy[i][j].pollution > 0) {
+            mapCopy[i][j].pollution--;
+          } else if (mapCopy[i][j].building != null && mapCopy[i][j].pollution < 100) {
+            mapCopy[i][j].pollution++;
+          }
+        }
+      }
+      for (let i = 1; i < mapLength; i++) {
+        for (let j = 1; j < mapLength; j++) {
+          let pollutionMedian = (mapCopy[i][j].pollution + mapCopy[i-1][j].pollution + mapCopy[i][j-1].pollution) / 3;
+          mapCopy[i-1][j].pollution = pollutionMedian
+          mapCopy[i][j-1].pollution = pollutionMedian
+          mapCopy[i][j].pollution = pollutionMedian;
+        }
+      }
+
+      state.map = mapCopy;
       state.mapNeedsUpdate = true;
     }
   },

@@ -36,6 +36,7 @@ import { Keycodes } from '../models/Keycodes';
 
 import PriceTooltip from '@/components/PriceTooltip.vue';
 import TileTooltip from '@/components/TileTooltip.vue';
+import { KeyboardService } from '../services/KeyboardService';
 
 @Component({
   components: {
@@ -80,13 +81,14 @@ export default class Map extends IdleGameVue {
     @Prop() private buildings!: { [id in Building]: { quantity: number } };
     @Prop() private consummables!: {[id in Consummable]: { quantity: number }};
 
+    private keyBoardService: KeyboardService;
+
     private ctx!: CanvasRenderingContext2D;
     private canvas!: HTMLCanvasElement;
     private mapCanvas!: HTMLCanvasElement;
     private mapContext!: CanvasRenderingContext2D;
     private mouseCanvas!: HTMLCanvasElement;
     private mouseContext!: CanvasRenderingContext2D;
-
 
     private mouseTileCoord: { x: number, y: number } | null = null;
     // TODO: this should not be init with a neg value... I have screwed up somewhere
@@ -97,8 +99,6 @@ export default class Map extends IdleGameVue {
     private isMouseDown = false;
     private draggingStartPoint!: { x: number, y: number };
     private isDragging = true;
-    private keyPressed: {[key: number]: boolean } = {};
-    private wheelDelta: number = 0;
 
     public buildingType: Building = Building.village;
 
@@ -122,6 +122,8 @@ export default class Map extends IdleGameVue {
         this.mapHabitatImages[Habitat.CoalDeposite].src = './img/coal-deposit.png';
         this.mapHabitatImages[Habitat.StoneDeposite].src = './img/stone-deposit.png';
         this.mapHabitatImages[Habitat.LimestoneDeposite].src = './img/limestone-deposit.png';
+
+        this.keyBoardService = new KeyboardService();
     }
 
     public isKnown(building: Building) {
@@ -145,19 +147,10 @@ export default class Map extends IdleGameVue {
         this.mouseContext = <CanvasRenderingContext2D>this.mouseCanvas.getContext('2d');
         this.mouseContext.imageSmoothingEnabled = false;
 
+        this.keyBoardService.Start();
+
         if (this.map.length <= 0)
             this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
-
-        // Mouse / Keyboard events
-        window.onkeyup = ((that: any) => {
-            return (e: KeyboardEvent) => { that.keyPressed[e.keyCode] = false; };
-        })(this);
-        window.onkeydown = ((that: any) => {
-            return (e: KeyboardEvent) => { that.keyPressed[e.keyCode] = true; };
-        })(this);
-        window.onwheel = ((that: any) => {
-            return (e: WheelEvent) => { that.wheelDelta = e.deltaY; };
-        })(this);
 
         let nbEnvImages = Object.keys(this.mapEnvironmentImages).length;
         let nbBuildingImages = Object.keys(this.mapBuildingImages).length;
@@ -193,17 +186,18 @@ export default class Map extends IdleGameVue {
 
     private compute() {
         const keyBoardMapMoveSpeed = 3;
-        if (this.keyPressed[Keycodes.UP_ARROW])
+        if (this.keyBoardService.IsKeyPressed(Keycodes.UP_ARROW))
             this.mapOffset.y+=keyBoardMapMoveSpeed;
-        else if (this.keyPressed[Keycodes.DOWN_ARROW])
+        else if (this.keyBoardService.IsKeyPressed(Keycodes.DOWN_ARROW))
             this.mapOffset.y-=keyBoardMapMoveSpeed;
 
-        if (this.keyPressed[Keycodes.RIGHT_ARROW])
+        if (this.keyBoardService.IsKeyPressed(Keycodes.RIGHT_ARROW))
             this.mapOffset.x-=keyBoardMapMoveSpeed;
-        else if (this.keyPressed[Keycodes.LEFT_ARROW])
+        else if (this.keyBoardService.IsKeyPressed(Keycodes.LEFT_ARROW))
             this.mapOffset.x+=keyBoardMapMoveSpeed;
 
-        if (this.wheelDelta < 0 && this.tileSize < 64) {
+        const wheelDelta =  this.keyBoardService.GetWheelDelta();
+        if (wheelDelta < 0 && this.tileSize < 64) {
             // Recenter camera on center tile
             this.mapOffset.x = this.mapOffset.x * 2 - this.canvasSize/2;
             this.mapOffset.y = this.mapOffset.y * 2 - this.canvasSize/2;
@@ -213,7 +207,7 @@ export default class Map extends IdleGameVue {
             this.tileSize *= 2;
 
             this.$store.commit('MapNeedsUpdate');
-        } else if (this.wheelDelta > 0 && this.tileSize > 8) {
+        } else if (wheelDelta > 0 && this.tileSize > 8) {
             // Recenter camera on center tile
             this.mapOffset.x = this.mapOffset.x / 2 + this.canvasSize/4;
             this.mapOffset.y = this.mapOffset.y / 2 + this.canvasSize/4;
@@ -224,7 +218,7 @@ export default class Map extends IdleGameVue {
 
             this.$store.commit('MapNeedsUpdate');
         }
-        this.wheelDelta = 0;
+        this.keyBoardService.Reset();
     }
 
     private drawMap() {
@@ -317,7 +311,7 @@ export default class Map extends IdleGameVue {
     private handleMouseDown(event: MouseEvent) {
         var canvasSize = this.tileSize*this.nbTilesOnRowOrColumn;
         if (event.pageX < canvasSize + this.canvas.offsetLeft && event.pageX > this.canvas.offsetLeft
-            && event.pageY < canvasSize + this.canvas.offsetTop && event.pageY >  this.canvas.offsetTop) {
+            && event.pageY < canvasSize + this.canvas.offsetTop && event.pageY > this.canvas.offsetTop) {
                 this.isMouseDown = true;
                 this.isDragging = true;
                 this.draggingStartPoint = { x: event.pageX - this.mapOffset.x, y: event.pageY - this.mapOffset.y }

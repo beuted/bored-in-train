@@ -18,7 +18,7 @@
             v-on:mouseup="handleMouseUp"
             v-on:mousemove="handleMouseMove"
             v-on:mouseout="handleMouseOut"
-            :width="nbTilesOnRowOrColumnOnScreen*tileSize+'px'" :height="nbTilesOnRowOrColumnOnScreen*tileSize+'px'"></canvas>
+            :width="canvasSize+'px'" :height="canvasSize+'px'"></canvas>
     </div>
 </template>
 
@@ -43,9 +43,12 @@ import TileTooltip from '@/components/TileTooltip.vue';
   },
 })
 export default class Map extends IdleGameVue {
-    private tileSize = 32;
-    private readonly nbTilesOnRowOrColumn = 100;
     private nbTilesOnRowOrColumnOnScreen = 20;
+    private tileSize = 32;
+
+    private readonly nbTilesOnRowOrColumn = 100;
+    private readonly canvasSize = this.nbTilesOnRowOrColumnOnScreen * this.tileSize;
+
     private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
         [Environment.Water]: new Image(),
         [Environment.Field]: new Image(),
@@ -196,19 +199,39 @@ export default class Map extends IdleGameVue {
         else if (this.keyPressed[Keycodes.LEFT_ARROW])
             this.mapOffset.x+=keyBoardMapMoveSpeed;
 
-        if (this.wheelDelta > 0) {
+        if (this.wheelDelta < 0 && this.tileSize < 64) {
+            // Recenter camera on center tile
+            this.mapOffset.x = this.mapOffset.x * 2 - this.canvasSize/2;
+            this.mapOffset.y = this.mapOffset.y * 2 - this.canvasSize/2;
+
+            // Resize tiles and map
             this.nbTilesOnRowOrColumnOnScreen /= 2;
             this.tileSize *= 2;
+
             this.$store.commit('MapNeedsUpdate');
-        } else if (this.wheelDelta < 0) {
+        } else if (this.wheelDelta > 0 && this.tileSize > 8) {
+            // Recenter camera on center tile
+            this.mapOffset.x = this.mapOffset.x / 2 + this.canvasSize/4;
+            this.mapOffset.y = this.mapOffset.y / 2 + this.canvasSize/4;
+
+            // Resize tiles and map
             this.nbTilesOnRowOrColumnOnScreen *= 2;
             this.tileSize /= 2;
+
             this.$store.commit('MapNeedsUpdate');
         }
         this.wheelDelta = 0;
     }
 
     private drawMap() {
+        // Refresh canvas layers since their size can have changed
+        this.mouseCanvas.width = this.tileSize;
+        this.mouseCanvas.height = this.tileSize;
+        this.mapCanvas.width = this.tileSize * this.nbTilesOnRowOrColumn;
+        this.mapCanvas.height = this.tileSize * this.nbTilesOnRowOrColumn;
+        this.mapContext.imageSmoothingEnabled = false;
+        this.mouseContext.imageSmoothingEnabled = false;
+
         this.mapContext.clearRect(0, 0, this.tileSize * this.nbTilesOnRowOrColumn, this.tileSize * this.nbTilesOnRowOrColumn);
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {

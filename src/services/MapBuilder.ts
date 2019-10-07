@@ -2,6 +2,7 @@ import { Environment } from '@/models/Environment';
 import { Building } from '@/models/Building';
 import { IMapTile } from '@/models/IMapTile';
 import SimplexNoise from 'simplex-noise';
+import { Habitat } from '@/models/Habitat';
 
 export class MapBuilder {
     private static simplexHeight = new SimplexNoise();
@@ -17,14 +18,16 @@ export class MapBuilder {
             for (let j = 0; j < mapSize; j++) {
                 let env = MapBuilder.GetHeightEnvironment(i, j, size);
 
+                let habitat: Habitat | null = null;
                 if ((env == Environment.Field || env == Environment.Beach || env == Environment.Concrete) && Math.random() > 0.97)
-                    env = MapBuilder.GetDepositeEnvironment();
+                    habitat = MapBuilder.GetHabitat();
 
                 let building = MapBuilder.GetBuilding(env, i, j);
 
                 map[i][j] = {
                     building: building,
                     environment: env,
+                    habitat: habitat,
                     discovered: false,
                     discoverable: 0,
                 };
@@ -54,14 +57,14 @@ export class MapBuilder {
         return null;
     }
 
-    private static GetDepositeEnvironment(): Environment {
+    private static GetHabitat(): Habitat {
         var seed = Math.random();
         if (seed < 0.33)
-            return Environment.CoalDeposite;
+            return Habitat.CoalDeposite;
         else if (seed < 0.66)
-            return Environment.StoneDeposite;
+            return Habitat.StoneDeposite;
         else
-            return Environment.LimestoneDeposite;
+            return Habitat.LimestoneDeposite;
     }
 
     private static GetHeightEnvironment(i: number, j: number, size: number) : Environment {

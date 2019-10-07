@@ -25,6 +25,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Building } from '@/models/Building';
+import { Habitat } from '@/models/Habitat';
 import { StaticBuildingInfo, ResearchInfo } from '@/services/GameEngine'
 import { Environment } from '@/models/Environment';
 import { IMapTile } from '@/models/IMapTile';
@@ -52,9 +53,6 @@ export default class Map extends IdleGameVue {
     private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
         [Environment.Water]: new Image(),
         [Environment.Field]: new Image(),
-        [Environment.CoalDeposite]: new Image(),
-        [Environment.StoneDeposite]: new Image(),
-        [Environment.LimestoneDeposite]: new Image(),
         [Environment.Beach]: new Image(),
         [Environment.Snow]: new Image(),
         [Environment.Concrete]: new Image(),
@@ -70,7 +68,13 @@ export default class Map extends IdleGameVue {
         limestoneMine: new Image(),
         limestoneBrickFactory: new Image(),
         coalPowerStation: new Image(),
-    }
+    };
+
+    private mapHabitatImages: { [id in number]: HTMLImageElement } = {
+        [Habitat.CoalDeposite]: new Image(),
+        [Habitat.StoneDeposite]: new Image(),
+        [Habitat.LimestoneDeposite]: new Image(),
+    };
 
     @Prop() private map!: IMapTile[][];
     @Prop() private buildings!: { [id in Building]: { quantity: number } };
@@ -103,9 +107,6 @@ export default class Map extends IdleGameVue {
 
         this.mapEnvironmentImages[Environment.Water].src = './img/mer.png';
         this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
-        this.mapEnvironmentImages[Environment.CoalDeposite].src = './img/coal-deposit.png';
-        this.mapEnvironmentImages[Environment.StoneDeposite].src = './img/stone-deposit.png';
-        this.mapEnvironmentImages[Environment.LimestoneDeposite].src = './img/limestone-deposit.png';
         this.mapEnvironmentImages[Environment.Beach].src = './img/beach.png';
         this.mapEnvironmentImages[Environment.Snow].src = './img/snow.png';
         this.mapEnvironmentImages[Environment.Concrete].src = './img/concrete.png';
@@ -118,6 +119,9 @@ export default class Map extends IdleGameVue {
         this.mapBuildingImages[Building.limestoneMine].src = './img/minecalcaire.png';
         this.mapBuildingImages[Building.limestoneBrickFactory].src = './img/limestone-brick-factory.png';
         this.mapBuildingImages[Building.coalPowerStation].src = './img/centralecharbon.png';
+        this.mapHabitatImages[Habitat.CoalDeposite].src = './img/coal-deposit.png';
+        this.mapHabitatImages[Habitat.StoneDeposite].src = './img/stone-deposit.png';
+        this.mapHabitatImages[Habitat.LimestoneDeposite].src = './img/limestone-deposit.png';
     }
 
     public isKnown(building: Building) {
@@ -239,17 +243,29 @@ export default class Map extends IdleGameVue {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment)
                     this.mapContext.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
 
-                    let buildingImage = this.getBuildingImage(this.map[i][j].building)
-                    if (buildingImage)
+                    const building = this.map[i][j].building;
+                    const habitat = this.map[i][j].habitat;
+                    if (building != null) {
+                        let buildingImage = this.getBuildingImage(building);
                         this.mapContext.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                    } else if (habitat != null) { // If a building is found no need to draw the habitat
+                        let habitatImage = this.getHabitatImage(habitat)
+                        this.mapContext.drawImage(habitatImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                    }
                 // The following statement is cached
                 } else if (this.$store.state.map.map[i][j].discoverable > 0) {
                     let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
                     this.mapContext.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
 
-                    let buildingImage = this.getBuildingImage(this.map[i][j].building)
-                    if (buildingImage)
+                    const building = this.map[i][j].building;
+                    const habitat = this.map[i][j].habitat;
+                    if (building != null) {
+                        let buildingImage = this.getBuildingImage(building)
                         this.mapContext.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                    } else if (habitat != null) { // If a building is found no need to draw the habitat
+                        let habitatImage = this.getHabitatImage(habitat)
+                        this.mapContext.drawImage(habitatImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                    }
 
                     this.mapContext.globalAlpha = 0.7;
                     this.mapContext.fillRect(i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
@@ -388,15 +404,15 @@ export default class Map extends IdleGameVue {
             return false;
 
         // You must build coalMine on coalDeposite
-        if (building == Building.coalMine && this.map[coord.x][coord.y].environment !== Environment.CoalDeposite)
+        if (building == Building.coalMine && this.map[coord.x][coord.y].habitat !== Habitat.CoalDeposite)
             return false;
 
         // You must build stoneMine on stoneDeposite
-        if (building == Building.stoneMine && this.map[coord.x][coord.y].environment !== Environment.StoneDeposite)
+        if (building == Building.stoneMine && this.map[coord.x][coord.y].habitat !== Habitat.StoneDeposite)
             return false;
 
         // You must build limestoneMine on limestoneDeposite
-        if (building == Building.limestoneMine && this.map[coord.x][coord.y].environment !== Environment.LimestoneDeposite)
+        if (building == Building.limestoneMine && this.map[coord.x][coord.y].habitat !== Habitat.LimestoneDeposite)
             return false;
 
         return true;
@@ -406,11 +422,12 @@ export default class Map extends IdleGameVue {
         return this.mapEnvironmentImages[environment];
     }
 
-    private getBuildingImage(building: Building | null): HTMLImageElement | null {
-        if (building == null)
-            return null;
-
+    private getBuildingImage(building: Building): HTMLImageElement {
         return this.mapBuildingImages[building];
+    }
+
+    private getHabitatImage(habitat: Habitat): HTMLImageElement {
+        return this.mapHabitatImages[habitat];
     }
 
     private getTileFromCoordinate(x: number, y: number) {

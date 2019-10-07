@@ -14,7 +14,7 @@ new Vue({
   render: (h) => h(App),
 }).$mount('#app');
 
-Vue.use(Toasted, {
+Vue.use<any>(<any>Toasted, {
   position: 'top-right',
   duration: 5000
 })

@@ -95,6 +95,21 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0
     }
   },
+  sawmill: {
+    name: 'Sawmill',
+    description: 'Allows you to gather wood at scale',
+    price: {
+      population: 0,
+      food: 0,
+      wood: 30,
+      stones: 0,
+      coals: 0,
+      limestone: 0,
+      limestoneBrick: 0,
+      energy: 0,
+      knowledge: 0
+    }
+  },
   coalMine: {
     name: 'Coal Mine',
     description: 'Allows you to recruit 3 coal miners, must be built on a coal deposite',
@@ -489,6 +504,42 @@ export const StaticJobInfo: IStaticJobInfo = {
       capacity: 3
     },
   },
+  'lumberjack': {
+    name: 'Lumberjack',
+    description: 'Extract wood at scale',
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': {
+        probability: 1,
+        quantity: 1
+      },
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    storage: {
+      name: Building.sawmill,
+      capacity: 3
+    },
+  },
   'coalMiner': {
     name: 'Coal Miner',
     description: 'Extract coal and stone from the ground at the cost of wood',
@@ -699,11 +750,20 @@ export const ResearchInfo: IResearchInfo = {
       buildings: [Building.farm],
     }
   },
+  woodcutting: {
+    name: 'Woodcutting',
+    description: 'Woodcutting allows you to build Sawmill',
+    price: 10,
+    prerequisite: [Research.agriculture],
+    unlocks: {
+      buildings: [Building.sawmill],
+    }
+  },
   mining: {
     name: 'Mining',
     description: 'Allows you to build mines',
     price: 100,
-    prerequisite: [],
+    prerequisite: [Research.agriculture],
     unlocks: {
       buildings: [Building.coalMine, Building.stoneMine, Building.limestoneMine],
     }

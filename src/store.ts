@@ -95,6 +95,9 @@ export default new Vuex.Store<IState>({
       stoneMiner: {
         quantity: 0,
       },
+      lumberjack: {
+        quantity: 0,
+      },
       coalMiner: {
         quantity: 0,
       },

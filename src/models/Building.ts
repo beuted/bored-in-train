@@ -3,6 +3,7 @@ export enum Building {
     village = 'village',
     barn = 'barn',
     farm = 'farm',
+    sawmill = 'sawmill',
     coalMine = 'coalMine',
     stoneMine = 'stoneMine',
     limestoneMine = 'limestoneMine',

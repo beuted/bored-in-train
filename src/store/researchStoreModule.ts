@@ -17,6 +17,9 @@ export const ResearchModule: Module<IResearchState, IState> = {
       agriculture: {
         owned: false
       },
+      woodcutting: {
+        owned: false,
+      },
       mining: {
         owned: false
       },

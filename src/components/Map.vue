@@ -66,6 +66,7 @@ export default class Map extends IdleGameVue {
         barn: new Image(),
         farm: new Image(),
         stoneMine: new Image(),
+        sawmill: new Image(),
         coalMine: new Image(),
         limestoneMine: new Image(),
         limestoneBrickFactory: new Image(),
@@ -117,6 +118,7 @@ export default class Map extends IdleGameVue {
         this.mapBuildingImages[Building.barn].src = './img/entrepot.png';
         this.mapBuildingImages[Building.farm].src = './img/farm.png';
         this.mapBuildingImages[Building.stoneMine].src = './img/minecalcaire.png';
+        this.mapBuildingImages[Building.sawmill].src = './img/windmill.png'
         this.mapBuildingImages[Building.coalMine].src = './img/minecharbon.png';
         this.mapBuildingImages[Building.limestoneMine].src = './img/minecalcaire.png';
         this.mapBuildingImages[Building.limestoneBrickFactory].src = './img/limestone-brick-factory.png';
@@ -256,6 +258,7 @@ export default class Map extends IdleGameVue {
                         this.mapContext.globalAlpha = Math.min(this.map[i][j].pollution / 100, 1);
                         this.mapContext.fillRect(i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
                         this.mapContext.globalAlpha = 1;
+                        this.mapContext.fillStyle = '#000000';
                     }
 
                 // The following statement is cached

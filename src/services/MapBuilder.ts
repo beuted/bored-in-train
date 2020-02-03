@@ -28,7 +28,7 @@ export class MapBuilder {
                     building: building,
                     environment: env,
                     habitat: habitat,
-                    discovered: true,
+                    discovered: false,
                     discoverable: 0,
                     pollution: 50,
                     temperature: 20

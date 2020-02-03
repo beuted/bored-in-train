@@ -34,6 +34,9 @@ export const MapModule: Module<IMapState, IState> = {
       stoneMine: {
         quantity: 0
       },
+      sawmill: {
+        quantity: 0,
+      },
       coalMine: {
         quantity: 0,
       },

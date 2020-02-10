@@ -95,6 +95,12 @@ export const MapModule: Module<IMapState, IState> = {
         state.buildings[previousTile.building].quantity--;
       }
 
+      // We need to update nbTreeNearby if a forest is added or deleted
+      if (previousTile.building == Building.forest || obj.type == Building.forest) {
+        let increment = (obj.type == Building.forest ? 1 : 0) - (previousTile.building == Building.forest ? 1 : 0)
+        UpdateNbTreeNearBy(obj, state.map, increment);
+      }
+
       state.map[obj.x][obj.y].building = obj.type;
 
       if (obj.type != null) {
@@ -184,4 +190,11 @@ export const MapModule: Module<IMapState, IState> = {
       }
     },
   }
+}
+
+function UpdateNbTreeNearBy(pos: {x: number, y: number}, map: IMapTile[][], increment: number) {
+  map[pos.x][pos.y-1].closeByTrees += increment;
+  map[pos.x][pos.y+1].closeByTrees += increment;
+  map[pos.x-1][pos.y].closeByTrees += increment;
+  map[pos.x+1][pos.y].closeByTrees += increment;
 }

@@ -424,6 +424,10 @@ export default class Map extends IdleGameVue {
         if (building == Building.limestoneMine && this.map[coord.x][coord.y].habitat !== Habitat.LimestoneDeposite)
             return false;
 
+        // You must build sawmill next to a forest
+        if (building == Building.sawmill && this.map[coord.x][coord.y].closeByTrees <= 0)
+            return false;
+
         return true;
     }
 

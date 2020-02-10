@@ -31,7 +31,8 @@ export class MapBuilder {
                     discovered: false,
                     discoverable: 0,
                     pollution: 50,
-                    temperature: 20
+                    temperature: 20,
+                    closeByTrees: 0
                 };
             }
         }
@@ -48,6 +49,23 @@ export class MapBuilder {
         map[center][center - 1].discoverable = 1;
         map[center + 1][center].discoverable = 1;
         map[center - 1][center].discoverable = 1;
+
+        // Compute closeByTrees
+        for (let i = 0; i < mapSize; i++) {
+            for (let j = 0; j < mapSize; j++) {
+                let nbTrees = 0;
+                if (i > 0 && map[i-1][j].building == Building.forest)
+                    nbTrees++;
+                if (j > 0 && map[i][j-1].building == Building.forest)
+                    nbTrees++;
+                if (i < mapSize-1 && map[i+1][j].building == Building.forest)
+                    nbTrees++;
+                if (j < mapSize-1 && map[i][j+1].building == Building.forest)
+                    nbTrees++;
+
+                map[i][j].closeByTrees = nbTrees;
+            }
+        }
 
         return map;
     }

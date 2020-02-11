@@ -46,7 +46,7 @@ export class GameService {
         if (staticJobProduction == null)
           continue;
 
-        let nbProducers = store.state.jobs[jobId as Job].quantity;
+        let nbProducers = store.state.map.jobs[jobId as Job].quantity;
         newConsummables[consummableId as Consummable].quantity += nbProducers * staticJobProduction.quantity;
       }
 
@@ -56,7 +56,7 @@ export class GameService {
         if (staticJobConsumption == null)
           continue;
 
-        let nbConsummer = store.state.jobs[jobId as Job].quantity;
+        let nbConsummer = store.state.map.jobs[jobId as Job].quantity;
         if (newConsummables[consummableId as Consummable].quantity >= nbConsummer * staticJobConsumption.quantity) {
           newConsummables[consummableId as Consummable].quantity -= nbConsummer * staticJobConsumption.quantity;
         } else {
@@ -110,7 +110,7 @@ export class GameService {
   }
 
   private tryDiscoverLand() {
-    let nbExplorers = store.state.jobs.explorer.quantity;
+    let nbExplorers = store.state.map.jobs.explorer.quantity;
 
     if (nbExplorers > 0 && store.state.controls.play) {
       let nbLandFound = store.state.map.mapNbTileFound;

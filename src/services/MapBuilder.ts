@@ -3,16 +3,18 @@ import { Building } from '@/models/Building';
 import { IMapTile } from '@/models/IMapTile';
 import SimplexNoise from 'simplex-noise';
 import { Habitat } from '@/models/Habitat';
+import { IMapBuildings } from '@/store/mapStoreModule';
 
 export class MapBuilder {
     private static simplexHeight = new SimplexNoise();
     private static simplexTrees = new SimplexNoise();
 
-    public static InitMap(size: number): IMapTile[][] {
+    public static InitMap(size: number): { map: IMapTile[][], buildings: IMapBuildings, } {
         var center = Math.floor(size/2);
         const mapSize = size;
         // Build Environment and natural Buildings (forests, ...)
         let map: IMapTile[][] = [];
+        let forestBuildingEntry: { quantity: number, coords: { [xThenCommaThenY in string]: {x: number, y: number} } } = { quantity: 0, coords: {} };
         for (let i = 0; i < mapSize; i++) {
             map[i] = [];
             for (let j = 0; j < mapSize; j++) {
@@ -33,12 +35,16 @@ export class MapBuilder {
                     pollution: 50,
                     temperature: 20,
                     closeByTrees: 0,
-                    quantity: 0
+                    quantity: 0,
+                    population: 0
                 };
 
                 // All trees start with a quantity of 100
-                if (building == Building.forest)
+                if (building == Building.forest) {
                     map[i][j].quantity = 100;
+                    forestBuildingEntry.quantity++;
+                    forestBuildingEntry.coords[i + ',' + j] = {x: i, y: j};
+                }
             }
         }
 
@@ -72,7 +78,45 @@ export class MapBuilder {
             }
         }
 
-        return map;
+        return { map: map, buildings: {
+          village: {
+            quantity: 1,
+            coords: { [center+','+center] : { x: center, y: center } }
+          },
+          barn: {
+            quantity: 1,
+            coords: { [center+','+(center+1)] : { x: center, y: center+1 } }
+          },
+          farm: {
+            quantity: 0,
+            coords: {}
+          },
+          stoneMine: {
+            quantity: 0,
+            coords: {}
+          },
+          sawmill: {
+            quantity: 0,
+            coords: {}
+          },
+          coalMine: {
+            quantity: 0,
+            coords: {}
+          },
+          limestoneMine: {
+            quantity: 0,
+            coords: {}
+          },
+          limestoneBrickFactory: {
+            quantity: 0,
+            coords: {}
+          },
+          coalPowerStation: {
+            quantity: 0,
+            coords: {}
+          },
+          forest: forestBuildingEntry,
+        }};
     }
 
     private static GetBuilding(env: Environment, i: number, j: number): Building | null {

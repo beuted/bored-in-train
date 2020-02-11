@@ -12,4 +12,6 @@ export interface IMapTile {
     temperature: number; // In celcius
     closeByTrees: number;
     quantity: number; // from 0 to N (100 for trees)
+    population: number;
+    disabled?: boolean | undefined; // When a building stopped working (ie: no trees next to a sawmill)
 }

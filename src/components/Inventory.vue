@@ -42,8 +42,8 @@ export default class Inventory extends IdleGameVue {
 
     public computeProduction(consummable: Consummable) {
         let production = 0;
-        for (let job in this.$store.state.jobs) {
-            let quantity = this.$store.state.jobs[job as Job].quantity;
+        for (let job in this.$store.state.map.jobs) {
+            let quantity = this.$store.state.map.jobs[job as Job].quantity;
 
             let consumeObj = StaticJobInfo[job as Job].consume[consummable];
             let consume = consumeObj ? consumeObj.quantity : 0;

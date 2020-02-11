@@ -233,6 +233,7 @@ export default class Map extends IdleGameVue {
         this.mapCanvas.height = this.tileSize * this.nbTilesOnRowOrColumn;
         this.mapContext.imageSmoothingEnabled = false;
         this.mouseContext.imageSmoothingEnabled = false;
+        this.mapContext.font = Math.floor(this.tileSize/2) + 'px Arial';
 
         this.mapContext.clearRect(0, 0, this.tileSize * this.nbTilesOnRowOrColumn, this.tileSize * this.nbTilesOnRowOrColumn);
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
@@ -246,6 +247,15 @@ export default class Map extends IdleGameVue {
                     if (building != null) {
                         let buildingImage = this.getBuildingImage(building);
                         this.mapContext.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+
+                        // Show population on the map
+                        const quantity = this.map[i][j].quantity;
+                        if (quantity > 0)
+                            this.mapContext.fillText(quantity+'', i*this.tileSize, (j+0.5)*this.tileSize);
+
+                        const pop = this.map[i][j].population;
+                        if (pop > 0)
+                            this.mapContext.fillText(pop+'', i*this.tileSize, (j+1)*this.tileSize);
                     } else if (habitat != null) { // If a building is found no need to draw the habitat
                         let habitatImage = this.getHabitatImage(habitat)
                         this.mapContext.drawImage(habitatImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);

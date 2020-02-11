@@ -1,4 +1,4 @@
-import { Module } from 'vuex';
+import { Module, createNamespacedHelpers } from 'vuex';
 
 import { Building } from '@/models/Building';
 import { MapBuilder } from '../services/MapBuilder';
@@ -8,13 +8,19 @@ import { Environment } from '../models/Environment';
 import { IMapTile } from '../models/IMapTile';
 import { UtilService } from '../services/UtilService';
 import { IState } from '../store';
+import { Job } from '@/models/Job';
 
 export interface IMapState {
   mapNbTileFound: number,
   map: IMapTile[][],
   mapNeedsUpdate: boolean,
-  buildings: { [id in Building]: { quantity: number } },
+  buildings: IMapBuildings,
+  jobs: IMapJobs;
 }
+
+//TODO: remove quantity use lenght
+export type IMapBuildings = { [id in Building]: { quantity: number, coords: { [xThenCommaThenY in string]: { x: number, y: number } } } }
+export type IMapJobs = { [id in Job]: { quantity: number } }
 
 export const MapModule: Module<IMapState, IState> = {
   state: {
@@ -23,36 +29,86 @@ export const MapModule: Module<IMapState, IState> = {
     mapNeedsUpdate: true,
     buildings: {
       village: {
-        quantity: 1,
+        quantity: 0,
+        coords: {}
       },
       barn: {
-        quantity: 1,
+        quantity: 0,
+        coords: {}
       },
       farm: {
         quantity: 0,
+        coords: {}
       },
       stoneMine: {
-        quantity: 0
+        quantity: 0,
+        coords: {}
       },
       sawmill: {
         quantity: 0,
+        coords: {}
       },
       coalMine: {
         quantity: 0,
+        coords: {}
       },
       limestoneMine: {
-        quantity: 0
+        quantity: 0,
+        coords: {}
       },
       limestoneBrickFactory: {
-        quantity: 0
+        quantity: 0,
+        coords: {}
       },
       coalPowerStation: {
         quantity: 0,
+        coords: {}
       },
       forest: {
-        quantity: 30, //TODO: Put real value here retreived from MapBuilder
+        quantity: 0,
+        coords: {}
       },
-
+    },
+    jobs: {
+      berryGatherer: {
+        quantity: 1,
+      },
+      woodGatherer: {
+        quantity: 0,
+      },
+      explorer: {
+        quantity: 0,
+      },
+      druid: {
+        quantity: 0,
+      },
+      farmer: {
+        quantity: 0,
+      },
+      stoneGatherer: {
+        quantity: 0,
+      },
+      stoneMiner: {
+        quantity: 0,
+      },
+      lumberjack: {
+        quantity: 0,
+      },
+      coalMiner: {
+        quantity: 0,
+      },
+      limestoneMiner: {
+        quantity: 0,
+      },
+      limestoneBrickWorker: {
+        quantity: 0,
+      },
+      coalStationEngineer: {
+        quantity: 0,
+      },
+      default: { //Job producing population
+        quantity: 1,
+      }
     },
   },
   actions: {
@@ -81,37 +137,16 @@ export const MapModule: Module<IMapState, IState> = {
   mutations: {
     // Init the map
     InitMap(state: IMapState, size: number) {
-      state.map = MapBuilder.InitMap(size);
+      const res = MapBuilder.InitMap(size);
+
+      state.map = res.map;
+      state.buildings = res.buildings;
 
       state.mapNeedsUpdate = true;
     },
     // Change a tile of a map giving it a certain type
-    ChangeTile(state: IMapState, obj: { x: number, y: number, type: Building }) {
-      var previousTile = state.map[obj.x][obj.y];
-
-      console.debug(`Changing tile ${obj.x}, ${obj.y} from ${previousTile.building} to ${obj.type}`);
-
-      if (previousTile.building != null) {
-        state.buildings[previousTile.building].quantity--;
-      }
-
-      // We need to update nbTreeNearby if a forest is added or deleted
-      if (previousTile.building == Building.forest || obj.type == Building.forest) {
-        let increment = (obj.type == Building.forest ? 1 : 0) - (previousTile.building == Building.forest ? 1 : 0)
-        UpdateNbTreeNearBy(obj, state.map, increment);
-      }
-
-      state.map[obj.x][obj.y].building = obj.type;
-
-      // If we're building a tree update the quantity
-      if (obj.type == Building.forest) {
-        state.map[obj.x][obj.y].quantity = 50;
-      }
-
-      if (obj.type != null) {
-        state.buildings[obj.type].quantity++;
-      }
-
+    ChangeTile(state: IMapState, obj: { x: number, y: number, type: Building | null }) {
+      ChangeTile(state.map, state.buildings, state.jobs, obj);
       state.mapNeedsUpdate = true;
     },
     MakeTileDiscovered(state: IMapState, obj: { x: number, y: number }) {
@@ -170,7 +205,7 @@ export const MapModule: Module<IMapState, IState> = {
           }
 
           if (mapCopy[i][j].building == Building.sawmill) {
-            const quantityToRemove = 1 / mapCopy[i][j].closeByTrees;
+            const quantityToRemove = mapCopy[i][j].population / mapCopy[i][j].closeByTrees;
             if (i > 0 && mapCopy[i-1][j].building == Building.forest)
               mapCopy[i-1][j].quantity -= quantityToRemove;
             if (j > 0 && mapCopy[i][j-1].building == Building.forest)
@@ -201,7 +236,7 @@ export const MapModule: Module<IMapState, IState> = {
           // Remove tree if quantity hit 0
           if (mapCopy[i][j].building == Building.forest && mapCopy[i][j].quantity <= 0) {
             console.log('Forest exausted...');
-            mapCopy[i][j].building = null;
+            ChangeTile(mapCopy, state.buildings, state.jobs, {x: i, y: j, type: null})
             mapCopy[i][j].quantity = 0;
           }
         }
@@ -224,9 +259,62 @@ export const MapModule: Module<IMapState, IState> = {
   }
 }
 
-function UpdateNbTreeNearBy(pos: {x: number, y: number}, map: IMapTile[][], increment: number) {
-  map[pos.x][pos.y-1].closeByTrees += increment;
-  map[pos.x][pos.y+1].closeByTrees += increment;
-  map[pos.x-1][pos.y].closeByTrees += increment;
-  map[pos.x+1][pos.y].closeByTrees += increment;
+function updateCloseByTreeAndSawmill(pos: {x: number, y: number}, map: IMapTile[][], buildings: IMapBuildings, jobs: IMapJobs, increment: number) {
+  map[pos.x][pos.y].closeByTrees += increment;
+  if (map[pos.x][pos.y].building == Building.sawmill && map[pos.x][pos.y].closeByTrees <= 0) {
+    delete buildings[Building.sawmill].coords[pos.x+','+pos.y];
+    buildings[Building.sawmill].quantity--;
+    // We do not remove the building from state.map so that it still appear on the map
+
+    jobs[Job.lumberjack].quantity -= map[pos.x][pos.y].population;
+    map[pos.x][pos.y].population = 0;
+  } else if (map[pos.x][pos.y].building == Building.sawmill && map[pos.x][pos.y].closeByTrees > 0) {
+    // Once a tree is planted we might reactivate the sawmills next to it
+    buildings[Building.sawmill].coords[pos.x+','+pos.y] = { x: pos.x, y: pos.y };
+    buildings[Building.sawmill].quantity++;
+  }
+}
+
+function UpdateNbTreeNearBy(pos: {x: number, y: number}, map: IMapTile[][], buildings: IMapBuildings, jobs: IMapJobs, increment: number) {
+  if (pos.x > 0)
+    updateCloseByTreeAndSawmill({x: pos.x-1, y: pos.y}, map, buildings, jobs, increment);
+
+  if (pos.x < map.length-1)
+    updateCloseByTreeAndSawmill({x: pos.x+1, y: pos.y}, map, buildings, jobs, increment);
+
+  if (pos.y > 0)
+    updateCloseByTreeAndSawmill({x: pos.x, y: pos.y-1}, map, buildings, jobs, increment);
+
+  if (pos.y < map.length-1)
+    updateCloseByTreeAndSawmill({x: pos.x, y: pos.y+1}, map, buildings, jobs, increment);
+}
+
+function ChangeTile(map: IMapTile[][], buildings: IMapBuildings, jobs: IMapJobs, obj: { x: number, y: number, type: Building | null }) {
+  var previousTile = map[obj.x][obj.y];
+
+  console.debug(`Changing tile ${obj.x}, ${obj.y} from ${previousTile.building} to ${obj.type}`);
+
+  if (previousTile.building != null) {
+    buildings[previousTile.building].quantity--;
+    delete buildings[previousTile.building].coords[obj.x + ',' + obj.y];
+  }
+
+  // We need to update nbTreeNearby if a forest is added or deleted
+  if (previousTile.building == Building.forest || obj.type == Building.forest) {
+    let increment = (obj.type == Building.forest ? 1 : 0) - (previousTile.building == Building.forest ? 1 : 0)
+    UpdateNbTreeNearBy(obj, map, buildings, jobs, increment);
+  }
+
+  map[obj.x][obj.y].building = obj.type;
+
+  // If we're building a tree update the quantity
+  if (obj.type == Building.forest) {
+    map[obj.x][obj.y].quantity = 20;
+  }
+
+  if (obj.type != null) {
+    buildings[obj.type].quantity++;
+    buildings[obj.type].coords[obj.x + ',' + obj.y] = { x: obj.x, y: obj.y };
+  }
+
 }

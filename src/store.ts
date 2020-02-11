@@ -7,6 +7,8 @@ import { IJobProductionEvent } from './EventBus';
 import { MapModule, IMapState } from './store/mapStoreModule';
 import { IResearchState, ResearchModule } from './store/researchStoreModule';
 import { StoreSaver } from './store/storeSaver';
+import { Building } from './models/Building';
+import { StaticJobInfo, StaticBuildingInfo } from './services/GameEngine';
 
 
 Vue.use(Vuex);
@@ -28,7 +30,6 @@ export interface IState {
   debugMode: boolean;
   controls: { play: boolean, speed: number}
   consummable: { [id in Consummable]: { quantity: number } };
-  jobs: { [id in Job]: { quantity: number } };
 }
 
 export default new Vuex.Store<IState>({
@@ -73,47 +74,6 @@ export default new Vuex.Store<IState>({
         quantity: 0,
       },
     },
-    jobs: {
-      berryGatherer: {
-        quantity: 1,
-      },
-      woodGatherer: {
-        quantity: 0,
-      },
-      explorer: {
-        quantity: 0,
-      },
-      druid: {
-        quantity: 0,
-      },
-      farmer: {
-        quantity: 0,
-      },
-      stoneGatherer: {
-        quantity: 0,
-      },
-      stoneMiner: {
-        quantity: 0,
-      },
-      lumberjack: {
-        quantity: 0,
-      },
-      coalMiner: {
-        quantity: 0,
-      },
-      limestoneMiner: {
-        quantity: 0,
-      },
-      limestoneBrickWorker: {
-        quantity: 0,
-      },
-      coalStationEngineer: {
-        quantity: 0,
-      },
-      default: { //Job producing population
-        quantity: 1,
-      }
-    }
   },
   mutations: {
     // For storeSaverPlugin
@@ -153,7 +113,40 @@ export default new Vuex.Store<IState>({
     //Add Job
     AddJob(state, obj: { jobName: Job, quantity: number }) {
       console.debug(`AddJob tile ${obj.jobName}, ${obj.quantity}`);
-      state.jobs[obj.jobName].quantity += obj.quantity;
+      state.map.jobs[obj.jobName].quantity += obj.quantity;
+
+      const storage = StaticJobInfo[obj.jobName].storage;
+      // Add these new workers on buildings
+      if (obj.quantity > 0 && storage != undefined) {
+        let toBeAdded = obj.quantity;
+        var buildingCoords = state.map.buildings[storage.name].coords;
+        for (let coord of Object.values(buildingCoords)) {
+          if (state.map.map[coord.x][coord.y].population < storage.capacity) {
+            let toAdd = Math.min(toBeAdded, storage.capacity - state.map.map[coord.x][coord.y].population);
+            state.map.map[coord.x][coord.y].population += toAdd;
+            toBeAdded -= toAdd;
+            if (toBeAdded <= 0) {
+              break;
+            }
+          }
+        }
+      }
+
+      // Remove these new workers from buildings
+      else if (obj.quantity < 0 && storage != undefined) {
+        let toBeRemoved = -obj.quantity;
+        var buildingCoords = state.map.buildings[storage.name].coords;
+        for (let coord of Object.values(buildingCoords)) {
+          if (state.map.map[coord.x][coord.y].population > 0) {
+            let toRemove = Math.min(toBeRemoved, state.map.map[coord.x][coord.y].population);
+            state.map.map[coord.x][coord.y].population -= toRemove;
+            toBeRemoved -= toRemove;
+            if (toBeRemoved <= 0) {
+              break;
+            }
+          }
+        }
+      }
     },
   },
   actions: {

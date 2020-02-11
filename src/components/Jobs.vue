@@ -40,7 +40,7 @@ export default class Jobs extends IdleGameVue {
     }
 
     public getJobQuantity(jobName: Job) {
-        return this.$store.state.jobs[jobName].quantity;
+        return this.$store.state.map.jobs[jobName].quantity;
     }
 
     public getJobDisplayName(jobName: Job) {
@@ -53,16 +53,16 @@ export default class Jobs extends IdleGameVue {
     }
 
     public get jobs() {
-        return Object.keys(this.$store.state.jobs).filter(x => x !== 'default');
+        return Object.keys(this.$store.state.map.jobs).filter(x => x !== 'default');
     }
 
     public get unemployed() {
         let totalWithJob = 0;
-        for (let key in this.$store.state.jobs) {
+        for (let key in this.$store.state.map.jobs) {
             if (key == 'default')
                 continue;
 
-            totalWithJob += this.$store.state.jobs[key as Job].quantity;
+            totalWithJob += this.$store.state.map.jobs[key as Job].quantity;
         };
         return this.$store.state.consummable.population.quantity - totalWithJob;
     }
@@ -91,14 +91,14 @@ export default class Jobs extends IdleGameVue {
 
         var maxStorage = this.computeMaxStorage(jobName as Job);
 
-        if (maxStorage != -1 && maxStorage <= this.$store.state.jobs[jobName as Job].quantity)
+        if (maxStorage != -1 && maxStorage <= this.$store.state.map.jobs[jobName as Job].quantity)
             return false;
 
         return true;
     }
 
     public canRemoveJob(quantity: number, jobName: string) {
-         return this.$store.state.jobs[jobName as Job].quantity >= quantity;
+         return this.$store.state.map.jobs[jobName as Job].quantity >= quantity;
     }
 
     private computeMaxStorage(jobName: Job): number {

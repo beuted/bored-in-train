@@ -104,7 +104,7 @@ export default class Jobs extends IdleGameVue {
     private computeMaxStorage(jobName: Job): number {
         var storageNeeded = StaticJobInfo[jobName].storage;
         if (!storageNeeded)
-            return 3; // Default job have a capacity of 3
+            return 10; // Default job have a capacity of 3
         return this.$store.state.map.buildings[storageNeeded.name as Building].quantity * storageNeeded.capacity;
     }
 }

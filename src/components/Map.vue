@@ -246,7 +246,11 @@ export default class Map extends IdleGameVue {
                     const habitat = this.map[i][j].habitat;
                     if (building != null) {
                         let buildingImage = this.getBuildingImage(building);
+
+                        if (this.map[i][j].disabled)
+                            this.mapContext.globalAlpha = 0.7;
                         this.mapContext.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
+                        this.mapContext.globalAlpha = 1;
 
                         // Show population on the map
                         const quantity = this.map[i][j].quantity;

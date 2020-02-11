@@ -50,6 +50,7 @@ export class MapBuilder {
 
         // Build buildings
         map[center][center].environment = Environment.Field;
+        map[center][center].quantity = 0;
         map[center][center].building = Building.village;
         map[center][center + 1].environment = Environment.Field;
         map[center][center + 1].building = Building.barn;

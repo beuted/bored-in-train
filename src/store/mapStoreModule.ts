@@ -9,6 +9,7 @@ import { IMapTile } from '../models/IMapTile';
 import { UtilService } from '../services/UtilService';
 import { IState } from '../store';
 import { Job } from '@/models/Job';
+import Vue from 'vue';
 
 export interface IMapState {
   mapNbTileFound: number,
@@ -268,10 +269,16 @@ function updateCloseByTreeAndSawmill(pos: {x: number, y: number}, map: IMapTile[
 
     jobs[Job.lumberjack].quantity -= map[pos.x][pos.y].population;
     map[pos.x][pos.y].population = 0;
+    map[pos.x][pos.y].disabled = true;
+
+    Vue.toasted.error('A sawmill stopped working due to a lack of forest nearby');
   } else if (map[pos.x][pos.y].building == Building.sawmill && map[pos.x][pos.y].closeByTrees > 0) {
     // Once a tree is planted we might reactivate the sawmills next to it
     buildings[Building.sawmill].coords[pos.x+','+pos.y] = { x: pos.x, y: pos.y };
     buildings[Building.sawmill].quantity++;
+    delete map[pos.x][pos.y].disabled;
+
+    Vue.toasted.success('Your sawmill started working again thanks to the new forest');
   }
 }
 

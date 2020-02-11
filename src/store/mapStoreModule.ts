@@ -103,6 +103,11 @@ export const MapModule: Module<IMapState, IState> = {
 
       state.map[obj.x][obj.y].building = obj.type;
 
+      // If we're building a tree update the quantity
+      if (obj.type == Building.forest) {
+        state.map[obj.x][obj.y].quantity = 50;
+      }
+
       if (obj.type != null) {
         state.buildings[obj.type].quantity++;
       }
@@ -156,9 +161,27 @@ export const MapModule: Module<IMapState, IState> = {
     },
     ApplyPollution(state: IMapState) {
       let mapLength = state.map.length;
-      let mapCopy = JSON.parse(JSON.stringify(state.map)); // TODO: better way to clone T[][] ?
+      let mapCopy = JSON.parse(JSON.stringify(state.map)) as IMapTile[][]; // TODO: better way to clone T[][] ?
       for (let i = 0; i < mapLength; i++) {
         for (let j = 0; j < mapLength; j++) {
+          // Add and remove Tree quantity
+          if (mapCopy[i][j].building == Building.forest && mapCopy[i][j].quantity < 100) {
+            mapCopy[i][j].quantity++;
+          }
+
+          if (mapCopy[i][j].building == Building.sawmill) {
+            const quantityToRemove = 1 / mapCopy[i][j].closeByTrees;
+            if (i > 0 && mapCopy[i-1][j].building == Building.forest)
+              mapCopy[i-1][j].quantity -= quantityToRemove;
+            if (j > 0 && mapCopy[i][j-1].building == Building.forest)
+              mapCopy[i][j-1].quantity -= quantityToRemove;
+            if (i < mapLength-1 && mapCopy[i+1][j].building == Building.forest)
+              mapCopy[i+1][j].quantity -= quantityToRemove;
+            if (j < mapLength-1 && mapCopy[i][j+1].building == Building.forest)
+              mapCopy[i][j+1].quantity -= quantityToRemove;
+          }
+
+          // Add and remove pollution
           if (mapCopy[i][j].building == Building.forest && mapCopy[i][j].pollution > 0) {
             mapCopy[i][j].pollution--;
           } else if (mapCopy[i][j].building != null && mapCopy[i][j].pollution < 100) {
@@ -166,12 +189,21 @@ export const MapModule: Module<IMapState, IState> = {
           }
         }
       }
+
       for (let i = 1; i < mapLength; i++) {
         for (let j = 1; j < mapLength; j++) {
+          // Spread polution
           let pollutionMedian = (mapCopy[i][j].pollution + mapCopy[i-1][j].pollution + mapCopy[i][j-1].pollution) / 3;
           mapCopy[i-1][j].pollution = pollutionMedian
           mapCopy[i][j-1].pollution = pollutionMedian
           mapCopy[i][j].pollution = pollutionMedian;
+
+          // Remove tree if quantity hit 0
+          if (mapCopy[i][j].building == Building.forest && mapCopy[i][j].quantity <= 0) {
+            console.log('Forest exausted...');
+            mapCopy[i][j].building = null;
+            mapCopy[i][j].quantity = 0;
+          }
         }
       }
 

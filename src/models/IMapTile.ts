@@ -11,4 +11,5 @@ export interface IMapTile {
     pollution: number; // from 0 to 100
     temperature: number; // In celcius
     closeByTrees: number;
+    quantity: number; // from 0 to N (100 for trees)
 }

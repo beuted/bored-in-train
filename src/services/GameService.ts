@@ -124,10 +124,8 @@ export class GameService {
   }
 
   private handlePollution() {
-    // Add and remove pollution
+    // Add and remove and spread pollution
     store.commit('ApplyPollution');
-
-    // Spread pollution
   }
 
   private static getProductionDiff(newConsummables: { [id in Consummable]: { quantity: number } }, oldConsummables: { [id in Consummable]: { quantity: number } }) {

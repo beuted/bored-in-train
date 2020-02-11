@@ -32,8 +32,13 @@ export class MapBuilder {
                     discoverable: 0,
                     pollution: 50,
                     temperature: 20,
-                    closeByTrees: 0
+                    closeByTrees: 0,
+                    quantity: 0
                 };
+
+                // All trees start with a quantity of 100
+                if (building == Building.forest)
+                    map[i][j].quantity = 100;
             }
         }
 

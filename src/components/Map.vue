@@ -201,7 +201,7 @@ export default class Map extends IdleGameVue {
             this.mapOffset.x+=keyBoardMapMoveSpeed;
 
         const wheelDelta =  this.keyBoardService.GetWheelDelta();
-        if (wheelDelta < 0 && this.tileSize < 64) {
+        if (wheelDelta < 0 && this.mouseTileCoord && this.tileSize < 64) {
             // Recenter camera on center tile
             this.mapOffset.x = this.mapOffset.x * 2 - this.canvasSize/2;
             this.mapOffset.y = this.mapOffset.y * 2 - this.canvasSize/2;
@@ -211,7 +211,7 @@ export default class Map extends IdleGameVue {
             this.tileSize *= 2;
 
             this.$store.commit('MapNeedsUpdate');
-        } else if (wheelDelta > 0 && this.tileSize > 8) {
+        } else if (wheelDelta > 0 && this.mouseTileCoord && this.tileSize > 8) {
             // Recenter camera on center tile
             this.mapOffset.x = this.mapOffset.x / 2 + this.canvasSize/4;
             this.mapOffset.y = this.mapOffset.y / 2 + this.canvasSize/4;

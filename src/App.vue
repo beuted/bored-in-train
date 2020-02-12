@@ -1,3 +1,4 @@
+
 <template>
   <div id="app">
     <div id="nav">
@@ -5,9 +6,24 @@
       <router-link to="/research">Research</router-link> |
       <router-link to="/about">About</router-link>
     </div>
-    <router-view/>
+    <router-view />
+    <Popup />
   </div>
 </template>
+
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import Popup from '@/components/Popup.vue';
+import { IState, IdleGameVue } from '@/store';
+
+@Component({
+  components: {
+    Popup
+  },
+})
+export default class App extends IdleGameVue {
+}
+</script>
 
 <style lang="less">
 #app {

@@ -4,13 +4,13 @@ import { IJobProductionEvent, EventBus } from '@/EventBus';
 import { Consummable } from '@/models/Consummable';
 import store from '@/store'
 import Vue from 'vue';
+import { MessageService } from './MessageService';
 
 export class GameService {
   private readonly StarvationFactor = 0.5; // Portion of disapearing goods when missing consummable
   private readonly LackOfStorageFactor = 1.0; // Portion of disapearing goods when missing storage
 
   private hasBeenInit = false;
-
 
   public constructor() {
     if (this.hasBeenInit)
@@ -35,7 +35,7 @@ export class GameService {
       return;
     }
 
-    let newConsummables = JSON.parse(JSON.stringify(store.state.consummable)); // TODO: Dirty deepcopy because Object.assign isn't enought
+    let newConsummables = JSON.parse(JSON.stringify(store.state.consummable)); // TODO: Dirty deepcopy because Object.assign isn't enough
 
     // First the creation of ressources
     for (let jobId in StaticJobInfo) {
@@ -72,6 +72,7 @@ export class GameService {
 
       // Remove part of production based on number of workers with non-fullfiled needs
       if (nbUnfullfiledWorkers > 0) {
+        MessageService.Help(`Careful! Some ${jobId} have not seen their needs fullfiled, they will not produce any ressource. Either produce more of the missing resource or remove some of them.`, 'needs-not-fullfiled');
         Vue.toasted.error(`${nbUnfullfiledWorkers} ${jobId} have not seen their needs fullfiled, they will not produce any ressource`);
         for (let consummableId in staticJob.produce) {
           let staticJobProduction: IStaticJobProduction | null = staticJob.produce[consummableId as Consummable];
@@ -110,6 +111,7 @@ export class GameService {
   }
 
   private tryDiscoverLand() {
+    //TODO: even if there is no food explorer still discover shits
     let nbExplorers = store.state.map.jobs.explorer.quantity;
 
     if (nbExplorers > 0 && store.state.controls.play) {

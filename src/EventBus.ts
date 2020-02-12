@@ -7,3 +7,8 @@ export interface IJobProductionEvent {
     job: Job;
     produced: { [id in Consummable]: number };
 }
+
+export interface IPopupMessageEvent {
+    message: string;
+    isHelp: boolean;
+}

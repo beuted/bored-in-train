@@ -309,7 +309,7 @@ export default class Map extends IdleGameVue {
             let image = this.getBuildingImage(this.buildingType);
             if (image) {
                 this.mouseContext.globalAlpha = 0.7;
-                if (!this.canBeBuilt(this.mouseTileCoord, this.buildingType)) {
+                if (!this.canBeBuilt(this.mouseTileCoord, this.buildingType).result) {
                     // Show a red bg when a building can't be built
                     this.mouseContext.fillStyle = '#FF0000';
                     this.mouseContext.fillRect(0, 0, this.tileSize, this.tileSize);
@@ -394,8 +394,11 @@ export default class Map extends IdleGameVue {
     }
 
     private tryBuild(coord: { x: number, y: number }, building: Building) {
-        if (!this.canBeBuilt(coord, building))
+        const canBeBuilt = this.canBeBuilt(coord, building);
+        if (!canBeBuilt.result) {
+            Vue.toasted.error(`You cannot build this building here: ${canBeBuilt.reason}`);
             return;
+        }
 
         // Pay the price of your purchase
         for (let consummable in StaticBuildingInfo[building].price) {
@@ -407,47 +410,47 @@ export default class Map extends IdleGameVue {
         this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: building });
     }
 
-    private canBeBuilt(coord: { x: number, y: number }, building: Building) {
+    private canBeBuilt(coord: { x: number, y: number }, building: Building): {result: boolean, reason: string | null} {
         if (coord.x < 0 || coord.y < 0 || coord.x >= this.nbTilesOnRowOrColumn || coord.y >= this.nbTilesOnRowOrColumn)
-            return false;
+            return {result: false, reason: 'This tile is outside the map'};
 
         // Check if you can afford your purchase
         for (let consummableId in StaticBuildingInfo[this.buildingType].price) {
             let price = StaticBuildingInfo[this.buildingType].price[consummableId as Consummable];
 
             if (price && this.consummables[consummableId as Consummable].quantity < price)
-                return false;
+                return {result: false, reason: `You don't have enough ${consummableId}`};
         }
 
         // If building is already there
         if (building == this.map[coord.x][coord.y].building)
-            return false;
+            return {result: false, reason: `There is already a ${building} here`};
 
         // If not discovered
         if (!this.map[coord.x][coord.y].discovered)
-            return false;
+            return {result: false, reason: `This tile have not been discovered yet`};
 
         // You can't build on water
         if (this.map[coord.x][coord.y].environment == Environment.Water)
-            return false;
+            return {result: false, reason: `You cannot build this on water`};
 
         // You must build coalMine on coalDeposite
         if (building == Building.coalMine && this.map[coord.x][coord.y].habitat !== Habitat.CoalDeposite)
-            return false;
+            return {result: false, reason: `A ${building} must be built on a coal deposite`};
 
         // You must build stoneMine on stoneDeposite
         if (building == Building.stoneMine && this.map[coord.x][coord.y].habitat !== Habitat.StoneDeposite)
-            return false;
+            return {result: false, reason: `A ${building} must be built on a stone deposite`};
 
         // You must build limestoneMine on limestoneDeposite
         if (building == Building.limestoneMine && this.map[coord.x][coord.y].habitat !== Habitat.LimestoneDeposite)
-            return false;
+            return {result: false, reason: `A ${building} must be built on a limestone deposite`};
 
         // You must build sawmill next to a forest
         if (building == Building.sawmill && this.map[coord.x][coord.y].closeByTrees <= 0)
-            return false;
+            return {result: false, reason: `A ${building} must be built next to a forest`};
 
-        return true;
+        return {result: true, reason: null};
     }
 
     private getEnvironmentImage(environment: Environment): HTMLImageElement {

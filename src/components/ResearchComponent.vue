@@ -6,9 +6,9 @@
       <button
         v-for="researchName of availableResearchs" v-bind:key="researchName"
         class="research-item"
-        v-bind:class="{ 'owned': isResearchOwned(researchName), 'cant-afford': cantAffordResearch(researchName) }"
+        v-bind:class="{ 'owned': isResearchOwned(researchName), 'cant-afford': !canAffordResearch(researchName) }"
         v-on:click="buyResearch(researchName)"
-        :disabled="cantAffordResearch(researchName) || isResearchOwned(researchName)">
+        :disabled="isResearchOwned(researchName)">
         <div>{{ getResearchInfo(researchName).name }}</div>
         <div class="price">Price: {{ getResearchInfo(researchName).price }} x 🔬</div>
       </button>
@@ -23,6 +23,7 @@ import { ResearchInfo } from '@/services/GameEngine';
 import { IState, IdleGameVue } from '@/store';
 import { EventBus, IJobProductionEvent } from '@/EventBus';
 import { Research } from '@/models/Research';
+import { MessageService } from '@/services/MessageService';
 
 @Component({
   components: {
@@ -42,15 +43,20 @@ export default class ResearchComponent extends IdleGameVue {
   }
 
   public buyResearch(researchName: Research) {
-    if (this.cantAffordResearch(researchName))
+    console.log('pwet');
+
+    if (!this.canAffordResearch(researchName)) {
+      Vue.toasted.error(`You don't have enough "knowledge" to buy this research.`);
+      MessageService.Help(`In order to buy research you must have enough "knowledge". To generate some knowledge hire some druids.`, 'research');
       return;
+    }
 
     this.$store.dispatch('BuyResearch', { researchName: researchName });
     this.$toasted.success(`You discovered ${ResearchInfo[researchName].name}!`);
   }
 
-  public cantAffordResearch(researchName: Research) {
-    return ResearchInfo[researchName].price > this.$store.state.consummable.knowledge.quantity;
+  public canAffordResearch(researchName: Research) {
+    return ResearchInfo[researchName].price <= this.$store.state.consummable.knowledge.quantity;
   }
 
   public mounted() {

@@ -28,6 +28,7 @@ export interface IState {
   map: IMapState;
   research: IResearchState;
   debugMode: boolean;
+  showHelp: boolean;
   controls: { play: boolean, speed: number}
   consummable: { [id in Consummable]: { quantity: number } };
 }
@@ -44,6 +45,7 @@ export default new Vuex.Store<IState>({
     map: <IMapState><any>null, // TODO: This hack is required to keep the type system happy
     research: <IResearchState><any>null, // TODO: This hack is required to keep the type system happy
     debugMode: false,
+    showHelp: true,
     controls: { play: true, speed: 1 },
     consummable: {
       population: {
@@ -86,12 +88,19 @@ export default new Vuex.Store<IState>({
     },
     // Toggle debug
     ToggleDebugMode(state) {
-      state.debugMode = !state.debugMode
+      state.debugMode = !state.debugMode;
       state.controls.speed = 10;
+    },
+    ToggleShowHelp(state) {
+      state.showHelp = !state.showHelp;
     },
     // Toggle play or pause
     TogglePlay(state) {
-      state.controls.play = !state.controls.play
+      state.controls.play = !state.controls.play;
+    },
+    // Set play
+    SetPlay(state, play) {
+      state.controls.play = play;
     },
     // Toggle fastforward
     ToggleFastForward(state) {

@@ -20,6 +20,7 @@ import { Consummable } from '@/models/Consummable';
 import { StaticConsummableInfo, StaticJobInfo, GlobalConfig } from '@/services/GameEngine';
 
 import ParticleEmitter from '@/components/ParticleEmitter.vue';
+import { MessageService } from '@/services/MessageService';
 
 @Component({
   components: {
@@ -52,6 +53,10 @@ export default class Inventory extends IdleGameVue {
             let produce = produceObj ? produceObj.quantity : 0;
 
             production += (produce - consume) / (GlobalConfig.TickInterval / 1000) * quantity;
+        }
+
+        if (production < -0.01) {
+            MessageService.Help(`Be careful! You have reached a negative production of ${consummable}. Either try to produce more of this ressource or remove some workers to consume less of it.`, 'negative-'+consummable);
         }
         var result = production.toFixed(2);
         // Avoid "negative zero"

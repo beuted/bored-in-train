@@ -102,6 +102,7 @@ export default class Map extends IdleGameVue {
     private draggingStartPoint!: { x: number, y: number };
     private isDragging = true;
     private showPollution = false;
+    private animLoop: number = -1;
 
     public buildingType: Building = Building.village;
 
@@ -181,8 +182,12 @@ export default class Map extends IdleGameVue {
         }
     }
 
+    private beforeDestroy() {
+        window.cancelAnimationFrame(this.animLoop);
+    }
+
     public mapLoop() {
-        window.requestAnimationFrame(() => this.mapLoop());
+        this.animLoop = window.requestAnimationFrame(() => this.mapLoop());
 
         this.compute();
         this.draw(false);

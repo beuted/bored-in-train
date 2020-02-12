@@ -313,6 +313,7 @@ function ChangeTile(map: IMapTile[][], buildings: IMapBuildings, jobs: IMapJobs,
   }
 
   map[obj.x][obj.y].building = obj.type;
+  map[obj.x][obj.y].quantity = 0;
 
   // If we're building a tree update the quantity
   if (obj.type == Building.forest) {

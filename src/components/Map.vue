@@ -3,7 +3,7 @@
         <div class="menu">
             <span v-for="(building, key) in buildings" v-bind:key="key">
                 <span v-if="isKnown(key)">
-                    <input type="radio" :id="key" :value="key" v-model="buildingType">
+                    <input type="radio" :id="key" :value="key" v-model="buildingType" v-on:click="buildingClicked(key)">
                     <label :for="key">
                         <PriceTooltip :building="key" :consummables="consummables">
                             <span v-once><img v-bind:src="mapBuildingImages[key].src"></span> x {{ building.quantity }}
@@ -13,7 +13,7 @@
             </span>
             <span v-on:click="showPollution = !showPollution">Pollution</span>
         </div>
-        <!--<TileTooltip :tile="map[0][0]"></TileTooltip>-->
+        <TileTooltip :tile="tooltipTile" :coord="tooltipCoord"></TileTooltip>
         <canvas id="canvas" class="map"
             v-on:mousedown="handleMouseDown"
             v-on:mouseup="handleMouseUp"
@@ -103,8 +103,10 @@ export default class Map extends IdleGameVue {
     private isDragging = true;
     private showPollution = false;
     private animLoop: number = -1;
+    private tooltipCoord = {x: 0, y: 0};
+    private tooltipTile: IMapTile  | null = null;
 
-    public buildingType: Building = Building.village;
+    public buildingType: Building | null = null;
 
     constructor() {
         super();
@@ -133,6 +135,12 @@ export default class Map extends IdleGameVue {
 
     public isKnown(building: Building) {
         return this.$store.getters.researchBuildingsKnown[building];
+    }
+
+    public buildingClicked(key: Building) {
+        if (this.buildingType == key) {
+            this.buildingType = null;
+        }
     }
 
     private mounted() {
@@ -304,7 +312,7 @@ export default class Map extends IdleGameVue {
     }
 
     private drawMouse() {
-        if (this.mouseTileCoord) {
+        if (this.mouseTileCoord && this.buildingType != null) {
             this.mouseContext.clearRect(0, 0, this.tileSize, this.tileSize);
             let image = this.getBuildingImage(this.buildingType);
             if (image) {
@@ -354,11 +362,19 @@ export default class Map extends IdleGameVue {
 
     private handleMouseUp(event: MouseEvent) {
         var coord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
-        this.isMouseDown = false;
 
-        //Check if this was a drag or a click
         if (this.isDragging) {
-            this.tryBuild(coord, this.buildingType);
+            if (this.buildingType == null) {
+                if (!this.tooltipTile) {
+                    this.tooltipCoord = { x: event.pageX - this.canvas.offsetLeft, y: event.pageY - this.canvas.offsetTop };
+                    this.tooltipTile = this.map[coord.x][coord.y];
+                } else {
+                    this.tooltipTile = null;
+                }
+            } else {
+                //Check if this was a drag or a click
+                this.tryBuild(coord, this.buildingType);
+            }
         }
 
         this.isDragging = true;
@@ -415,8 +431,8 @@ export default class Map extends IdleGameVue {
             return {result: false, reason: 'This tile is outside the map'};
 
         // Check if you can afford your purchase
-        for (let consummableId in StaticBuildingInfo[this.buildingType].price) {
-            let price = StaticBuildingInfo[this.buildingType].price[consummableId as Consummable];
+        for (let consummableId in StaticBuildingInfo[building].price) {
+            let price = StaticBuildingInfo[building].price[consummableId as Consummable];
 
             if (price && this.consummables[consummableId as Consummable].quantity < price)
                 return {result: false, reason: `You don't have enough ${consummableId}`};
@@ -485,10 +501,10 @@ export default class Map extends IdleGameVue {
 }
 
 input {
-    visibility:hidden;
-    width:0;
-    height:0;
-    margin:0;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    margin: 0;
 }
 label {
     cursor: pointer;

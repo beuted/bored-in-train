@@ -176,7 +176,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     price: {
       population: 0,
       food: 0,
-      wood: 50,
+      wood: 20,
       stones: 0,
       coals: 0,
       limestone: 0,

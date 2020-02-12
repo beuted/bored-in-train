@@ -1,11 +1,28 @@
 <template>
-    <div class="tooltip">
-        <span class="tooltip-content">
-            <div class="tooltip-title">Environment:</div>
-            <br>
-            <div class="tooltip-title">Building:</div>
-        </span>
-    </div>
+  <div class="tooltip" v-if="tile != null">
+    <span class="tooltip-content" :style="getCoordStyle()">
+      <div v-if="!tile.discovered && !tile.discoverable">
+        <div class="tooltip-title">You haven't discovered this zone yet</div>
+      </div>
+      <div v-if="tile.discovered || tile.discoverable">
+        <div v-if="floorResources">
+          <div class="tooltip-title">Floor resources: {{floorResources}}</div>
+        </div>
+        <div v-if="tile.building">
+          <div class="tooltip-title">Building: {{tile.building}}</div>
+        </div>
+        <div v-if="tile.quantity > 0">
+          <div class="tooltip-title">{{tile.building}} capacity: {{tile.quantity}}</div>
+        </div>
+        <div v-if="tile.population > 0">
+          <div class="tooltip-title">{{tile.population}} people are working here</div>
+        </div>
+        <div v-if="tile.pollution > 0">
+          <div class="tooltip-title">Pollution: {{tile.pollution.toPrecision(2)}}</div>
+        </div>
+      </div>
+    </span>
+  </div>
 </template>
 
 <script lang="ts">
@@ -15,13 +32,24 @@ import { Consummable } from '@/models/Consummable';
 import { StaticBuildingInfo } from '@/services/GameEngine';
 import { Building } from '@/models/Building';
 import { IMapTile } from '../models/IMapTile';
+import { habitatName } from '../models/Habitat';
 
 @Component({
   components: {
   },
 })
 export default class TileTooltip extends IdleGameVue {
-    @Prop() private tile!: IMapTile;
+  @Prop() private tile!: IMapTile | null;
+  @Prop() private coord!: { x: number, y: number };
+
+  public getCoordStyle(): string {
+    return 'left:' + this.coord.x + 'px;top:' + this.coord.y + 'px';
+  }
+
+  public get floorResources() {
+    if (this.tile == null || this.tile.habitat == null) return null;
+    return habitatName(this.tile.habitat);
+  }
 }
 </script>
 
@@ -30,14 +58,14 @@ export default class TileTooltip extends IdleGameVue {
 /* Tooltip container */
 .tooltip {
   position: relative;
-  display: inline-block;
+  top: 0;
 }
 
 /* Tooltip text */
 .tooltip .tooltip-content {
   width: 200px;
-  bottom: 100%;
-  left: 50%;
+  top: 0;
+  left: 0;
   margin-left: -100px; /* Use half of the width (200/2 = 100), to center the tooltip */
   background-color: white;
   color: #2c3e50;

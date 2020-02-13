@@ -3,7 +3,7 @@ import { Module, createNamespacedHelpers } from 'vuex';
 import { Building } from '@/models/Building';
 import { MapBuilder } from '../services/MapBuilder';
 import { Consummable } from '../models/Consummable';
-import { StaticConsummableInfo } from '../services/GameEngine';
+import { StaticConsummableInfo, StaticBuildingInfo } from '../services/GameEngine';
 import { Environment } from '../models/Environment';
 import { IMapTile } from '../models/IMapTile';
 import { UtilService } from '../services/UtilService';
@@ -132,7 +132,8 @@ export const MapModule: Module<IMapState, IState> = {
         }
       }
 
-      commit('MakeTileDiscovered', {x: maxDisco.x, y: maxDisco.y });
+      if (maxDisco.value > 0) // If we have'nt found any tile discoverable, don't discover anything
+        commit('MakeTileDiscovered', {x: maxDisco.x, y: maxDisco.y });
     },
   },
   mutations: {
@@ -237,7 +238,7 @@ export const MapModule: Module<IMapState, IState> = {
           // Remove tree if quantity hit 0
           if (mapCopy[i][j].building == Building.forest && mapCopy[i][j].quantity <= 0) {
             console.log('Forest exausted...');
-            ChangeTile(mapCopy, state.buildings, state.jobs, {x: i, y: j, type: null})
+            ChangeTile(mapCopy, state.buildings, state.jobs, {x: i, y: j, type: null});
             mapCopy[i][j].quantity = 0;
           }
         }
@@ -272,7 +273,7 @@ function updateCloseByTreeAndSawmill(pos: {x: number, y: number}, map: IMapTile[
     map[pos.x][pos.y].disabled = true;
 
     Vue.toasted.error('A sawmill stopped working due to a lack of forest nearby');
-  } else if (map[pos.x][pos.y].building == Building.sawmill && map[pos.x][pos.y].closeByTrees > 0) {
+  } else if (map[pos.x][pos.y].building == Building.sawmill && map[pos.x][pos.y].closeByTrees > 0 && !buildings[Building.sawmill].coords[pos.x+','+pos.y]) {
     // Once a tree is planted we might reactivate the sawmills next to it
     buildings[Building.sawmill].coords[pos.x+','+pos.y] = { x: pos.x, y: pos.y };
     buildings[Building.sawmill].quantity++;
@@ -301,7 +302,10 @@ function ChangeTile(map: IMapTile[][], buildings: IMapBuildings, jobs: IMapJobs,
 
   console.debug(`Changing tile ${obj.x}, ${obj.y} from ${previousTile.building} to ${obj.type}`);
 
-  if (previousTile.building != null) {
+  if (previousTile.building != null && !previousTile.disabled) {
+    let removedJob = StaticBuildingInfo[previousTile.building].job
+    if (removedJob != null && previousTile.population > 0)
+      jobs[removedJob].quantity -= previousTile.population;
     buildings[previousTile.building].quantity--;
     delete buildings[previousTile.building].coords[obj.x + ',' + obj.y];
   }
@@ -314,6 +318,8 @@ function ChangeTile(map: IMapTile[][], buildings: IMapBuildings, jobs: IMapJobs,
 
   map[obj.x][obj.y].building = obj.type;
   map[obj.x][obj.y].quantity = 0;
+  map[obj.x][obj.y].population = 0;
+  delete map[obj.x][obj.y].disabled;
 
   // If we're building a tree update the quantity
   if (obj.type == Building.forest) {

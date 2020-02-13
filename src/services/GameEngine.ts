@@ -21,6 +21,7 @@ export interface IStaticBuilding {
   name: string;
   description: string;
   price: {[id in Consummable]: number};
+  job: Job | null;
 }
 
 export interface IConsuming {
@@ -49,6 +50,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
+    job: null
   },
   barn: {
     name: 'Barns',
@@ -63,7 +65,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       limestoneBrick: 0,
       energy: 0,
       knowledge: 0
-    }
+    },
+    job: null
   },
   farm: {
     name: 'Farm',
@@ -78,22 +81,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       limestoneBrick: 0,
       energy: 0,
       knowledge: 0
-    }
-  },
-  stoneMine: {
-    name: 'Stone Mine',
-    description: 'Allows you to recruit 3 stoneminers, must be built on a stone deposite',
-    price: {
-      population: 0,
-      food: 0,
-      wood: 50,
-      stones: 30,
-      coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
-      energy: 0,
-      knowledge: 0
-    }
+    },
+    job: Job.farmer
   },
   sawmill: {
     name: 'Sawmill',
@@ -108,7 +97,24 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       limestoneBrick: 0,
       energy: 0,
       knowledge: 0
-    }
+    },
+    job: Job.lumberjack
+  },
+  stoneMine: {
+    name: 'Stone Mine',
+    description: 'Allows you to recruit 3 stoneminers, must be built on a stone deposite',
+    price: {
+      population: 0,
+      food: 0,
+      wood: 50,
+      stones: 30,
+      coals: 0,
+      limestone: 0,
+      limestoneBrick: 0,
+      energy: 0,
+      knowledge: 0
+    },
+    job: Job.stoneMiner
   },
   coalMine: {
     name: 'Coal Mine',
@@ -123,7 +129,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       limestoneBrick: 0,
       energy: 0,
       knowledge: 0
-    }
+    },
+    job: Job.coalMiner
   },
   limestoneMine: {
     name: 'Limestone Mine',
@@ -138,7 +145,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       limestoneBrick: 0,
       energy: 0,
       knowledge: 0
-    }
+    },
+    job: Job.limestoneMiner
   },
   limestoneBrickFactory: {
     name: 'Brick Factory',
@@ -153,7 +161,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       limestoneBrick: 0,
       energy: 0,
       knowledge: 0
-    }
+    },
+    job: Job.limestoneBrickWorker
   },
   coalPowerStation: {
     name: 'Coal Power Station',
@@ -168,7 +177,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       limestoneBrick: 150,
       energy: 0,
       knowledge: 0
-    }
+    },
+    job: Job.coalStationEngineer
   },
   forest: {
     name: 'Forest',
@@ -183,7 +193,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       limestoneBrick: 0,
       energy: 0,
       knowledge: 0
-    }
+    },
+    job: null
   }
 }
 

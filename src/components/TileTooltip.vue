@@ -5,7 +5,10 @@
         <div class="tooltip-title">You haven't discovered this zone yet</div>
       </div>
       <div v-if="tile.discovered || tile.discoverable">
-        <div v-if="floorResources">
+        <div v-if="tile.environment">
+          <div class="tooltip-title">Landscape: {{environmentName}}</div>
+        </div>
+        <div v-if="tile.habitat">
           <div class="tooltip-title">Floor resources: {{floorResources}}</div>
         </div>
         <div v-if="tile.building">
@@ -31,8 +34,9 @@ import { IState, IdleGameVue } from '@/store';
 import { Consummable } from '@/models/Consummable';
 import { StaticBuildingInfo } from '@/services/GameEngine';
 import { Building } from '@/models/Building';
-import { IMapTile } from '../models/IMapTile';
-import { habitatName } from '../models/Habitat';
+import { IMapTile } from '@/models/IMapTile';
+import { habitatName } from '@/models/Habitat';
+import { environmentName } from '@/models/Environment';
 
 @Component({
   components: {
@@ -49,6 +53,11 @@ export default class TileTooltip extends IdleGameVue {
   public get floorResources() {
     if (this.tile == null || this.tile.habitat == null) return null;
     return habitatName(this.tile.habitat);
+  }
+
+  public get environmentName() {
+    if (this.tile == null || this.tile.environment == null) return null;
+    return environmentName(this.tile.environment);
   }
 }
 </script>

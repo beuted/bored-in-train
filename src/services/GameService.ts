@@ -93,6 +93,13 @@ export class GameService {
         let quantityToRemove = this.LackOfStorageFactor *
           (newConsummables[consummableId as Consummable].quantity - store.state.map.buildings[staticConsummable.storage.name].quantity * staticConsummable.storage.capacity);
           newConsummables[consummableId as Consummable].quantity -= quantityToRemove;
+
+        // Show help messages
+        if (consummableId as Consummable == Consummable.population) {
+          MessageService.Help(`You have reached your max population, build more villages to welcome more people.`, 'max-pop-reached');
+        } else {
+          MessageService.Help(`You cannot store the ${consummableId} you produced, build more barns to store it.`, 'max-consummable-reached');
+        }
       }
     }
 

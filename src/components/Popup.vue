@@ -1,7 +1,7 @@
 <template>
   <div class="popup-container" v-if="isShown">
     <div class="popup">
-      <div>{{message}}</div>
+      <div class="popup-message">{{message}}</div>
       <div class="popup-btns-container">
         <div class="popup-help-input" v-if="isHelp"><input type="checkbox" v-bind:checked="showHelp" v-on:click="toggleShowHelp()">Show help messages</div>
         <button class="popup-dismiss-btn" v-on:click="dismiss()">Dismiss</button>
@@ -50,37 +50,42 @@ export default class Popup extends IdleGameVue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
-.invisible {
-  display: none;
-}
-
 .popup-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   position: fixed;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.1);
   top: 0;
   left: 0;
   text-align: left;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .popup {
-  // TODO: center verticalement là j'ai pas internet
+  display: flex;
+  flex-direction: column;
   position: relative;
   margin: auto;
   padding: 20px;
-  width: 600px;
-  min-height: 200px;
-  background-color: white;
-  top: 200px;
+  width: 500px;
+  border-radius: 2px;
+  color: #fff;
+  text-shadow: 0px 1px 1px #000;
+  background-color: rgba(30, 30, 30, 0.5);
+  box-shadow: 0px 0px 3px 0px rgba(255,255,255,0.1)
+}
+
+.popup-message {
+  flex-grow: 1
 }
 
 .popup-btns-container {
   //TODO: bouger ca plus en bas la j'ai pas internet
   position: relative;
-  height: 50px;
   bottom: 0;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 .popup-help-input {
   display: inline-block;

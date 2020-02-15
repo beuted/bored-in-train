@@ -27,7 +27,7 @@ export class GameService {
 
   private mainLoop() {
     // in the case of pause nothing happens
-    if (!store.state.controls.play) {
+    if (store.state.controls.speed <= 0) {
       // Recursive setTimeout for precision
       setTimeout (() => {
         this.mainLoop()
@@ -121,7 +121,7 @@ export class GameService {
     //TODO: even if there is no food explorer still discover shits
     let nbExplorers = store.state.map.jobs.explorer.quantity;
 
-    if (nbExplorers > 0 && store.state.controls.play) {
+    if (nbExplorers > 0 && store.state.controls.speed > 0) {
       let nbLandFound = store.state.map.mapNbTileFound;
       // Probabilty in proba of at least 1 explorer out of nbExplorers to find a tile
       let probability = 1-Math.pow(1-2/nbLandFound, nbExplorers*2);

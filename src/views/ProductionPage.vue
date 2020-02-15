@@ -1,7 +1,5 @@
 <template>
-  <div class="home">
-    <Game msg="Boring Idle Game"/>
-  </div>
+  <Game msg="Boring Idle Game"/>
 </template>
 
 <script lang="ts">

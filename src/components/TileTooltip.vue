@@ -76,13 +76,14 @@ export default class TileTooltip extends IdleGameVue {
   top: 0;
   left: 0;
   margin-left: -100px; /* Use half of the width (200/2 = 100), to center the tooltip */
-  background-color: white;
-  color: #2c3e50;
-  text-align: center;
   padding: 5px 0;
+  color: #fff;
+  text-shadow: 0px 1px 1px #000;
+  text-align: center;
+  background-color: rgba(20, 20, 20, 0.90);
   border-radius: 2px;
-  border: 1px solid #2c3e50;
-  box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24);
+  box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.2);
+
 
   /* Position the tooltip text - see examples below! */
   position: absolute;
@@ -90,7 +91,6 @@ export default class TileTooltip extends IdleGameVue {
 }
 
 .tooltip-title {
-    font-weight: bold;
     margin-bottom: 10px;
 }
 </style>

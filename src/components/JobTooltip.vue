@@ -66,12 +66,14 @@ export default class JobTooltip extends IdleGameVue {
   bottom: 100%;
   left: 50%;
   margin-left: -100px; /* Use half of the width (200/2 = 100), to center the tooltip */
-  background-color: #2c3e50;
+  padding: 5px;
   color: #fff;
   text-align: center;
-  padding: 5px;
+  text-shadow: 0px 1px 1px #000;
+  text-align: center;
+  background-color: rgba(20, 20, 20, 0.90);
   border-radius: 2px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24);
+  box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.2);
 
   /* Position the tooltip text - see examples below! */
   position: absolute;

@@ -1,7 +1,5 @@
 <template>
-  <div class="home">
-    <ResearchComponent />
-  </div>
+  <ResearchComponent />
 </template>
 
 <script lang="ts">

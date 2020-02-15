@@ -494,10 +494,11 @@ export default class Map extends IdleGameVue {
 <style scoped lang="less">
 .map {
     margin: auto;
+    cursor: pointer;
 }
 
 .menu {
-    margin: 20px;
+    margin: 15px;
 }
 
 input {

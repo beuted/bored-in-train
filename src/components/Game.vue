@@ -1,13 +1,7 @@
   <template>
   <div>
-    <h1>
-      {{ msg }}
-      <button v-on:click="toggleDebug()">Debug</button>
-      <button v-on:click="reset()">Reset</button>
-      <button v-on:click="save()">Save</button>
-    </h1>
-
     <Controls />
+
     <div class="flex-container">
       <div class="job-item">
         <Jobs />
@@ -63,18 +57,6 @@ export default class Game extends IdleGameVue {
     return this.$store.state.consummable;
   }
 
-  public toggleDebug() {
-    this.$store.commit('ToggleDebugMode');
-  }
-
-  public reset() {
-    StoreSaver.Reset();
-  }
-
-  public save() {
-    StoreSaver.Save();
-  }
-
   public mounted() {
   }
 }
@@ -92,14 +74,12 @@ export default class Game extends IdleGameVue {
 }
 
 .inventory-item {
-  margin-top: 60px;
+  margin-top: 50px;
   width: 300px;
 }
-.job-item {
-  margin-top: 60px;
-  width: 300px;
-}
-.map-item {
 
+.job-item {
+  margin-top: 50px;
+  width: 300px;
 }
 </style>

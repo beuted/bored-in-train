@@ -29,7 +29,7 @@ export interface IState {
   research: IResearchState;
   debugMode: boolean;
   showHelp: boolean;
-  controls: { play: boolean, speed: number}
+  controls: { speed: number}
   consummable: { [id in Consummable]: { quantity: number } };
 }
 
@@ -46,7 +46,7 @@ export default new Vuex.Store<IState>({
     research: <IResearchState><any>null, // TODO: This hack is required to keep the type system happy
     debugMode: false,
     showHelp: true,
-    controls: { play: true, speed: 1 },
+    controls: { speed: 1 },
     consummable: {
       population: {
         quantity: 6,
@@ -96,18 +96,15 @@ export default new Vuex.Store<IState>({
     },
     // Toggle play or pause
     TogglePlay(state) {
-      state.controls.play = !state.controls.play;
+      state.controls.speed = state.controls.speed < 1 ? 1 : 0;
     },
     // Set play
-    SetPlay(state, play) {
-      state.controls.play = play;
+    SetPlay(state, play: boolean) {
+      state.controls.speed = play ? 1 : 0;
     },
     // Toggle fastforward
     ToggleFastForward(state) {
-      if (state.controls.speed === 1)
         state.controls.speed = 2;
-      else
-        state.controls.speed = 1;
     },
     // Increment the value of a consummable from 'value'
     IncrementConsummable(state, obj: { name: Consummable, value: number }) {

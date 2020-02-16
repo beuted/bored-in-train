@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Research</h1>
+    <span class="title">Research</span>
 
     <div class="flex-container">
       <button

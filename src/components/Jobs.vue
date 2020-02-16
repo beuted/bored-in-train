@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>Jobs</h2>
+        <span class="title">Jobs</span>
         <ul>
             <li>
                 <span>Unemployed: {{ unemployed }}</span>

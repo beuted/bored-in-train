@@ -3,8 +3,10 @@
     <div class="popup">
       <div class="popup-message">{{message}}</div>
       <div class="popup-btns-container">
-        <div class="popup-help-input" v-if="isHelp"><input type="checkbox" v-bind:checked="showHelp" v-on:click="toggleShowHelp()">Show help messages</div>
-        <button class="popup-dismiss-btn" v-on:click="dismiss()">Dismiss</button>
+        <div class="popup-help-input" v-if="isHelp"><input class="chx" type="checkbox" id="toggleShowHelp" v-bind:checked="showHelp" v-on:click="toggleShowHelp()">
+          <label class="chx-label" for="toggleShowHelp">Show help messages</label>
+        </div>
+        <button class="popup-dismiss-btn btn" v-on:click="dismiss()">Dismiss</button>
       </div>
     </div>
 
@@ -61,6 +63,7 @@ export default class Popup extends IdleGameVue {
   left: 0;
   text-align: left;
   background-color: rgba(0, 0, 0, 0.5);
+  z-index: 800;
 }
 
 .popup {

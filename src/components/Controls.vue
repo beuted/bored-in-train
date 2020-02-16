@@ -50,7 +50,9 @@ export default class Controls extends IdleGameVue {
   }
 
   public reset() {
-    StoreSaver.Reset();
+    if (confirm('Are you sure you want ot reset your game ?')) {
+      StoreSaver.Reset();
+    }
   }
 
   public save() {

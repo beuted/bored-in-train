@@ -126,7 +126,7 @@ export class GameService {
       // Probabilty in proba of at least 1 explorer out of nbExplorers to find a tile
       let probability = 1-Math.pow(1-2/nbLandFound, nbExplorers*2);
       if (Math.random() <= probability) {
-        Vue.toasted.success(`Land Found! (Probability was: ${probability.toPrecision(2)})`);
+        Vue.toasted.success(`Land Found! (Probability was: ${(probability*100).toPrecision(2)} %)`);
         store.dispatch('DiscoverTile');
       }
     }

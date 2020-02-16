@@ -1,5 +1,8 @@
 <template>
-    <div class="tooltip"><div v-bind:class="buildableClass"> <slot></slot> </div>
+    <div class="tooltip">
+        <div v-bind:class="buildableClass">
+            <slot></slot>
+        </div>
         <span class="tooltip-content">
             <div class="tooltip-title">{{ buildingInfo.name }}</div>
             <div>{{ buildingInfo.description }}</div>
@@ -61,7 +64,6 @@ export default class PriceTooltip extends IdleGameVue {
 .tooltip .tooltip-content {
   visibility: hidden;
   width: 200px;
-  bottom: 100%;
   left: 50%;
   margin-left: -100px; /* Use half of the width (200/2 = 100), to center the tooltip */
   padding: 5px 0;

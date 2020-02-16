@@ -10,6 +10,7 @@ import { UtilService } from '../services/UtilService';
 import { IState } from '../store';
 import { Job } from '@/models/Job';
 import Vue from 'vue';
+import { MessageService } from '@/services/MessageService';
 
 export interface IMapState {
   mapNbTileFound: number,
@@ -238,6 +239,8 @@ export const MapModule: Module<IMapState, IState> = {
           // Remove tree if quantity hit 0
           if (mapCopy[i][j].building == Building.forest && mapCopy[i][j].quantity <= 0) {
             console.log('Forest exausted...');
+            MessageService.Help('Your lumberjacks have destroyed a forest... Try to have more trees around your Sawmills to let the forests naturally regenerate.', 'forest-exausted');
+            Vue.toasted.error(`Your lumberjacks have destroyed a forest`);
             ChangeTile(mapCopy, state.buildings, state.jobs, {x: i, y: j, type: null});
             mapCopy[i][j].quantity = 0;
           }

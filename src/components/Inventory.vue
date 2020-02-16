@@ -1,6 +1,6 @@
 <template>
     <div class="inventory">
-        <h2>Inventory</h2>
+        <span class="title">Inventory</span>
         <ul>
             <li v-for="(consummable, key) in consummables" v-bind:key="key">
                 <ParticleEmitter :consummable="key">

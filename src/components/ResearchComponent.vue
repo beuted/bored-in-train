@@ -1,8 +1,6 @@
 <template>
-  <div>
-    <span class="title">Research</span>
-
-    <div class="flex-container">
+  <div class="flex-container">
+    <div class="research-item-container">
       <button
         v-for="researchName of availableResearchs" v-bind:key="researchName"
         class="research-item"
@@ -71,7 +69,7 @@ export default class ResearchComponent extends IdleGameVue {
     padding: 0;
     margin: 0;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
 }
 

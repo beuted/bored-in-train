@@ -104,7 +104,10 @@ export default new Vuex.Store<IState>({
     },
     // Toggle fastforward
     ToggleFastForward(state) {
+      if (state.controls.speed != 2)
         state.controls.speed = 2;
+      else
+        state.controls.speed = 1;
     },
     // Increment the value of a consummable from 'value'
     IncrementConsummable(state, obj: { name: Consummable, value: number }) {

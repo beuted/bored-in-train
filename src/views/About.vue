@@ -1,6 +1,5 @@
 <template>
   <div class="about">
-    <span class="title">About</span>
     <div class="column">
       <p>
         I started this dumb Idle game because I was bored on the train. I drop it right after (like most of my personnal projects ⚰).
@@ -15,6 +14,13 @@
 </template>
 
 <style lang="less">
+.about {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
 .column {
   width: 800px;
   margin: 20px auto;

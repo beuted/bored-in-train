@@ -60,6 +60,12 @@ export default class Map extends IdleGameVue {
         [Environment.Concrete]: new Image(),
     };
 
+    private mapForestImages: { [id in number]: HTMLImageElement } = {
+        1: new Image(),
+        2: new Image(),
+        3: new Image(),
+    };
+
     private mapBuildingImages: { [id in Building]: HTMLImageElement } = {
         forest: new Image(),
         village: new Image(),
@@ -116,7 +122,7 @@ export default class Map extends IdleGameVue {
         this.mapEnvironmentImages[Environment.Beach].src = './img/beach.png';
         this.mapEnvironmentImages[Environment.Snow].src = './img/snow.png';
         this.mapEnvironmentImages[Environment.Concrete].src = './img/concrete.png';
-        this.mapBuildingImages[Building.forest].src = './img/foret-2.png';
+        this.mapBuildingImages[Building.forest].src = './img/foret-stage3.png';
         this.mapBuildingImages[Building.village].src = './img/village-2.png';
         this.mapBuildingImages[Building.barn].src = './img/entrepot.png';
         this.mapBuildingImages[Building.farm].src = './img/farm.png';
@@ -129,6 +135,9 @@ export default class Map extends IdleGameVue {
         this.mapHabitatImages[Habitat.CoalDeposite].src = './img/coal-deposit.png';
         this.mapHabitatImages[Habitat.StoneDeposite].src = './img/stone-deposit.png';
         this.mapHabitatImages[Habitat.LimestoneDeposite].src = './img/limestone-deposit.png';
+        this.mapForestImages[1].src = './img/foret-stage1.png';
+        this.mapForestImages[2].src = './img/foret-stage2.png';
+        this.mapForestImages[3].src = './img/foret-stage3.png';
 
         this.keyBoardService = new KeyboardService();
     }
@@ -257,8 +266,9 @@ export default class Map extends IdleGameVue {
 
                     const building = this.map[i][j].building;
                     const habitat = this.map[i][j].habitat;
+                    const quantity = this.map[i][j].quantity;
                     if (building != null) {
-                        let buildingImage = this.getBuildingImage(building);
+                        let buildingImage = this.getBuildingImage(building, quantity);
 
                         if (this.map[i][j].disabled)
                             this.mapContext.globalAlpha = 0.7;
@@ -266,7 +276,6 @@ export default class Map extends IdleGameVue {
                         this.mapContext.globalAlpha = 1;
 
                         // Show population on the map
-                        const quantity = this.map[i][j].quantity;
                         if (quantity > 0)
                             this.mapContext.fillText(quantity+'', i*this.tileSize, (j+0.5)*this.tileSize);
 
@@ -295,8 +304,9 @@ export default class Map extends IdleGameVue {
 
                     const building = this.map[i][j].building;
                     const habitat = this.map[i][j].habitat;
+                    const quantity = this.map[i][j].quantity;
                     if (building != null) {
-                        let buildingImage = this.getBuildingImage(building)
+                        let buildingImage = this.getBuildingImage(building, quantity)
                         this.mapContext.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
                     } else if (habitat != null) { // If a building is found no need to draw the habitat
                         let habitatImage = this.getHabitatImage(habitat)
@@ -314,7 +324,7 @@ export default class Map extends IdleGameVue {
     private drawMouse() {
         if (this.mouseTileCoord && this.buildingType != null) {
             this.mouseContext.clearRect(0, 0, this.tileSize, this.tileSize);
-            let image = this.getBuildingImage(this.buildingType);
+            let image = this.getBuildingImage(this.buildingType, 20);
             if (image) {
                 this.mouseContext.globalAlpha = 0.7;
                 if (!this.canBeBuilt(this.mouseTileCoord, this.buildingType).result) {
@@ -473,7 +483,15 @@ export default class Map extends IdleGameVue {
         return this.mapEnvironmentImages[environment];
     }
 
-    private getBuildingImage(building: Building): HTMLImageElement {
+    private getBuildingImage(building: Building, quantity: number): HTMLImageElement {
+        if (building == Building.forest) {
+            if (quantity <= 33)
+                return this.mapForestImages[1];
+            else if (quantity <= 66)
+                return this.mapForestImages[2];
+            else
+                return this.mapForestImages[3];
+        }
         return this.mapBuildingImages[building];
     }
 
@@ -512,6 +530,6 @@ label {
     margin: 0 10px 0 10px;
 }
 input:checked + label {
-    border-bottom: 3px solid red;
+    border-bottom: 3px solid #3a96dd;
 }
 </style>

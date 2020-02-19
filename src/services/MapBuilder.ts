@@ -41,7 +41,7 @@ export class MapBuilder {
 
                 // All trees start with a quantity of 100
                 if (building == Building.forest) {
-                    map[i][j].quantity = 100;
+                    map[i][j].quantity = Math.floor(Math.random() * 100) + 1  ;
                     forestBuildingEntry.quantity++;
                     forestBuildingEntry.coords[i + ',' + j] = {x: i, y: j};
                 }

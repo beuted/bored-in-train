@@ -1,7 +1,5 @@
   <template>
   <div>
-    <Controls />
-
     <div class="flex-container">
       <div class="job-item">
         <Jobs />
@@ -38,8 +36,7 @@ const gameService = new GameService();
   components: {
     Jobs,
     Inventory,
-    Map,
-    Controls
+    Map
   },
 })
 export default class Game extends IdleGameVue {

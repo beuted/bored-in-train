@@ -9,7 +9,7 @@
             <br>
             <div class="tooltip-title">Price:</div>
             <div v-for="(value, key) in buildingInfo.price" :key="key">
-                <span v-if="value != 0"><img class="consummable-icon" :src="getConsummableIcon(key)" /> x {{ value }}</span>
+                <span v-if="value != 0"><consumable-icon :consumable="key" /> x {{ value }}</span>
             </div>
         </span>
     </div>
@@ -21,9 +21,11 @@ import { IState, IdleGameVue } from '@/store';
 import { Consummable } from '@/models/Consummable';
 import { StaticBuildingInfo, StaticConsummableInfo } from '@/services/GameEngine';
 import { Building } from '@/models/Building';
+import ConsumableIcon from '@/components/ConsumableIcon.vue';
 
 @Component({
   components: {
+      ConsumableIcon
   },
 })
 export default class PriceTooltip extends IdleGameVue {
@@ -39,10 +41,6 @@ export default class PriceTooltip extends IdleGameVue {
 
     public get buildingInfo() {
         return StaticBuildingInfo[this.building];
-    }
-
-    public getConsummableIcon(consummable: Consummable) {
-        return StaticConsummableInfo[consummable].icon;
     }
 
     private isBuildable() {
@@ -96,10 +94,5 @@ export default class PriceTooltip extends IdleGameVue {
 
 .not-buildable {
     opacity: 0.3;
-}
-
-.consummable-icon {
-    vertical-align: top;
-    margin-right: 5px;
 }
 </style>

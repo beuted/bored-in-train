@@ -8,7 +8,7 @@
         v-on:click="buyResearch(researchName)"
         :disabled="isResearchOwned(researchName)">
         <div>{{ getResearchInfo(researchName).name }}</div>
-        <div class="price">Price: <img class="consummable-icon" :src="getKnowledgeIcon()" />x {{ getResearchInfo(researchName).price }}</div>
+        <div class="price">Price: <consumable-icon consumable="knowledge" />x {{ getResearchInfo(researchName).price }}</div>
       </button>
     </div>
   </div>
@@ -23,9 +23,11 @@ import { EventBus, IJobProductionEvent } from '@/EventBus';
 import { Research } from '@/models/Research';
 import { MessageService } from '@/services/MessageService';
 import { Consummable } from '../models/Consummable';
+import ConsumableIcon from '@/components/ConsumableIcon.vue';
 
 @Component({
   components: {
+    ConsumableIcon
   },
 })
 export default class ResearchComponent extends IdleGameVue {
@@ -42,8 +44,6 @@ export default class ResearchComponent extends IdleGameVue {
   }
 
   public buyResearch(researchName: Research) {
-    console.log('pwet');
-
     if (!this.canAffordResearch(researchName)) {
       Vue.toasted.error(`You don't have enough "knowledge" to buy this research.`);
       MessageService.Help(`In order to buy research you must have enough "knowledge". To generate some knowledge hire some druids.`, 'research');
@@ -59,10 +59,6 @@ export default class ResearchComponent extends IdleGameVue {
   }
 
   public mounted() {
-  }
-
-  public getKnowledgeIcon() {
-      return StaticConsummableInfo[Consummable.knowledge].icon;
   }
 }
 </script>
@@ -105,11 +101,6 @@ export default class ResearchComponent extends IdleGameVue {
 
 .price {
   color: #3a96dd;
-}
-
-.consummable-icon {
-    vertical-align: top;
-    margin-right: 5px;
 }
 
 </style>

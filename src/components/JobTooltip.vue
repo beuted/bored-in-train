@@ -6,13 +6,13 @@
                 <div> {{ description }}</div>
                 <div class="tooltip-title">Produce:</div>
                 <div v-for="(value, key) in produce" :key="key">
-                    <span v-if="value != null"><img class="consummable-icon" :src="getConsummableIcon(key)" /> x {{ value.quantity }}</span>
+                    <span v-if="value != null"><consumable-icon :consumable="key" /> x {{ value.quantity }}</span>
                 </div>
             </div>
             <div>
                 <div class="tooltip-title">Consume:</div>
                 <div v-for="(value, key) in consume" :key="key">
-                    <span v-if="value != null"><img class="consummable-icon" :src="getConsummableIcon(key)" />x {{ value.quantity }}</span>
+                    <span v-if="value != null"><consumable-icon :consumable="key" />x {{ value.quantity }}</span>
                 </div>
             </div>
         </span>
@@ -25,17 +25,15 @@ import { IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
 import { StaticJobInfo, StaticConsummableInfo } from '@/services/GameEngine';
 import { Consummable } from '../models/Consummable';
+import ConsumableIcon from '@/components/ConsumableIcon.vue';
 
 @Component({
   components: {
+      ConsumableIcon
   },
 })
 export default class JobTooltip extends IdleGameVue {
     @Prop() private jobName!: Job;
-
-    public getConsummableIcon(consummable: Consummable) {
-        return StaticConsummableInfo[consummable].icon;
-    }
 
     public get name() {
         return StaticJobInfo[this.jobName].name;
@@ -98,10 +96,5 @@ export default class JobTooltip extends IdleGameVue {
 
 .not-buildable {
     color: red;
-}
-
-.consummable-icon {
-    vertical-align: top;
-    margin-right: 5px;
 }
 </style>

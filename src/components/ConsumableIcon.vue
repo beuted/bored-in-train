@@ -5,18 +5,18 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IdleGameVue } from '@/store';
-import { StaticConsummableInfo } from '@/services/GameEngine';
-import { Consummable } from '../models/Consummable';
+import { StaticConsumableInfo } from '@/services/GameEngine';
+import { Consumable } from '../models/Consumable';
 
 @Component({
   components: {
   },
 })
 export default class ConsumableIcon extends IdleGameVue {
-  @Prop() private consumable!: Consummable;
+  @Prop() private consumable!: Consumable;
 
   public getConsumableIcon() {
-    return StaticConsummableInfo[this.consumable].icon;
+    return StaticConsumableInfo[this.consumable].icon;
   }
 }
 </script>

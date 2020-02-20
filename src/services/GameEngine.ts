@@ -1,4 +1,4 @@
-import { Consummable } from '@/models/Consummable';
+import { Consumable } from '@/models/Consumable';
 import { Job } from '@/models/Job';
 import { Building } from '@/models/Building';
 import { Research } from '@/models/Research';
@@ -8,10 +8,10 @@ export const GlobalConfig = {
   TickInterval: 5000
 }
 
-export type IStaticConsummableInfo = {[id in Consummable]: IStaticConsummable}
+export type IStaticConsumableInfo = {[id in Consumable]: IStaticConsumable}
 export type IStaticBuildingInfo = {[id in Building]: IStaticBuilding}
 
-export interface IStaticConsummable {
+export interface IStaticConsumable {
   name: string;
   icon: string;
   storage: IStorage | undefined;
@@ -20,12 +20,12 @@ export interface IStaticConsummable {
 export interface IStaticBuilding {
   name: string;
   description: string;
-  price: {[id in Consummable]: number};
+  price: {[id in Consumable]: number};
   job: Job | null;
 }
 
 export interface IConsuming {
-  name: Consummable;
+  name: Consumable;
   consomation: number;
   probability: number;
 }
@@ -198,7 +198,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   }
 }
 
-export const StaticConsummableInfo: IStaticConsummableInfo = {
+export const StaticConsumableInfo: IStaticConsumableInfo = {
   population: {
     name: 'Population',
     icon: './img/population.png',
@@ -272,8 +272,8 @@ export type IStaticJobInfo = {[id in Job]: IStaticJob }
 export interface IStaticJob {
   name: string;
   description: string;
-  produce: {[id in Consummable]: IStaticJobProduction | null };
-  consume: {[id in Consummable]: IStaticJobProduction | null };
+  produce: {[id in Consumable]: IStaticJobProduction | null };
+  consume: {[id in Consumable]: IStaticJobProduction | null };
   storage?: IStorage;
 }
 

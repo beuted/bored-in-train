@@ -1,12 +1,12 @@
 <template>
     <div class="particle-box"><div> <slot></slot> </div>
         <span class="particle particle-positive">
-            <transition name="bounce" v-for="(value, key) in consummables" :key="key">
+            <transition name="bounce" v-for="(value, key) in consumables" :key="key">
                 <div v-if="shows[value].positive"><img v-bind:src="getParticleEmoji(value)"/></div>
             </transition>
         </span>
         <span class="particle particle-negative">
-            <transition name="unbounce" v-for="(value, key) in consummables" :key="key">
+            <transition name="unbounce" v-for="(value, key) in consumables" :key="key">
                 <div v-if="shows[value].negative"><img v-bind:src="getParticleEmoji(value)"/></div>
             </transition>
         </span>
@@ -17,47 +17,47 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
-import { StaticJobInfo, StaticConsummableInfo } from '@/services/GameEngine';
+import { StaticJobInfo, StaticConsumableInfo } from '@/services/GameEngine';
 import { EventBus, IJobProductionEvent } from '@/EventBus';
-import { Consummable } from '@/models/Consummable';
+import { Consumable } from '@/models/Consumable';
 
 @Component({
   components: {
   },
 })
 export default class ParticleEmitter extends IdleGameVue {
-    @Prop() private consummable!: Consummable;
+    @Prop() private consumable!: Consumable;
 
-    private shows: { [id in Consummable]: { positive: boolean, negative: boolean } } = <any>{};
+    private shows: { [id in Consumable]: { positive: boolean, negative: boolean } } = <any>{};
 
     public constructor() {
         super();
-        EventBus.$on('consummable-production', (event: { [id in Consummable]: number }) => {
-            if (event[this.consummable])
-                this.emitParticles(event[this.consummable], this.consummable)
+        EventBus.$on('consumable-production', (event: { [id in Consumable]: number }) => {
+            if (event[this.consumable])
+                this.emitParticles(event[this.consumable], this.consumable)
         });
 
         // Init the show array
-        for (let consummable in Consummable) {
-            this.shows[consummable as Consummable] = { positive: false, negative: false };
+        for (let consumable in Consumable) {
+            this.shows[consumable as Consumable] = { positive: false, negative: false };
         }
     }
 
-    public get consummables() {
-        return Consummable;
+    public get consumables() {
+        return Consumable;
     }
 
-    public getParticleEmoji(consummable: Consummable) {
-        return StaticConsummableInfo[consummable].icon;
+    public getParticleEmoji(consumable: Consumable) {
+        return StaticConsumableInfo[consumable].icon;
     }
 
-    private emitParticles(nbConsummable: number, consummable: Consummable) {
-        if (nbConsummable > 0) {
-            this.shows[consummable as Consummable].positive = true;
-            setTimeout(() => { this.shows[consummable as Consummable].positive = false; }, 800);
-        } else if (nbConsummable < 0) {
-            this.shows[consummable as Consummable].negative = true;
-            setTimeout(() => { this.shows[consummable as Consummable].negative = false; }, 800);
+    private emitParticles(nbConsumable: number, consumable: Consumable) {
+        if (nbConsumable > 0) {
+            this.shows[consumable as Consumable].positive = true;
+            setTimeout(() => { this.shows[consumable as Consumable].positive = false; }, 800);
+        } else if (nbConsumable < 0) {
+            this.shows[consumable as Consumable].negative = true;
+            setTimeout(() => { this.shows[consumable as Consumable].negative = false; }, 800);
         }
     }
 }

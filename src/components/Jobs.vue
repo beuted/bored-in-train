@@ -36,7 +36,7 @@ import JobTooltip from '@/components/JobTooltip.vue';
 })
 export default class Jobs extends IdleGameVue {
     public get population() {
-        return this.$store.state.consummable.population;
+        return this.$store.state.consumable.population;
     }
 
     public getJobQuantity(jobName: Job) {
@@ -64,7 +64,7 @@ export default class Jobs extends IdleGameVue {
 
             totalWithJob += this.$store.state.map.jobs[key as Job].quantity;
         };
-        return this.$store.state.consummable.population.quantity - totalWithJob;
+        return this.$store.state.consumable.population.quantity - totalWithJob;
     }
 
     public get debugMode() {

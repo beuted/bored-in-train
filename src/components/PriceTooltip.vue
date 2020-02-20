@@ -18,8 +18,8 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
-import { Consummable } from '@/models/Consummable';
-import { StaticBuildingInfo, StaticConsummableInfo } from '@/services/GameEngine';
+import { Consumable } from '@/models/Consumable';
+import { StaticBuildingInfo, StaticConsumableInfo } from '@/services/GameEngine';
 import { Building } from '@/models/Building';
 import ConsumableIcon from '@/components/ConsumableIcon.vue';
 
@@ -30,7 +30,7 @@ import ConsumableIcon from '@/components/ConsumableIcon.vue';
 })
 export default class PriceTooltip extends IdleGameVue {
     @Prop() private building!: Building;
-    @Prop() private consummables!: {[id in Consummable]: { quantity: number }};
+    @Prop() private consumables!: {[id in Consumable]: { quantity: number }};
 
     public get buildableClass() {
         if (!this.isBuildable())
@@ -45,8 +45,8 @@ export default class PriceTooltip extends IdleGameVue {
 
     private isBuildable() {
         for (const key in StaticBuildingInfo[this.building].price) {
-            var value = StaticBuildingInfo[this.building].price[key as Consummable];
-            if (this.consummables[key as Consummable].quantity < value)
+            var value = StaticBuildingInfo[this.building].price[key as Consumable];
+            if (this.consumables[key as Consumable].quantity < value)
                 return false;
         }
         return true;

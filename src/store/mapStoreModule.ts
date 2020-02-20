@@ -2,8 +2,8 @@ import { Module, createNamespacedHelpers } from 'vuex';
 
 import { Building } from '@/models/Building';
 import { MapBuilder } from '../services/MapBuilder';
-import { Consummable } from '../models/Consummable';
-import { StaticConsummableInfo, StaticBuildingInfo } from '../services/GameEngine';
+import { Consumable } from '../models/Consumable';
+import { StaticConsumableInfo, StaticBuildingInfo } from '../services/GameEngine';
 import { Environment } from '../models/Environment';
 import { IMapTile } from '../models/IMapTile';
 import { UtilService } from '../services/UtilService';
@@ -252,9 +252,9 @@ export const MapModule: Module<IMapState, IState> = {
     }
   },
   getters: {
-    getRessourceStorage(state): (id: Consummable) => number {
-      return (id: Consummable) => {
-        var storage = StaticConsummableInfo[id].storage;
+    getRessourceStorage(state): (id: Consumable) => number {
+      return (id: Consumable) => {
+        var storage = StaticConsumableInfo[id].storage;
         if (storage === undefined)
           return -1;
 

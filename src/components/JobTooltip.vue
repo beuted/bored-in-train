@@ -23,8 +23,8 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
-import { StaticJobInfo, StaticConsummableInfo } from '@/services/GameEngine';
-import { Consummable } from '../models/Consummable';
+import { StaticJobInfo, StaticConsumableInfo } from '@/services/GameEngine';
+import { Consumable } from '../models/Consumable';
 import ConsumableIcon from '@/components/ConsumableIcon.vue';
 
 @Component({

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex, { Store, Module } from 'vuex';
 
-import { Consummable } from './models/Consummable';
+import { Consumable } from './models/Consumable';
 import { Job } from './models/Job';
 import { IJobProductionEvent } from './EventBus';
 import { MapModule, IMapState } from './store/mapStoreModule';
@@ -30,7 +30,7 @@ export interface IState {
   debugMode: boolean;
   showHelp: boolean;
   controls: { speed: number}
-  consummable: { [id in Consummable]: { quantity: number } };
+  consumable: { [id in Consumable]: { quantity: number } };
 }
 
 export default new Vuex.Store<IState>({
@@ -47,7 +47,7 @@ export default new Vuex.Store<IState>({
     debugMode: false,
     showHelp: true,
     controls: { speed: 1 },
-    consummable: {
+    consumable: {
       population: {
         quantity: 6,
       },
@@ -109,14 +109,14 @@ export default new Vuex.Store<IState>({
       else
         state.controls.speed = 1;
     },
-    // Increment the value of a consummable from 'value'
-    IncrementConsummable(state, obj: { name: Consummable, value: number }) {
-      state.consummable[obj.name].quantity += obj.value;
+    // Increment the value of a consumable from 'value'
+    IncrementConsumable(state, obj: { name: Consumable, value: number }) {
+      state.consumable[obj.name].quantity += obj.value;
     },
-    // Increment the value of a consummable from 'value'
-    IncrementConsummables(state, production: { [id in Consummable]: number }) {
-      for (let consummable in production) {
-        state.consummable[consummable as Consummable].quantity += production[consummable as Consummable];
+    // Increment the value of a consumable from 'value'
+    IncrementConsumables(state, production: { [id in Consumable]: number }) {
+      for (let consumable in production) {
+        state.consumable[consumable as Consumable].quantity += production[consumable as Consumable];
       }
     },
     //Add Job

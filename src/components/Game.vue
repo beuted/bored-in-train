@@ -5,7 +5,7 @@
         <Jobs />
       </div>
       <div class="map-item">
-        <Map :map="map" :buildings="buildings" :consummables="consummables"/>
+        <Map :map="map" :buildings="buildings" :consumables="consumables"/>
       </div>
       <div class="inventory-item">
         <Inventory />
@@ -17,10 +17,10 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { StaticConsummableInfo, IStaticConsummable, IConsuming, StaticJobInfo, IStaticJobInfo, IStaticJob, IStaticJobProduction } from '@/services/GameEngine';
+import { StaticConsumableInfo, IStaticConsumable, IConsuming, StaticJobInfo, IStaticJobInfo, IStaticJob, IStaticJobProduction } from '@/services/GameEngine';
 import { IState, IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
-import { Consummable } from '@/models/Consummable';
+import { Consumable } from '@/models/Consumable';
 import { EventBus, IJobProductionEvent } from '@/EventBus';
 import { GameService } from '@/services/GameService';
 
@@ -50,8 +50,8 @@ export default class Game extends IdleGameVue {
     return this.$store.state.map.buildings;
   }
 
-  private get consummables() {
-    return this.$store.state.consummable;
+  private get consumables() {
+    return this.$store.state.consumable;
   }
 
   public mounted() {

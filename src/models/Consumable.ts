@@ -1,4 +1,4 @@
-export enum Consummable {
+export enum Consumable {
     population= 'population',
     food = 'food',
     wood = 'wood',

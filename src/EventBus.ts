@@ -1,11 +1,11 @@
 import Vue from 'vue';
 import { Job } from './models/Job';
-import { Consummable } from './models/Consummable';
+import { Consumable } from './models/Consumable';
 export const EventBus = new Vue();
 
 export interface IJobProductionEvent {
     job: Job;
-    produced: { [id in Consummable]: number };
+    produced: { [id in Consumable]: number };
 }
 
 export interface IPopupMessageEvent {

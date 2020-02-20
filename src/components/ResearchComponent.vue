@@ -17,12 +17,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { ResearchInfo, StaticConsummableInfo } from '@/services/GameEngine';
+import { ResearchInfo, StaticConsumableInfo } from '@/services/GameEngine';
 import { IState, IdleGameVue } from '@/store';
 import { EventBus, IJobProductionEvent } from '@/EventBus';
 import { Research } from '@/models/Research';
 import { MessageService } from '@/services/MessageService';
-import { Consummable } from '../models/Consummable';
+import { Consumable } from '../models/Consumable';
 import ConsumableIcon from '@/components/ConsumableIcon.vue';
 
 @Component({
@@ -55,7 +55,7 @@ export default class ResearchComponent extends IdleGameVue {
   }
 
   public canAffordResearch(researchName: Research) {
-    return ResearchInfo[researchName].price <= this.$store.state.consummable.knowledge.quantity;
+    return ResearchInfo[researchName].price <= this.$store.state.consumable.knowledge.quantity;
   }
 
   public mounted() {

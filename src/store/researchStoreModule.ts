@@ -3,7 +3,7 @@ import { Module } from 'vuex';
 import { ResearchInfo } from '../services/GameEngine';
 import { IState } from '../store';
 import { Research } from '@/models/Research';
-import { Consummable } from '@/models/Consummable';
+import { Consumable } from '@/models/Consumable';
 import { Building } from '@/models/Building';
 import { Job } from '@/models/Job';
 
@@ -43,7 +43,7 @@ export const ResearchModule: Module<IResearchState, IState> = {
     BuyResearch(context, obj: { researchName: Research }) {
       console.debug(`Buying research ${obj.researchName}`);
       context.commit('OwnResearch', obj);
-      context.commit('IncrementConsummable', { name: Consummable.knowledge, value: -ResearchInfo[obj.researchName as Research].price }, { root: true })
+      context.commit('IncrementConsumable', { name: Consumable.knowledge, value: -ResearchInfo[obj.researchName as Research].price }, { root: true })
     },
   },
   getters: {

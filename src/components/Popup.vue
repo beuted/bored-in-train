@@ -16,7 +16,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
-import { StaticConsummableInfo, StaticJobInfo, GlobalConfig } from '@/services/GameEngine';
+import { StaticConsumableInfo, StaticJobInfo, GlobalConfig } from '@/services/GameEngine';
 import { EventBus, IPopupMessageEvent } from '@/EventBus';
 
 

@@ -31,7 +31,7 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
-import { Consummable } from '@/models/Consummable';
+import { Consumable } from '@/models/Consumable';
 import { StaticBuildingInfo } from '@/services/GameEngine';
 import { Building } from '@/models/Building';
 import { IMapTile } from '@/models/IMapTile';

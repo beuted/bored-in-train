@@ -2,9 +2,9 @@
     <div class="inventory">
         <span class="title">Inventory</span>
         <ul>
-            <li v-for="(consummable, key) in consummables" v-bind:key="key">
-                <ParticleEmitter :consummable="key">
-                    <div> {{ getName(key) }} <img v-bind:src="getIcon(key)"> {{ consummable.quantity }} / {{ getStorage(key) }}</div>
+            <li v-for="(consumable, key) in consumables" v-bind:key="key">
+                <ParticleEmitter :consumable="key">
+                    <div> {{ getName(key) }} <img v-bind:src="getIcon(key)"> {{ consumable.quantity }} / {{ getStorage(key) }}</div>
                 </ParticleEmitter>
                 <div class="production" v-bind:class="{ negative: computeProduction(key) < 0 }"> ({{ computeProduction(key) }} /sec)</div>
             </li>
@@ -16,8 +16,8 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
 import { Job } from '@/models/Job';
-import { Consummable } from '@/models/Consummable';
-import { StaticConsummableInfo, StaticJobInfo, GlobalConfig } from '@/services/GameEngine';
+import { Consumable } from '@/models/Consumable';
+import { StaticConsumableInfo, StaticJobInfo, GlobalConfig } from '@/services/GameEngine';
 
 import ParticleEmitter from '@/components/ParticleEmitter.vue';
 import { MessageService } from '@/services/MessageService';
@@ -29,34 +29,34 @@ import { MessageService } from '@/services/MessageService';
 })
 export default class Inventory extends IdleGameVue {
 
-    get consummables() {
-         return this.$store.state.consummable;
+    get consumables() {
+         return this.$store.state.consumable;
     }
 
-    getName(consummable: Consummable) {
-        return StaticConsummableInfo[consummable].name;
+    getName(consumable: Consumable) {
+        return StaticConsumableInfo[consumable].name;
     }
 
-    getIcon(consummable: Consummable) {
-        return StaticConsummableInfo[consummable].icon;
+    getIcon(consumable: Consumable) {
+        return StaticConsumableInfo[consumable].icon;
     }
 
-    public computeProduction(consummable: Consummable) {
+    public computeProduction(consumable: Consumable) {
         let production = 0;
         for (let job in this.$store.state.map.jobs) {
             let quantity = this.$store.state.map.jobs[job as Job].quantity;
 
-            let consumeObj = StaticJobInfo[job as Job].consume[consummable];
+            let consumeObj = StaticJobInfo[job as Job].consume[consumable];
             let consume = consumeObj ? consumeObj.quantity : 0;
 
-            let produceObj = StaticJobInfo[job as Job].produce[consummable];
+            let produceObj = StaticJobInfo[job as Job].produce[consumable];
             let produce = produceObj ? produceObj.quantity : 0;
 
             production += (produce - consume) / (GlobalConfig.TickInterval / 1000) * quantity;
         }
 
         if (production < -0.01) {
-            MessageService.Help(`Be careful! You have reached a negative production of ${consummable}. Either try to produce more of this ressource or remove some workers to consume less of it.`, 'negative-'+consummable);
+            MessageService.Help(`Be careful! You have reached a negative production of ${consumable}. Either try to produce more of this ressource or remove some workers to consume less of it.`, 'negative-'+consumable);
         }
         var result = production.toFixed(2);
         // Avoid "negative zero"
@@ -69,8 +69,8 @@ export default class Inventory extends IdleGameVue {
         return this.$store.state.debugMode;
     }
 
-    public getStorage(consummable: string) {
-        var storage = this.$store.getters.getRessourceStorage(consummable);
+    public getStorage(consumable: string) {
+        var storage = this.$store.getters.getRessourceStorage(consumable);
         return storage != -1 ? storage : '∞';
     }
 }

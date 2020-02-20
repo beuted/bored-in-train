@@ -5,7 +5,7 @@
                 <span v-if="isKnown(key)">
                     <input type="radio" :id="key" :value="key" v-model="buildingType" v-on:click="buildingClicked(key)">
                     <label :for="key">
-                        <PriceTooltip :building="key" :consummables="consummables">
+                        <PriceTooltip :building="key" :consumables="consumables">
                             <span v-once><img v-bind:src="mapBuildingImages[key].src"></span> x {{ building.quantity }}
                         </PriceTooltip>
                     </label>
@@ -31,7 +31,7 @@ import { StaticBuildingInfo, ResearchInfo } from '@/services/GameEngine'
 import { Environment } from '@/models/Environment';
 import { IMapTile } from '@/models/IMapTile';
 import { IState, IdleGameVue } from '@/store';
-import { Consummable } from '@/models/Consummable';
+import { Consumable } from '@/models/Consumable';
 import { Research } from '../models/Research';
 import { Keycodes } from '../models/Keycodes';
 
@@ -87,7 +87,7 @@ export default class Map extends IdleGameVue {
 
     @Prop() private map!: IMapTile[][];
     @Prop() private buildings!: { [id in Building]: { quantity: number } };
-    @Prop() private consummables!: {[id in Consummable]: { quantity: number }};
+    @Prop() private consumables!: {[id in Consumable]: { quantity: number }};
 
     private keyBoardService: KeyboardService;
 
@@ -421,10 +421,10 @@ export default class Map extends IdleGameVue {
         }
 
         // Pay the price of your purchase
-        for (let consummable in StaticBuildingInfo[building].price) {
-            let price = StaticBuildingInfo[building].price[consummable as Consummable];
+        for (let consumable in StaticBuildingInfo[building].price) {
+            let price = StaticBuildingInfo[building].price[consumable as Consumable];
             if (price && price != 0)
-                this.$store.commit('IncrementConsummable', { name: consummable, value: -price });
+                this.$store.commit('IncrementConsumable', { name: consumable, value: -price });
         }
 
         this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: building });
@@ -435,11 +435,11 @@ export default class Map extends IdleGameVue {
             return {result: false, reason: 'This tile is outside the map'};
 
         // Check if you can afford your purchase
-        for (let consummableId in StaticBuildingInfo[building].price) {
-            let price = StaticBuildingInfo[building].price[consummableId as Consummable];
+        for (let consumableId in StaticBuildingInfo[building].price) {
+            let price = StaticBuildingInfo[building].price[consumableId as Consumable];
 
-            if (price && this.consummables[consummableId as Consummable].quantity < price)
-                return {result: false, reason: `You don't have enough ${consummableId}`};
+            if (price && this.consumables[consumableId as Consumable].quantity < price)
+                return {result: false, reason: `You don't have enough ${consumableId}`};
         }
 
         // If building is already there

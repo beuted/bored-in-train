@@ -242,6 +242,8 @@ export default class Map extends IdleGameVue {
             this.nbTilesOnRowOrColumnOnScreen *= 2;
             this.tileSize /= 2;
 
+            this.boundMapOffset();
+
             this.$store.commit('MapNeedsUpdate');
         }
         this.keyBoardService.Reset();
@@ -404,15 +406,7 @@ export default class Map extends IdleGameVue {
             this.mapOffset.x = event.pageX - this.draggingStartPoint.x;
             this.mapOffset.y = event.pageY - this.draggingStartPoint.y;
 
-            if (this.mapOffset.x < (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize)
-                this.mapOffset.x = (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize;
-            if (this.mapOffset.x > 0)
-                this.mapOffset.x = 0;
-
-            if (this.mapOffset.y < (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize)
-                this.mapOffset.y = (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize;
-            if (this.mapOffset.y > 0)
-                this.mapOffset.y = 0;
+            this.boundMapOffset();
 
             // Of a drag happened do not consider it as a click
             this.isDragging = false;
@@ -504,6 +498,18 @@ export default class Map extends IdleGameVue {
             x: Math.floor((x-this.mapOffset.x)/this.tileSize),
             y: Math.floor((y-this.mapOffset.y)/this.tileSize)
         }
+    }
+
+    private boundMapOffset() {
+        if (this.mapOffset.x < (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize)
+            this.mapOffset.x = (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize;
+        if (this.mapOffset.x > 0)
+            this.mapOffset.x = 0;
+
+        if (this.mapOffset.y < (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize)
+            this.mapOffset.y = (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize;
+        if (this.mapOffset.y > 0)
+            this.mapOffset.y = 0;
     }
 }
 </script>

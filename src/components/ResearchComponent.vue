@@ -8,7 +8,7 @@
         v-on:click="buyResearch(researchName)"
         :disabled="isResearchOwned(researchName)">
         <div>{{ getResearchInfo(researchName).name }}</div>
-        <div class="price">Price: {{ getResearchInfo(researchName).price }} x 🔬</div>
+        <div class="price">Price: <img class="consummable-icon" :src="getKnowledgeIcon()" />x {{ getResearchInfo(researchName).price }}</div>
       </button>
     </div>
   </div>
@@ -17,11 +17,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { ResearchInfo } from '@/services/GameEngine';
+import { ResearchInfo, StaticConsummableInfo } from '@/services/GameEngine';
 import { IState, IdleGameVue } from '@/store';
 import { EventBus, IJobProductionEvent } from '@/EventBus';
 import { Research } from '@/models/Research';
 import { MessageService } from '@/services/MessageService';
+import { Consummable } from '../models/Consummable';
 
 @Component({
   components: {
@@ -58,6 +59,10 @@ export default class ResearchComponent extends IdleGameVue {
   }
 
   public mounted() {
+  }
+
+  public getKnowledgeIcon() {
+      return StaticConsummableInfo[Consummable.knowledge].icon;
   }
 }
 </script>
@@ -100,6 +105,11 @@ export default class ResearchComponent extends IdleGameVue {
 
 .price {
   color: #3a96dd;
+}
+
+.consummable-icon {
+    vertical-align: top;
+    margin-right: 5px;
 }
 
 </style>

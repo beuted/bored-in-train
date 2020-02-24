@@ -69,6 +69,7 @@ export default class Map extends IdleGameVue {
     private mapBuildingImages: { [id in Building]: HTMLImageElement } = {
         forest: new Image(),
         village: new Image(),
+        gathererHut: new Image(),
         barn: new Image(),
         farm: new Image(),
         stoneMine: new Image(),
@@ -122,16 +123,10 @@ export default class Map extends IdleGameVue {
         this.mapEnvironmentImages[Environment.Beach].src = './img/beach.png';
         this.mapEnvironmentImages[Environment.Snow].src = './img/snow.png';
         this.mapEnvironmentImages[Environment.Concrete].src = './img/concrete.png';
-        this.mapBuildingImages[Building.forest].src = './img/foret-stage3.png';
-        this.mapBuildingImages[Building.village].src = './img/village-2.png';
-        this.mapBuildingImages[Building.barn].src = './img/entrepot.png';
-        this.mapBuildingImages[Building.farm].src = './img/farm.png';
-        this.mapBuildingImages[Building.stoneMine].src = './img/minecalcaire.png';
-        this.mapBuildingImages[Building.sawmill].src = './img/windmill.png'
-        this.mapBuildingImages[Building.coalMine].src = './img/minecharbon.png';
-        this.mapBuildingImages[Building.limestoneMine].src = './img/minecalcaire.png';
-        this.mapBuildingImages[Building.limestoneBrickFactory].src = './img/limestone-brick-factory.png';
-        this.mapBuildingImages[Building.coalPowerStation].src = './img/centralecharbon.png';
+
+        for (const building in StaticBuildingInfo)
+            this.mapBuildingImages[building as Building].src = StaticBuildingInfo[building as Building].icon;
+
         this.mapHabitatImages[Habitat.CoalDeposite].src = './img/coal-deposit.png';
         this.mapHabitatImages[Habitat.StoneDeposite].src = './img/stone-deposit.png';
         this.mapHabitatImages[Habitat.LimestoneDeposite].src = './img/limestone-deposit.png';

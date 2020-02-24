@@ -8,7 +8,6 @@ import { Environment } from '../models/Environment';
 import { IMapTile } from '../models/IMapTile';
 import { UtilService } from '../services/UtilService';
 import { IState } from '../store';
-import { Job } from '@/models/Job';
 import Vue from 'vue';
 import { MessageService } from '@/services/MessageService';
 
@@ -17,12 +16,10 @@ export interface IMapState {
   map: IMapTile[][],
   mapNeedsUpdate: boolean,
   buildings: IMapBuildings,
-  jobs: IMapJobs;
 }
 
 //TODO: remove quantity use lenght
 export type IMapBuildings = { [id in Building]: { quantity: number, coords: { [xThenCommaThenY in string]: { x: number, y: number } } } }
-export type IMapJobs = { [id in Job]: { quantity: number } }
 
 export const MapModule: Module<IMapState, IState> = {
   state: {
@@ -31,6 +28,10 @@ export const MapModule: Module<IMapState, IState> = {
     mapNeedsUpdate: true,
     buildings: {
       village: {
+        quantity: 0,
+        coords: {}
+      },
+      gathererHut: {
         quantity: 0,
         coords: {}
       },
@@ -70,48 +71,7 @@ export const MapModule: Module<IMapState, IState> = {
         quantity: 0,
         coords: {}
       },
-    },
-    jobs: {
-      berryGatherer: {
-        quantity: 1,
-      },
-      woodGatherer: {
-        quantity: 0,
-      },
-      explorer: {
-        quantity: 0,
-      },
-      druid: {
-        quantity: 0,
-      },
-      farmer: {
-        quantity: 0,
-      },
-      stoneGatherer: {
-        quantity: 0,
-      },
-      stoneMiner: {
-        quantity: 0,
-      },
-      lumberjack: {
-        quantity: 0,
-      },
-      coalMiner: {
-        quantity: 0,
-      },
-      limestoneMiner: {
-        quantity: 0,
-      },
-      limestoneBrickWorker: {
-        quantity: 0,
-      },
-      coalStationEngineer: {
-        quantity: 0,
-      },
-      default: { //Job producing population
-        quantity: 1,
-      }
-    },
+    }
   },
   actions: {
     DiscoverTile({ getters, commit, state }) {
@@ -149,7 +109,7 @@ export const MapModule: Module<IMapState, IState> = {
     },
     // Change a tile of a map giving it a certain type
     ChangeTile(state: IMapState, obj: { x: number, y: number, type: Building | null }) {
-      ChangeTile(state.map, state.buildings, state.jobs, obj);
+      ChangeTile(state.map, state.buildings, obj);
       state.mapNeedsUpdate = true;
     },
     MakeTileDiscovered(state: IMapState, obj: { x: number, y: number }) {
@@ -241,7 +201,7 @@ export const MapModule: Module<IMapState, IState> = {
             console.log('Forest exausted...');
             MessageService.Help('Your lumberjacks have destroyed a forest... Try to have more trees around your Sawmills to let the forests naturally regenerate.', 'forest-exausted');
             Vue.toasted.error(`Your lumberjacks have destroyed a forest`);
-            ChangeTile(mapCopy, state.buildings, state.jobs, {x: i, y: j, type: null});
+            ChangeTile(mapCopy, state.buildings, {x: i, y: j, type: null});
             mapCopy[i][j].quantity = 0;
           }
         }
@@ -264,14 +224,13 @@ export const MapModule: Module<IMapState, IState> = {
   }
 }
 
-function updateCloseByTreeAndSawmill(pos: {x: number, y: number}, map: IMapTile[][], buildings: IMapBuildings, jobs: IMapJobs, increment: number) {
+function updateCloseByTreeAndSawmill(pos: {x: number, y: number}, map: IMapTile[][], buildings: IMapBuildings, increment: number) {
   map[pos.x][pos.y].closeByTrees += increment;
   if (map[pos.x][pos.y].building == Building.sawmill && map[pos.x][pos.y].closeByTrees <= 0) {
     delete buildings[Building.sawmill].coords[pos.x+','+pos.y];
     buildings[Building.sawmill].quantity--;
     // We do not remove the building from state.map so that it still appear on the map
 
-    jobs[Job.lumberjack].quantity -= map[pos.x][pos.y].population;
     map[pos.x][pos.y].population = 0;
     map[pos.x][pos.y].disabled = true;
 
@@ -286,29 +245,26 @@ function updateCloseByTreeAndSawmill(pos: {x: number, y: number}, map: IMapTile[
   }
 }
 
-function UpdateNbTreeNearBy(pos: {x: number, y: number}, map: IMapTile[][], buildings: IMapBuildings, jobs: IMapJobs, increment: number) {
+function UpdateNbTreeNearBy(pos: {x: number, y: number}, map: IMapTile[][], buildings: IMapBuildings, increment: number) {
   if (pos.x > 0)
-    updateCloseByTreeAndSawmill({x: pos.x-1, y: pos.y}, map, buildings, jobs, increment);
+    updateCloseByTreeAndSawmill({x: pos.x-1, y: pos.y}, map, buildings, increment);
 
   if (pos.x < map.length-1)
-    updateCloseByTreeAndSawmill({x: pos.x+1, y: pos.y}, map, buildings, jobs, increment);
+    updateCloseByTreeAndSawmill({x: pos.x+1, y: pos.y}, map, buildings, increment);
 
   if (pos.y > 0)
-    updateCloseByTreeAndSawmill({x: pos.x, y: pos.y-1}, map, buildings, jobs, increment);
+    updateCloseByTreeAndSawmill({x: pos.x, y: pos.y-1}, map, buildings, increment);
 
   if (pos.y < map.length-1)
-    updateCloseByTreeAndSawmill({x: pos.x, y: pos.y+1}, map, buildings, jobs, increment);
+    updateCloseByTreeAndSawmill({x: pos.x, y: pos.y+1}, map, buildings, increment);
 }
 
-function ChangeTile(map: IMapTile[][], buildings: IMapBuildings, jobs: IMapJobs, obj: { x: number, y: number, type: Building | null }) {
+function ChangeTile(map: IMapTile[][], buildings: IMapBuildings, obj: { x: number, y: number, type: Building | null }) {
   var previousTile = map[obj.x][obj.y];
 
   console.debug(`Changing tile ${obj.x}, ${obj.y} from ${previousTile.building} to ${obj.type}`);
 
   if (previousTile.building != null && !previousTile.disabled) {
-    let removedJob = StaticBuildingInfo[previousTile.building].job
-    if (removedJob != null && previousTile.population > 0)
-      jobs[removedJob].quantity -= previousTile.population;
     buildings[previousTile.building].quantity--;
     delete buildings[previousTile.building].coords[obj.x + ',' + obj.y];
   }
@@ -316,7 +272,7 @@ function ChangeTile(map: IMapTile[][], buildings: IMapBuildings, jobs: IMapJobs,
   // We need to update nbTreeNearby if a forest is added or deleted
   if (previousTile.building == Building.forest || obj.type == Building.forest) {
     let increment = (obj.type == Building.forest ? 1 : 0) - (previousTile.building == Building.forest ? 1 : 0)
-    UpdateNbTreeNearBy(obj, map, buildings, jobs, increment);
+    UpdateNbTreeNearBy(obj, map, buildings, increment);
   }
 
   map[obj.x][obj.y].building = obj.type;

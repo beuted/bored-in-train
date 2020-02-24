@@ -1,13 +1,12 @@
-import { StaticJobInfo, IStaticJob, IStaticJobProduction, StaticConsumableInfo, IStaticConsumable, GlobalConfig } from './GameEngine';
-import { Job } from '@/models/Job';
-import { IJobProductionEvent, EventBus } from '@/EventBus';
+import { IStaticBuildingProduction, StaticConsumableInfo, IStaticConsumable, GlobalConfig, StaticBuildingInfo, IStaticBuilding } from './GameEngine';
+import { IProductionEvent, EventBus } from '@/EventBus';
 import { Consumable } from '@/models/Consumable';
 import store from '@/store'
 import Vue from 'vue';
 import { MessageService } from './MessageService';
+import { Building } from '@/models/Building';
 
 export class GameService {
-  private readonly StarvationFactor = 0.5; // Portion of disapearing goods when missing consumable
   private readonly LackOfStorageFactor = 1.0; // Portion of disapearing goods when missing storage
 
   private hasBeenInit = false;
@@ -38,25 +37,25 @@ export class GameService {
     let newConsumables = JSON.parse(JSON.stringify(store.state.consumable)); // TODO: Dirty deepcopy because Object.assign isn't enough
 
     // First the creation of ressources
-    for (let jobId in StaticJobInfo) {
-      let staticJob: IStaticJob = StaticJobInfo[jobId as Job]; //TODO: fix typeing weirdlness
+    for (let buildingId in StaticBuildingInfo) {
+      let staticBuilding: IStaticBuilding = StaticBuildingInfo[buildingId as Building]; //TODO: fix typeing weirdlness
 
-      for (let consumableId in staticJob.produce) {
-        let staticJobProduction: IStaticJobProduction | null = staticJob.produce[consumableId as Consumable];
-        if (staticJobProduction == null)
+      for (let consumableId in staticBuilding.produce) {
+        let staticBuildingProduction: IStaticBuildingProduction | null = staticBuilding.produce[consumableId as Consumable];
+        if (staticBuildingProduction == null)
           continue;
 
-        let nbProducers = store.state.map.jobs[jobId as Job].quantity;
-        newConsumables[consumableId as Consumable].quantity += nbProducers * staticJobProduction.quantity;
+        let nbProducers = store.state.map.buildings[buildingId as Building].quantity;
+        newConsumables[consumableId as Consumable].quantity += nbProducers * staticBuildingProduction.quantity;
       }
 
       let nbUnfullfiledWorkers = 0; // Nb workers that have not been receiving ressources therefore will be deduced from production
-      for (let consumableId in staticJob.consume) {
-        let staticJobConsumption: IStaticJobProduction | null = staticJob.consume[consumableId as Consumable];
+      for (let consumableId in staticBuilding.consume) {
+        let staticJobConsumption: IStaticBuildingProduction | null = staticBuilding.consume[consumableId as Consumable];
         if (staticJobConsumption == null)
           continue;
 
-        let nbConsummer = store.state.map.jobs[jobId as Job].quantity;
+        let nbConsummer = store.state.map.buildings[buildingId as Building].quantity;
         if (newConsumables[consumableId as Consumable].quantity >= nbConsummer * staticJobConsumption.quantity) {
           newConsumables[consumableId as Consumable].quantity -= nbConsummer * staticJobConsumption.quantity;
         } else {
@@ -72,10 +71,10 @@ export class GameService {
 
       // Remove part of production based on number of workers with non-fullfiled needs
       if (nbUnfullfiledWorkers > 0) {
-        MessageService.Help(`Careful! Some ${jobId} have not seen their needs fullfiled, they will not produce any ressource. Either produce more of the missing resource or remove some of them.`, 'needs-not-fullfiled');
-        Vue.toasted.error(`${nbUnfullfiledWorkers} ${jobId} have not seen their needs fullfiled, they will not produce any ressource`);
-        for (let consumableId in staticJob.produce) {
-          let staticJobProduction: IStaticJobProduction | null = staticJob.produce[consumableId as Consumable];
+        MessageService.Help(`Careful! Some ${buildingId} have not seen their needs fullfiled, they will not produce any ressource. Either produce more of the missing resource or remove some of them.`, 'needs-not-fullfiled');
+        Vue.toasted.error(`${nbUnfullfiledWorkers} ${buildingId} have not seen their needs fullfiled, they will not produce any ressource`);
+        for (let consumableId in staticBuilding.produce) {
+          let staticJobProduction: IStaticBuildingProduction | null = staticBuilding.produce[consumableId as Consumable];
           if (staticJobProduction == null)
             continue;
 
@@ -118,8 +117,8 @@ export class GameService {
   }
 
   private tryDiscoverLand() {
-    //TODO: even if there is no food explorer still discover shits
-    let nbExplorers = store.state.map.jobs.explorer.quantity;
+    //TODO: tours de gaie !
+    let nbExplorers = 10;//store.state.map.buildings.explorer.quantity;
 
     if (nbExplorers > 0 && store.state.controls.speed > 0) {
       let nbLandFound = store.state.map.mapNbTileFound;

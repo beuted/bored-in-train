@@ -2,13 +2,12 @@ import Vue from 'vue';
 import Vuex, { Store, Module } from 'vuex';
 
 import { Consumable } from './models/Consumable';
-import { Job } from './models/Job';
-import { IJobProductionEvent } from './EventBus';
+import { IProductionEvent } from './EventBus';
 import { MapModule, IMapState } from './store/mapStoreModule';
 import { IResearchState, ResearchModule } from './store/researchStoreModule';
 import { StoreSaver } from './store/storeSaver';
 import { Building } from './models/Building';
-import { StaticJobInfo, StaticBuildingInfo } from './services/GameEngine';
+import { StaticBuildingInfo } from './services/GameEngine';
 
 
 Vue.use(Vuex);
@@ -117,44 +116,6 @@ export default new Vuex.Store<IState>({
     IncrementConsumables(state, production: { [id in Consumable]: number }) {
       for (let consumable in production) {
         state.consumable[consumable as Consumable].quantity += production[consumable as Consumable];
-      }
-    },
-    //Add Job
-    AddJob(state, obj: { jobName: Job, quantity: number }) {
-      console.debug(`AddJob tile ${obj.jobName}, ${obj.quantity}`);
-      state.map.jobs[obj.jobName].quantity += obj.quantity;
-
-      const storage = StaticJobInfo[obj.jobName].storage;
-      // Add these new workers on buildings
-      if (obj.quantity > 0 && storage != undefined) {
-        let toBeAdded = obj.quantity;
-        var buildingCoords = state.map.buildings[storage.name].coords;
-        for (let coord of Object.values(buildingCoords)) {
-          if (state.map.map[coord.x][coord.y].population < storage.capacity) {
-            let toAdd = Math.min(toBeAdded, storage.capacity - state.map.map[coord.x][coord.y].population);
-            state.map.map[coord.x][coord.y].population += toAdd;
-            toBeAdded -= toAdd;
-            if (toBeAdded <= 0) {
-              break;
-            }
-          }
-        }
-      }
-
-      // Remove these new workers from buildings
-      else if (obj.quantity < 0 && storage != undefined) {
-        let toBeRemoved = -obj.quantity;
-        var buildingCoords = state.map.buildings[storage.name].coords;
-        for (let coord of Object.values(buildingCoords)) {
-          if (state.map.map[coord.x][coord.y].population > 0) {
-            let toRemove = Math.min(toBeRemoved, state.map.map[coord.x][coord.y].population);
-            state.map.map[coord.x][coord.y].population -= toRemove;
-            toBeRemoved -= toRemove;
-            if (toBeRemoved <= 0) {
-              break;
-            }
-          }
-        }
       }
     },
   },

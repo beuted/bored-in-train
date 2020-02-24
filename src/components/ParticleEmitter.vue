@@ -16,9 +16,8 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { IdleGameVue } from '@/store';
-import { Job } from '@/models/Job';
-import { StaticJobInfo, StaticConsumableInfo } from '@/services/GameEngine';
-import { EventBus, IJobProductionEvent } from '@/EventBus';
+import { StaticConsumableInfo } from '@/services/GameEngine';
+import { EventBus, IProductionEvent } from '@/EventBus';
 import { Consumable } from '@/models/Consumable';
 
 @Component({

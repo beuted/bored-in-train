@@ -15,12 +15,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
-import { Job } from '@/models/Job';
 import { Consumable } from '@/models/Consumable';
-import { StaticConsumableInfo, StaticJobInfo, GlobalConfig } from '@/services/GameEngine';
+import { StaticConsumableInfo, GlobalConfig, StaticBuildingInfo } from '@/services/GameEngine';
 
 import ParticleEmitter from '@/components/ParticleEmitter.vue';
 import { MessageService } from '@/services/MessageService';
+import { Building } from '../models/Building';
 
 @Component({
   components: {
@@ -43,13 +43,13 @@ export default class Inventory extends IdleGameVue {
 
     public computeProduction(consumable: Consumable) {
         let production = 0;
-        for (let job in this.$store.state.map.jobs) {
-            let quantity = this.$store.state.map.jobs[job as Job].quantity;
+        for (let building in this.$store.state.map.buildings) {
+            let quantity = this.$store.state.map.buildings[building as Building].quantity;
 
-            let consumeObj = StaticJobInfo[job as Job].consume[consumable];
+            let consumeObj = StaticBuildingInfo[building as Building].consume[consumable];
             let consume = consumeObj ? consumeObj.quantity : 0;
 
-            let produceObj = StaticJobInfo[job as Job].produce[consumable];
+            let produceObj = StaticBuildingInfo[building as Building].produce[consumable];
             let produce = produceObj ? produceObj.quantity : 0;
 
             production += (produce - consume) / (GlobalConfig.TickInterval / 1000) * quantity;

@@ -5,7 +5,6 @@ import { IState } from '../store';
 import { Research } from '@/models/Research';
 import { Consumable } from '@/models/Consumable';
 import { Building } from '@/models/Building';
-import { Job } from '@/models/Job';
 
 export interface IResearchState {
   research: { [id in Research]: { owned: boolean } },

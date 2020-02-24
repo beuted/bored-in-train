@@ -17,12 +17,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
-import { StaticJobInfo } from '@/services/GameEngine';
-import { Job } from '@/models/Job';
 import { Building } from '@/models/Building';
 import { StoreSaver } from '@/store/storeSaver';
-
-
 
 @Component({
   components: {

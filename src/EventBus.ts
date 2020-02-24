@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import { Job } from './models/Job';
+import { Building } from './models/Building';
 import { Consumable } from './models/Consumable';
 export const EventBus = new Vue();
 
-export interface IJobProductionEvent {
-    job: Job;
+export interface IProductionEvent {
+    building: Building;
     produced: { [id in Consumable]: number };
 }
 

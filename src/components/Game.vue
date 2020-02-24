@@ -1,9 +1,6 @@
   <template>
   <div>
     <div class="flex-container">
-      <div class="job-item">
-        <Jobs />
-      </div>
       <div class="map-item">
         <Map :map="map" :buildings="buildings" :consumables="consumables"/>
       </div>
@@ -17,14 +14,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { StaticConsumableInfo, IStaticConsumable, IConsuming, StaticJobInfo, IStaticJobInfo, IStaticJob, IStaticJobProduction } from '@/services/GameEngine';
+import { StaticConsumableInfo, IStaticConsumable, IConsuming } from '@/services/GameEngine';
 import { IState, IdleGameVue } from '@/store';
-import { Job } from '@/models/Job';
 import { Consumable } from '@/models/Consumable';
-import { EventBus, IJobProductionEvent } from '@/EventBus';
+import { EventBus } from '@/EventBus';
 import { GameService } from '@/services/GameService';
 
-import Jobs from '@/components/Jobs.vue';
 import Inventory from '@/components/Inventory.vue';
 import Map from '@/components/Map.vue';
 import Controls from '@/components/Controls.vue';
@@ -34,7 +29,6 @@ const gameService = new GameService();
 
 @Component({
   components: {
-    Jobs,
     Inventory,
     Map
   },
@@ -71,11 +65,6 @@ export default class Game extends IdleGameVue {
 }
 
 .inventory-item {
-  margin-top: 50px;
-  width: 300px;
-}
-
-.job-item {
   margin-top: 50px;
   width: 300px;
 }

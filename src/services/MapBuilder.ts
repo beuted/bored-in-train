@@ -84,6 +84,10 @@ export class MapBuilder {
             quantity: 1,
             coords: { [center+','+center] : { x: center, y: center } }
           },
+          gathererHut: {
+            quantity: 0,
+            coords: { }
+          },
           barn: {
             quantity: 1,
             coords: { [center+','+(center+1)] : { x: center, y: center+1 } }

@@ -1,5 +1,4 @@
 import { Consumable } from '@/models/Consumable';
-import { Job } from '@/models/Job';
 import { Building } from '@/models/Building';
 import { Research } from '@/models/Research';
 
@@ -19,9 +18,11 @@ export interface IStaticConsumable {
 
 export interface IStaticBuilding {
   name: string;
+  icon: string;
   description: string;
+  produce: {[id in Consumable]: IStaticBuildingProduction | null };
+  consume: {[id in Consumable]: IStaticBuildingProduction | null };
   price: {[id in Consumable]: number};
-  job: Job | null;
 }
 
 export interface IConsuming {
@@ -38,6 +39,7 @@ export interface IStorage {
 export const StaticBuildingInfo: IStaticBuildingInfo = {
   village: {
     name: 'Village',
+    icon: './img/village-2.png',
     description: 'Increases your maximum population by 10',
     price: {
       population: 0,
@@ -50,10 +52,76 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
-    job: null
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
+  },
+  gathererHut: {
+    name: 'Gatherer Hut',
+    icon: './img/village.png',
+    description: 'Hut from where people will go try to find some rocks and woods. They\'ll find berries on their journey so you don\'t need to feed them.',
+    price: {
+      population: 2,
+      food: 0,
+      wood: 10,
+      stones: 0,
+      coals: 0,
+      limestone: 0,
+      limestoneBrick: 0,
+      energy: 0,
+      knowledge: 0
+    },
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': {
+        probability: 1,
+        quantity: 0.5
+      },
+      'stones': {
+        probability: 1,
+        quantity: 0.5
+      },
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
   },
   barn: {
     name: 'Barns',
+    icon: './img/entrepot.png',
     description: 'Increases the quantity of food you can store by 20',
     price: {
       population: 0,
@@ -66,13 +134,35 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
-    job: null
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
   },
   farm: {
     name: 'Farm',
+    icon: './img/farm.png',
     description: 'Allows you to recruit 3 farmers',
     price: {
-      population: 0,
+      population: 3,
       food: 0,
       wood: 25,
       stones: 5,
@@ -82,13 +172,41 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
-    job: Job.farmer
+    produce: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 3
+      },
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': null,
+      'wood': {
+        probability: 1,
+        quantity: 1
+      },
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
   },
   sawmill: {
     name: 'Sawmill',
+    icon: './img/windmill.png',
     description: 'Allows you to gather wood at scale',
     price: {
-      population: 0,
+      population: 3,
       food: 0,
       wood: 30,
       stones: 0,
@@ -98,13 +216,41 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
-    job: Job.lumberjack
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': {
+        probability: 1,
+        quantity: 3
+      },
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
   },
   stoneMine: {
     name: 'Stone Mine',
+    icon: './img/minecalcaire.png',
     description: 'Allows you to recruit 3 stoneminers, must be built on a stone deposite',
     price: {
-      population: 0,
+      population: 3,
       food: 0,
       wood: 50,
       stones: 30,
@@ -114,13 +260,41 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
-    job: Job.stoneMiner
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': {
+        probability: 1,
+        quantity: 3
+      },
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
   },
   coalMine: {
     name: 'Coal Mine',
+    icon: './img/minecharbon.png',
     description: 'Allows you to recruit 3 coal miners, must be built on a coal deposite',
     price: {
-      population: 0,
+      population: 3,
       food: 0,
       wood: 50,
       stones: 100,
@@ -130,13 +304,41 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
-    job: Job.coalMiner
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': {
+        probability: 1,
+        quantity: 3
+      },
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
   },
   limestoneMine: {
     name: 'Limestone Mine',
+    icon: './img/minecalcaire.png',
     description: 'Allows you to recruit 3 limestone miners, must be built on a limestone deposite',
     price: {
-      population: 0,
+      population: 3,
       food: 0,
       wood: 100,
       stones: 150,
@@ -146,13 +348,41 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
-    job: Job.limestoneMiner
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': {
+        probability: 1,
+        quantity: 3
+      },
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
   },
   limestoneBrickFactory: {
     name: 'Brick Factory',
+    icon: './img/limestone-brick-factory.png',
     description: 'Allows you to recruit 3 brick workers',
     price: {
-      population: 0,
+      population: 3,
       food: 0,
       wood: 200,
       stones: 200,
@@ -162,13 +392,41 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
-    job: Job.limestoneBrickWorker
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': {
+        probability: 1,
+        quantity: 3
+      },
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
   },
   coalPowerStation: {
     name: 'Coal Power Station',
+    icon: './img/centralecharbon.png',
     description: 'Allows you to recruit 3 coal station engineer',
     price: {
-      population: 0,
+      population: 3,
       food: 0,
       wood: 200,
       stones: 50,
@@ -178,10 +436,41 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
-    job: Job.coalStationEngineer
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': {
+        probability: 1,
+        quantity: 3
+      },
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': {
+        probability: 1,
+        quantity: 1
+      },
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
   },
   forest: {
     name: 'Forest',
+    icon: './img/foret-stage3.png',
     description: 'Just a bunch of trees',
     price: {
       population: 0,
@@ -194,7 +483,28 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0
     },
-    job: null
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
   }
 }
 
@@ -267,479 +577,10 @@ export const StaticConsumableInfo: IStaticConsumableInfo = {
   }
 };
 
-export type IStaticJobInfo = {[id in Job]: IStaticJob }
-
-export interface IStaticJob {
-  name: string;
-  description: string;
-  produce: {[id in Consumable]: IStaticJobProduction | null };
-  consume: {[id in Consumable]: IStaticJobProduction | null };
-  storage?: IStorage;
-}
-
-export interface IStaticJobProduction {
+export interface IStaticBuildingProduction {
   probability: number;
   quantity: number;
 }
-
-export const StaticJobInfo: IStaticJobInfo = {
-  'woodGatherer': {
-    name: 'Wood gatherer',
-    description: 'Wanders around finding wood',
-    produce: {
-      'population': null,
-      'food': null,
-      'wood': {
-        probability: 1,
-        quantity: 1
-      },
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-  },
-  'berryGatherer': {
-    name: 'Berry gatherer',
-    description: 'Wanders around finding food',
-    produce: {
-      'population': null,
-      'wood': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': null,
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-  },
-  'explorer': {
-    name: 'Explorer',
-    description: 'Discovers new ground to build on',
-    produce: {
-      'population': null,
-      'wood': null,
-      'food': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-  },
-  'druid': {
-    name: 'Druid',
-    description: 'Allows to unlock new technology in the Research tab',
-    produce: {
-      'population': null,
-      'wood': null,
-      'food': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': {
-        probability: 1,
-        quantity: 1
-      },
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-  },
-  'farmer': {
-    name: 'Farmer',
-    description: 'Produces food at the cost of wood',
-    produce: {
-      'population': null,
-      'wood': null,
-      'food': {
-        probability: 1,
-        quantity: 4
-      },
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': {
-        probability: 1,
-        quantity: 0.5
-      },
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    storage: {
-      name: Building.farm,
-      capacity: 3
-    },
-  },
-  'stoneGatherer': {
-    name: 'Stone gatherer',
-    description: 'Wanders around finding stone',
-    produce: {
-      'population': null,
-      'food': null,
-      'wood': null,
-      'stones': {
-        probability: 1,
-        quantity: 0.5
-      },
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-  },
-  'stoneMiner': {
-    name: 'Stone Miner',
-    description: 'Extract stone from the ground at the cost of wood',
-    produce: {
-      'population': null,
-      'food': null,
-      'wood': null,
-      'stones': {
-        probability: 1,
-        quantity: 1
-      },
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': {
-        probability: 1,
-        quantity: 1
-      },
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    storage: {
-      name: Building.stoneMine,
-      capacity: 3
-    },
-  },
-  'lumberjack': {
-    name: 'Lumberjack',
-    description: 'Extract wood at scale',
-    produce: {
-      'population': null,
-      'food': null,
-      'wood': {
-        probability: 1,
-        quantity: 1
-      },
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    storage: {
-      name: Building.sawmill,
-      capacity: 3
-    },
-  },
-  'coalMiner': {
-    name: 'Coal Miner',
-    description: 'Extract coal and stone from the ground at the cost of wood',
-    produce: {
-      'population': null,
-      'food': null,
-      'wood': null,
-      'stones': null,
-      'coals': {
-        probability: 1,
-        quantity: 1
-      },
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': {
-        probability: 1,
-        quantity: 1
-      },
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    storage: {
-      name: Building.coalMine,
-      capacity: 3
-    },
-  },
-  'limestoneMiner': {
-    name: 'Limestone Miner',
-    description: 'Extract limestone from the ground at the cost of wood',
-    produce: {
-      'population': null,
-      'food': null,
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': {
-        probability: 1,
-        quantity: 1
-      },
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': {
-        probability: 1,
-        quantity: 1
-      },
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    storage: {
-      name: Building.limestoneMine,
-      capacity: 3
-    },
-  },
-  'limestoneBrickWorker': {
-    name: 'brick worker',
-    description: 'Create bricks out of limestone and coal',
-    produce: {
-      'population': null,
-      'food': null,
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': {
-        probability: 1,
-        quantity: 1
-      },
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': null,
-      'stones': null,
-      'coals': {
-        probability: 1,
-        quantity: 1
-      },
-      'limestone': {
-        probability: 1,
-        quantity: 2
-      },
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    storage: {
-      name: Building.limestoneBrickFactory,
-      capacity: 3
-    },
-  },
-  'coalStationEngineer': {
-    name: 'Coal Station Eng.',
-    description: 'Burn coal in order to procude energy',
-    produce: {
-      'population': null,
-      'food': null,
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': {
-        probability: 1,
-        quantity: 1
-      },
-    },
-    consume: {
-      'population': null,
-      'food': {
-        probability: 1,
-        quantity: 1
-      },
-      'wood': null,
-      'stones': null,
-      'coals': {
-        probability: 1,
-        quantity: 2
-      },
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    storage: {
-      name: Building.coalPowerStation,
-      capacity: 3
-    },
-  },
-  'default':  {
-    name: 'DEFAULT',
-    description: '',
-    produce: {
-      'population': {
-        probability: 1,
-        quantity: 0.5
-      },
-      'food': null,
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-    consume: {
-      'population': null,
-      'food': null,
-      'wood': null,
-      'stones': null,
-      'coals': null,
-      'limestone': null,
-      'limestoneBrick': null,
-      'knowledge': null,
-      'energy': null,
-    },
-  },
-};
 
 export type IResearchInfo = { [id in Research]: IStaticResearch }
 

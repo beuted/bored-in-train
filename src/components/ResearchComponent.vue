@@ -19,7 +19,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
 import { ResearchInfo, StaticConsumableInfo } from '@/services/GameEngine';
 import { IState, IdleGameVue } from '@/store';
-import { EventBus, IJobProductionEvent } from '@/EventBus';
+import { EventBus } from '@/EventBus';
 import { Research } from '@/models/Research';
 import { MessageService } from '@/services/MessageService';
 import { Consumable } from '../models/Consumable';

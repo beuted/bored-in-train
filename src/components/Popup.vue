@@ -1,52 +1,57 @@
 <template>
-  <div class="popup-container" v-if="isShown">
-    <div class="popup">
-      <div class="popup-message">{{message}}</div>
-      <div class="popup-btns-container">
-        <div class="popup-help-input" v-if="isHelp"><input class="chx" type="checkbox" id="toggleShowHelp" v-bind:checked="showHelp" v-on:click="toggleShowHelp()">
-          <label class="chx-label" for="toggleShowHelp">Show help messages</label>
+  <transition name="fade">
+    <div class="popup-container" v-if="isShown" v-on:click="dismiss()">
+      <div class="popup" v-on:click="$event.stopPropagation()">
+        <div class="popup-message">{{message}}</div>
+        <div class="popup-btns-container">
+          <div class="popup-help-input" v-if="isHelp"><input class="chx" type="checkbox" id="toggleShowHelp" v-bind:checked="showHelp" v-on:click="toggleShowHelp()">
+            <label class="chx-label" for="toggleShowHelp">Show help messages</label>
+          </div>
+          <button class="popup-dismiss-btn btn" v-on:click="dismiss()">Dismiss</button>
         </div>
-        <button class="popup-dismiss-btn btn" v-on:click="dismiss()">Dismiss</button>
       </div>
     </div>
-
-  </div>
+  </transition>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { IState, IdleGameVue } from '@/store';
-import { StaticConsumableInfo, StaticJobInfo, GlobalConfig } from '@/services/GameEngine';
+import { StaticConsumableInfo, GlobalConfig } from '@/services/GameEngine';
 import { EventBus, IPopupMessageEvent } from '@/EventBus';
 
 
 @Component({
 })
 export default class Popup extends IdleGameVue {
-    private isShown = false;
-    private isHelp = false;
-    private message = '';
+  private isShown = false;
+  private isHelp = false;
+  private message = '';
+  private lastTimeShown: number = 0;
 
-    private mounted() {
-      EventBus.$on('show-popup', (event: IPopupMessageEvent) => {
-        this.message = event.message;
-        this.isHelp = event.isHelp;
-        this.isShown = true;
-      });
-    }
+  private mounted() {
+    EventBus.$on('show-popup', (event: IPopupMessageEvent) => {
+      this.message = event.message;
+      this.isHelp = event.isHelp;
+      this.isShown = true;
+      this.lastTimeShown = Date.now();
+    });
+  }
 
-    public get showHelp() {
-      return this.$store.state.showHelp;
-    }
+  public get showHelp() {
+    return this.$store.state.showHelp;
+  }
 
-    public toggleShowHelp() {
-      this.$store.commit('ToggleShowHelp');
-    }
+  public toggleShowHelp() {
+    this.$store.commit('ToggleShowHelp');
+  }
 
-    public dismiss() {
-      this.isShown = false;
-      this.$store.commit('SetPlay', true);
-    }
+  public dismiss() {
+    if (Date.now() - this.lastTimeShown <= 500)
+      return;
+    this.isShown = false;
+    this.$store.commit('SetPlay', true);
+  }
 }
 </script>
 
@@ -98,6 +103,13 @@ export default class Popup extends IdleGameVue {
   display: inline-block;
   position: absolute;
   right: 0;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 
 </style>

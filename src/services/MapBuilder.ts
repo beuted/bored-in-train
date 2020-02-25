@@ -54,6 +54,8 @@ export class MapBuilder {
         map[center][center].building = Building.village;
         map[center][center + 1].environment = Environment.Field;
         map[center][center + 1].building = Building.barn;
+        map[center][center - 1].environment = Environment.Field;
+        map[center][center - 1].building = Building.watchTower;
 
         // Set discovered
         map[center][center].discovered = true;
@@ -87,6 +89,10 @@ export class MapBuilder {
           gathererHut: {
             quantity: 0,
             coords: { }
+          },
+          watchTower: {
+            quantity: 1,
+            coords: { [center+','+(center-1)] : { x: center, y: center-1 } }
           },
           barn: {
             quantity: 1,

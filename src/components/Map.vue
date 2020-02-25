@@ -69,6 +69,7 @@ export default class Map extends IdleGameVue {
     private mapBuildingImages: { [id in Building]: HTMLImageElement } = {
         forest: new Image(),
         village: new Image(),
+        watchTower: new Image(),
         gathererHut: new Image(),
         barn: new Image(),
         farm: new Image(),

@@ -106,9 +106,9 @@ export class GameService {
     store.commit('IncrementConsumables', production);
     EventBus.$emit('consumable-production', production);
 
-    this.tryDiscoverLand();
+    //this.tryDiscoverLand();
 
-    this.handlePollution();
+    this.handleMapChanges();
 
     // Recursive setTimeout for precision
     setTimeout (() => {
@@ -131,9 +131,9 @@ export class GameService {
     }
   }
 
-  private handlePollution() {
-    // Add and remove and spread pollution
-    store.commit('ApplyPollution');
+  private handleMapChanges() {
+    // Add and remove and spread pollution. Add and remove trees and handle discovery
+    store.commit('ApplyMapChanges');
   }
 
   private static getProductionDiff(newConsumables: { [id in Consumable]: { quantity: number } }, oldConsumables: { [id in Consumable]: { quantity: number } }) {

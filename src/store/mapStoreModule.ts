@@ -35,6 +35,10 @@ export const MapModule: Module<IMapState, IState> = {
         quantity: 0,
         coords: {}
       },
+      watchTower: {
+        quantity: 0,
+        coords: {}
+      },
       barn: {
         quantity: 0,
         coords: {}
@@ -74,7 +78,7 @@ export const MapModule: Module<IMapState, IState> = {
     }
   },
   actions: {
-    DiscoverTile({ getters, commit, state }) {
+    DiscoverTile({ getters, commit, state }) { // Not used anymore
       let mapLength = state.map.length;
       let xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(mapLength));
       let ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(mapLength));
@@ -118,34 +122,8 @@ export const MapModule: Module<IMapState, IState> = {
 
       let mapCopy = JSON.parse(JSON.stringify(state.map)); // TODO: better way to clone T[][] ?
 
-      mapCopy[obj.x][obj.y].discovered = true;
-      mapCopy[obj.x][obj.y].discoverable = 0;
+      MakeTileDiscovered(mapCopy, obj);
       state.mapNbTileFound++;
-
-      let mapLength = mapCopy.length;
-      if (obj.y < mapLength-1) {
-        if (!mapCopy[obj.x][obj.y+1].discovered) {
-          mapCopy[obj.x][obj.y+1].discoverable++;
-        }
-      }
-
-      if (obj.y > 0) {
-        if (!mapCopy[obj.x][obj.y-1].discovered) {
-          mapCopy[obj.x][obj.y-1].discoverable++;
-        }
-      }
-
-      if (obj.x < mapLength-1) {
-        if (!mapCopy[obj.x+1][obj.y].discovered) {
-          mapCopy[obj.x+1][obj.y].discoverable++;
-        }
-      }
-
-      if (obj.x > 0) {
-        if (!mapCopy[obj.x-1][obj.y].discovered) {
-          mapCopy[obj.x-1][obj.y].discoverable++;
-        }
-      }
 
       state.map = mapCopy;
       state.mapNeedsUpdate = true;
@@ -157,9 +135,11 @@ export const MapModule: Module<IMapState, IState> = {
     MapNeedsUpdate(state: IMapState) {
       state.mapNeedsUpdate = true;
     },
-    ApplyPollution(state: IMapState) {
+    ApplyMapChanges(state: IMapState) {
       let mapLength = state.map.length;
       let mapCopy = JSON.parse(JSON.stringify(state.map)) as IMapTile[][]; // TODO: better way to clone T[][] ?
+      let mapNbTileFoundCopy = state.mapNbTileFound;
+
       for (let i = 0; i < mapLength; i++) {
         for (let j = 0; j < mapLength; j++) {
           // Add and remove Tree quantity
@@ -185,6 +165,22 @@ export const MapModule: Module<IMapState, IState> = {
           } else if (mapCopy[i][j].building != null && mapCopy[i][j].pollution < 100) {
             mapCopy[i][j].pollution++;
           }
+
+          // Discover tiles
+          if (mapCopy[i][j].building == Building.watchTower) { //TODO: we might want to be able to tell when a watch tower is useless
+
+            // Generate uniformly random coord inside circle
+            const radius = 4;
+            let a = Math.random() * 2 * Math.PI;
+            let r = radius * Math.sqrt(Math.random());
+            var iFound = i + Math.floor(r * Math.cos(a));
+            var jFound = j + Math.floor(r * Math.sin(a));
+
+            if (!mapCopy[iFound][jFound].discovered) {
+              MakeTileDiscovered(mapCopy, {x: iFound, y: jFound});
+              mapNbTileFoundCopy++
+            }
+          }
         }
       }
 
@@ -207,6 +203,7 @@ export const MapModule: Module<IMapState, IState> = {
         }
       }
 
+      state.mapNbTileFound = mapNbTileFoundCopy++;
       state.map = mapCopy;
       state.mapNeedsUpdate = true;
     }
@@ -289,5 +286,34 @@ function ChangeTile(map: IMapTile[][], buildings: IMapBuildings, obj: { x: numbe
     buildings[obj.type].quantity++;
     buildings[obj.type].coords[obj.x + ',' + obj.y] = { x: obj.x, y: obj.y };
   }
+}
 
+function MakeTileDiscovered(map: IMapTile[][], coord: { x: number, y: number }) {
+  map[coord.x][coord.y].discovered = true;
+  map[coord.x][coord.y].discoverable = 0;
+
+  let mapLength = map.length;
+  if (coord.y < mapLength-1) {
+    if (!map[coord.x][coord.y+1].discovered) {
+      map[coord.x][coord.y+1].discoverable++;
+    }
+  }
+
+  if (coord.y > 0) {
+    if (!map[coord.x][coord.y-1].discovered) {
+      map[coord.x][coord.y-1].discoverable++;
+    }
+  }
+
+  if (coord.x < mapLength-1) {
+    if (!map[coord.x+1][coord.y].discovered) {
+      map[coord.x+1][coord.y].discoverable++;
+    }
+  }
+
+  if (coord.x > 0) {
+    if (!map[coord.x-1][coord.y].discovered) {
+      map[coord.x-1][coord.y].discoverable++;
+    }
+  }
 }

@@ -468,6 +468,47 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       'energy': null,
     }
   },
+  watchTower: {
+    name: 'Watch tower',
+    icon: './img/puitpetrole.png',
+    description: 'Let you explore the surrounding area',
+    price: {
+      population: 1,
+      food: 0,
+      wood: 50,
+      stones: 0,
+      coals: 0,
+      limestone: 0,
+      limestoneBrick: 0,
+      energy: 0,
+      knowledge: 0
+    },
+    produce: {
+      'population': null,
+      'food': null,
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    },
+    consume: {
+      'population': null,
+      'food': {
+        probability: 1,
+        quantity: 1
+      },
+      'wood': null,
+      'stones': null,
+      'coals': null,
+      'limestone': null,
+      'limestoneBrick': null,
+      'knowledge': null,
+      'energy': null,
+    }
+  },
   forest: {
     name: 'Forest',
     icon: './img/foret-stage3.png',

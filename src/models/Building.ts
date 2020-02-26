@@ -3,6 +3,7 @@ export enum Building {
     village = 'village',
     watchTower = 'watchTower',
     gathererHut = 'gathererHut',
+    druidHut = 'druidHut',
     barn = 'barn',
     farm = 'farm',
     sawmill = 'sawmill',

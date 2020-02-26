@@ -49,7 +49,7 @@ export class GameService {
         newConsumables[consumableId as Consumable].quantity += nbProducers * staticBuildingProduction.quantity;
       }
 
-      let nbUnfullfiledWorkers = 0; // Nb workers that have not been receiving ressources therefore will be deduced from production
+      let nbUnfullfiledBuildings = 0; // Nb workers that have not been receiving ressources therefore will be deduced from production
       for (let consumableId in staticBuilding.consume) {
         let staticJobConsumption: IStaticBuildingProduction | null = staticBuilding.consume[consumableId as Consumable];
         if (staticJobConsumption == null)
@@ -61,8 +61,8 @@ export class GameService {
         } else {
           // Do not produce if needs not fulfilled!
           const whatCanBeconsummed = store.state.consumable[consumableId as Consumable].quantity;
-          let nbUnfullfiledWorkersOnConsumable = Math.floor((nbConsummer * staticJobConsumption.quantity - store.state.consumable[consumableId as Consumable].quantity) / staticJobConsumption.quantity);
-          nbUnfullfiledWorkers = Math.max(nbUnfullfiledWorkers, nbUnfullfiledWorkersOnConsumable);
+          let nbUnfullfiledBuildingOnConsumable = Math.floor((nbConsummer * staticJobConsumption.quantity - store.state.consumable[consumableId as Consumable].quantity) / staticJobConsumption.quantity);
+          nbUnfullfiledBuildings = Math.max(nbUnfullfiledBuildings, nbUnfullfiledBuildingOnConsumable);
 
           newConsumables[consumableId as Consumable].quantity -= whatCanBeconsummed;
         }
@@ -70,19 +70,22 @@ export class GameService {
 
 
       // Remove part of production based on number of workers with non-fullfiled needs
-      if (nbUnfullfiledWorkers > 0) {
+      if (nbUnfullfiledBuildings > 0) {
         MessageService.Help(`Careful! Some ${buildingId} have not seen their needs fullfiled, they will not produce any ressource. Either produce more of the missing resource or remove some of them.`, 'needs-not-fullfiled');
-        Vue.toasted.error(`${nbUnfullfiledWorkers} ${buildingId} have not seen their needs fullfiled, they will not produce any ressource`);
+        Vue.toasted.error(`${nbUnfullfiledBuildings} ${buildingId} have not seen their needs fullfiled, they will not produce any ressource`);
         for (let consumableId in staticBuilding.produce) {
           let staticJobProduction: IStaticBuildingProduction | null = staticBuilding.produce[consumableId as Consumable];
           if (staticJobProduction == null)
             continue;
 
-          newConsumables[consumableId as Consumable].quantity -= nbUnfullfiledWorkers * staticJobProduction.quantity;
+          newConsumables[consumableId as Consumable].quantity -= nbUnfullfiledBuildings * staticJobProduction.quantity;
         }
       }
 
     }
+
+    newConsumables[Consumable.population].quantity += 0.5;
+    //TODO: do better because the number of pop per sec is broken in the UI
 
     // After operation checks (storage, ...)
     for (let consumableId in StaticConsumableInfo) {
@@ -106,29 +109,12 @@ export class GameService {
     store.commit('IncrementConsumables', production);
     EventBus.$emit('consumable-production', production);
 
-    //this.tryDiscoverLand();
-
     this.handleMapChanges();
 
     // Recursive setTimeout for precision
     setTimeout (() => {
       this.mainLoop()
     }, GlobalConfig.TickInterval / store.state.controls.speed);
-  }
-
-  private tryDiscoverLand() {
-    //TODO: tours de gaie !
-    let nbExplorers = 10;//store.state.map.buildings.explorer.quantity;
-
-    if (nbExplorers > 0 && store.state.controls.speed > 0) {
-      let nbLandFound = store.state.map.mapNbTileFound;
-      // Probabilty in proba of at least 1 explorer out of nbExplorers to find a tile
-      let probability = 1-Math.pow(1-2/nbLandFound, nbExplorers*2);
-      if (Math.random() <= probability) {
-        Vue.toasted.success(`Land Found! (Probability was: ${(probability*100).toPrecision(2)} %)`);
-        store.dispatch('DiscoverTile');
-      }
-    }
   }
 
   private handleMapChanges() {

@@ -71,6 +71,7 @@ export default class Map extends IdleGameVue {
         village: new Image(),
         watchTower: new Image(),
         gathererHut: new Image(),
+        druidHut: new Image(),
         barn: new Image(),
         farm: new Image(),
         stoneMine: new Image(),
@@ -419,8 +420,17 @@ export default class Map extends IdleGameVue {
         // Pay the price of your purchase
         for (let consumable in StaticBuildingInfo[building].price) {
             let price = StaticBuildingInfo[building].price[consumable as Consumable];
-            if (price && price != 0)
+            if (price && price != 0) {
                 this.$store.commit('IncrementConsumable', { name: consumable, value: -price });
+                if (consumable == Consumable.population) {
+                    this.$store.commit('IncrementPopStorage', { value: -price });
+                }
+            }
+        }
+
+        //TODO: not ideal
+        if (building == Building.village) {
+            this.$store.commit('IncrementPopStorage', { value: 10 });
         }
 
         this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: building });

@@ -2,7 +2,7 @@
     <div class="inventory">
         <span class="title">Inventory</span>
         <ul>
-            <li v-for="(consumable, key) in consumables" v-bind:key="key">
+            <li v-for="(consumable, key) in consumables" v-bind:key="key" >
                 <ParticleEmitter :consumable="key">
                     <div> {{ getName(key) }} <img v-bind:src="getIcon(key)"> {{ consumable.quantity }} / {{ getStorage(key) }}</div>
                 </ParticleEmitter>
@@ -69,7 +69,9 @@ export default class Inventory extends IdleGameVue {
         return this.$store.state.debugMode;
     }
 
-    public getStorage(consumable: string) {
+    public getStorage(consumable: Consumable) {
+        if (consumable == Consumable.population)
+            return this.$store.state.popStorage;
         var storage = this.$store.getters.getRessourceStorage(consumable);
         return storage != -1 ? storage : '∞';
     }

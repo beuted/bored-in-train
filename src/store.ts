@@ -30,6 +30,7 @@ export interface IState {
   showHelp: boolean;
   controls: { speed: number}
   consumable: { [id in Consumable]: { quantity: number } };
+  popStorage: number;
 }
 
 export default new Vuex.Store<IState>({
@@ -75,6 +76,7 @@ export default new Vuex.Store<IState>({
         quantity: 0,
       },
     },
+    popStorage: 10
   },
   mutations: {
     // For storeSaverPlugin
@@ -118,6 +120,9 @@ export default new Vuex.Store<IState>({
         state.consumable[consumable as Consumable].quantity += production[consumable as Consumable];
       }
     },
+    IncrementPopStorage(state, obj: { value: number }) {
+      state.popStorage += obj.value;
+    }
   },
   actions: {
 

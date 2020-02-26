@@ -7,9 +7,25 @@
             <div class="tooltip-title">{{ buildingInfo.name }}</div>
             <div>{{ buildingInfo.description }}</div>
             <br>
-            <div class="tooltip-title">Price:</div>
-            <div v-for="(value, key) in buildingInfo.price" :key="key">
-                <span v-if="value != 0"><consumable-icon :consumable="key" /> x {{ value }}</span>
+            <div>
+                <div class="tooltip-title">Price:</div>
+                <div v-for="(value, keyPrice) in buildingInfo.price" :key="keyPrice">
+                    <span v-if="value != 0"><consumable-icon :consumable="keyPrice" /> x {{ value }}</span>
+                </div>
+            </div>
+            <br>
+            <div>
+                <div class="tooltip-title">Produce:</div>
+                <div v-for="(value, keyProduce) in buildingInfo.produce" :key="keyProduce">
+                    <span v-if="value != null"><consumable-icon :consumable="keyProduce" /> x {{ value.quantity }}</span>
+                </div>
+            </div>
+            <br>
+            <div>
+                <div class="tooltip-title">Consume:</div>
+                <div v-for="(value, keyConsume) in buildingInfo.consume" :key="keyConsume">
+                    <span v-if="value != null"><consumable-icon :consumable="keyConsume" /> x {{ value.quantity }}</span>
+                </div>
             </div>
         </span>
     </div>

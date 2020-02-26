@@ -52,10 +52,18 @@ export class MapBuilder {
         map[center][center].environment = Environment.Field;
         map[center][center].quantity = 0;
         map[center][center].building = Building.village;
+
         map[center][center + 1].environment = Environment.Field;
+        map[center][center + 1].quantity = 0;
         map[center][center + 1].building = Building.barn;
+
         map[center][center - 1].environment = Environment.Field;
+        map[center][center - 1].quantity = 0;
         map[center][center - 1].building = Building.watchTower;
+
+        map[center - 1][center].environment = Environment.Field;
+        map[center - 1][center].quantity = 0;
+        map[center - 1][center].building = Building.gathererHut;
 
         // Set discovered
         map[center][center].discovered = true;
@@ -87,8 +95,12 @@ export class MapBuilder {
             coords: { [center+','+center] : { x: center, y: center } }
           },
           gathererHut: {
+            quantity: 1,
+            coords: { [center-1+','+center] : { x: center-1, y: center } }
+          },
+          druidHut: {
             quantity: 0,
-            coords: { }
+            coords: {}
           },
           watchTower: {
             quantity: 1,

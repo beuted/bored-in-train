@@ -35,6 +35,10 @@ export const MapModule: Module<IMapState, IState> = {
         quantity: 0,
         coords: {}
       },
+      druidHut: {
+        quantity: 0,
+        coords: {}
+      },
       watchTower: {
         quantity: 0,
         coords: {}
@@ -170,7 +174,7 @@ export const MapModule: Module<IMapState, IState> = {
           if (mapCopy[i][j].building == Building.watchTower) { //TODO: we might want to be able to tell when a watch tower is useless
 
             // Generate uniformly random coord inside circle
-            const radius = 4;
+            const radius = 3;
             let a = Math.random() * 2 * Math.PI;
             let r = radius * Math.sqrt(Math.random());
             var iFound = i + Math.floor(r * Math.cos(a));

@@ -105,6 +105,11 @@ export class GameService {
       }
     }
 
+    // Particular case of restrictling pop with its storage
+    if (newConsumables[Consumable.population].quantity >= store.state.popStorage) {
+      newConsumables[Consumable.population].quantity = store.state.popStorage;
+    }
+
     let production = GameService.getProductionDiff(newConsumables, store.state.consumable);
     store.commit('IncrementConsumables', production);
     EventBus.$emit('consumable-production', production);

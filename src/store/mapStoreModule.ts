@@ -177,8 +177,8 @@ export const MapModule: Module<IMapState, IState> = {
             const radius = 3;
             let a = Math.random() * 2 * Math.PI;
             let r = radius * Math.sqrt(Math.random());
-            var iFound = i + Math.floor(r * Math.cos(a));
-            var jFound = j + Math.floor(r * Math.sin(a));
+            var iFound = i + Math.floor(r * Math.cos(a) + 0.5);
+            var jFound = j + Math.floor(r * Math.sin(a) + 0.5);
 
             if (!mapCopy[iFound][jFound].discovered) {
               MakeTileDiscovered(mapCopy, {x: iFound, y: jFound});

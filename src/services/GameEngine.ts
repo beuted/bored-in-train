@@ -153,7 +153,10 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     },
     consume: {
       population: null,
-      food: null,
+      food: {
+        probability: 1,
+        quantity: 1
+      },
       wood: null,
       stones: null,
       coals: null,

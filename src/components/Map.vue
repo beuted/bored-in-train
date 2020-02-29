@@ -1,18 +1,5 @@
 <template>
     <div>
-        <div class="menu">
-            <span v-for="(building, key) in buildings" v-bind:key="key">
-                <span v-if="isKnown(key)">
-                    <input type="radio" :id="key" :value="key" v-model="buildingType" v-on:click="buildingClicked(key)">
-                    <label :for="key">
-                        <PriceTooltip :building="key" :consumables="consumables">
-                            <span v-once><img v-bind:src="mapBuildingImages[key].src"></span> x {{ building.quantity }}
-                        </PriceTooltip>
-                    </label>
-                </span>
-            </span>
-            <span v-on:click="showPollution = !showPollution">Pollution</span>
-        </div>
         <TileTooltip :tile="tooltipTile" :coord="tooltipCoord"></TileTooltip>
         <canvas id="canvas" class="map"
             v-on:mousedown="handleMouseDown"
@@ -20,6 +7,7 @@
             v-on:mousemove="handleMouseMove"
             v-on:mouseout="handleMouseOut"
             :width="canvasSize+'px'" :height="canvasSize+'px'"></canvas>
+        <div v-on:click="showPollution = !showPollution">Show Pollution</div>
     </div>
 </template>
 
@@ -35,13 +23,13 @@ import { Consumable } from '@/models/Consumable';
 import { Research } from '../models/Research';
 import { Keycodes } from '../models/Keycodes';
 
-import PriceTooltip from '@/components/PriceTooltip.vue';
 import TileTooltip from '@/components/TileTooltip.vue';
+import ShopMenu from '@/components/ShopMenu.vue';
 import { KeyboardService } from '../services/KeyboardService';
+import { imageService } from '../services/ImageService';
 
 @Component({
   components: {
-      PriceTooltip,
       TileTooltip
   },
 })
@@ -52,44 +40,9 @@ export default class Map extends IdleGameVue {
     private readonly nbTilesOnRowOrColumn = 100;
     private readonly canvasSize = this.nbTilesOnRowOrColumnOnScreen * this.tileSize;
 
-    private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
-        [Environment.Water]: new Image(),
-        [Environment.Field]: new Image(),
-        [Environment.Beach]: new Image(),
-        [Environment.Snow]: new Image(),
-        [Environment.Concrete]: new Image(),
-    };
-
-    private mapForestImages: { [id in number]: HTMLImageElement } = {
-        1: new Image(),
-        2: new Image(),
-        3: new Image(),
-    };
-
-    private mapBuildingImages: { [id in Building]: HTMLImageElement } = {
-        forest: new Image(),
-        village: new Image(),
-        watchTower: new Image(),
-        gathererHut: new Image(),
-        druidHut: new Image(),
-        barn: new Image(),
-        farm: new Image(),
-        stoneMine: new Image(),
-        sawmill: new Image(),
-        coalMine: new Image(),
-        limestoneMine: new Image(),
-        limestoneBrickFactory: new Image(),
-        coalPowerStation: new Image(),
-    };
-
-    private mapHabitatImages: { [id in number]: HTMLImageElement } = {
-        [Habitat.CoalDeposite]: new Image(),
-        [Habitat.StoneDeposite]: new Image(),
-        [Habitat.LimestoneDeposite]: new Image(),
-    };
-
     @Prop() private map!: IMapTile[][];
     @Prop() private buildings!: { [id in Building]: { quantity: number } };
+    @Prop() private building!: Building | null; // The selected building
     @Prop() private consumables!: {[id in Consumable]: { quantity: number }};
 
     private keyBoardService: KeyboardService;
@@ -115,38 +68,10 @@ export default class Map extends IdleGameVue {
     private tooltipCoord = {x: 0, y: 0};
     private tooltipTile: IMapTile  | null = null;
 
-    public buildingType: Building | null = null;
-
     constructor() {
         super();
 
-        this.mapEnvironmentImages[Environment.Water].src = './img/mer.png';
-        this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
-        this.mapEnvironmentImages[Environment.Beach].src = './img/beach.png';
-        this.mapEnvironmentImages[Environment.Snow].src = './img/snow.png';
-        this.mapEnvironmentImages[Environment.Concrete].src = './img/concrete.png';
-
-        for (const building in StaticBuildingInfo)
-            this.mapBuildingImages[building as Building].src = StaticBuildingInfo[building as Building].icon;
-
-        this.mapHabitatImages[Habitat.CoalDeposite].src = './img/coal-deposit.png';
-        this.mapHabitatImages[Habitat.StoneDeposite].src = './img/stone-deposit.png';
-        this.mapHabitatImages[Habitat.LimestoneDeposite].src = './img/limestone-deposit.png';
-        this.mapForestImages[1].src = './img/foret-stage1.png';
-        this.mapForestImages[2].src = './img/foret-stage2.png';
-        this.mapForestImages[3].src = './img/foret-stage3.png';
-
         this.keyBoardService = new KeyboardService();
-    }
-
-    public isKnown(building: Building) {
-        return this.$store.getters.researchBuildingsKnown[building];
-    }
-
-    public buildingClicked(key: Building) {
-        if (this.buildingType == key) {
-            this.buildingType = null;
-        }
     }
 
     private mounted() {
@@ -171,29 +96,9 @@ export default class Map extends IdleGameVue {
         if (this.map.length <= 0)
             this.$store.commit('InitMap', this.nbTilesOnRowOrColumn);
 
-        let nbEnvImages = Object.keys(this.mapEnvironmentImages).length;
-        let nbBuildingImages = Object.keys(this.mapBuildingImages).length;
-
-        for (const key in this.mapBuildingImages) {
-            (this.mapBuildingImages as any)[key].onload = () => {
-                nbBuildingImages--;
-                if (nbBuildingImages == 0 && nbEnvImages == 0) {
-                    console.log('starting map loop');
-                    window.requestAnimationFrame(() => { this.draw(true); this.mapLoop(); });
-                }
-            }
-        }
-
-        for (const key in this.mapEnvironmentImages)
-        {
-            (this.mapEnvironmentImages as any)[key].onload = () => {
-                nbEnvImages--;
-                if (nbEnvImages == 0 && nbBuildingImages == 0) {
-                    console.log('starting map loop');
-                    window.requestAnimationFrame(() => { this.draw(true); this.mapLoop(); });
-                }
-            }
-        }
+        imageService.isLoaded().then(() => {
+            window.requestAnimationFrame(() => { this.draw(true); this.mapLoop(); });
+        });
     }
 
     private beforeDestroy() {
@@ -260,14 +165,14 @@ export default class Map extends IdleGameVue {
         for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
             for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
                 if (this.map[i][j].discovered) {
-                    let environmentImage = this.getEnvironmentImage(this.map[i][j].environment)
+                    let environmentImage = imageService.getEnvironmentImage(this.map[i][j].environment)
                     this.mapContext.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
 
                     const building = this.map[i][j].building;
                     const habitat = this.map[i][j].habitat;
                     const quantity = this.map[i][j].quantity;
                     if (building != null) {
-                        let buildingImage = this.getBuildingImage(building, quantity);
+                        let buildingImage = imageService.getBuildingImage(building, quantity);
 
                         if (this.map[i][j].disabled)
                             this.mapContext.globalAlpha = 0.7;
@@ -282,7 +187,7 @@ export default class Map extends IdleGameVue {
                         if (pop > 0)
                             this.mapContext.fillText(pop+'', i*this.tileSize, (j+1)*this.tileSize);
                     } else if (habitat != null) { // If a building is found no need to draw the habitat
-                        let habitatImage = this.getHabitatImage(habitat)
+                        let habitatImage = imageService.getHabitatImage(habitat)
                         this.mapContext.drawImage(habitatImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
                     }
 
@@ -298,17 +203,17 @@ export default class Map extends IdleGameVue {
 
                 // The following statement is cached
                 } else if (this.$store.state.map.map[i][j].discoverable > 0) {
-                    let environmentImage = this.getEnvironmentImage(this.map[i][j].environment);
+                    let environmentImage = imageService.getEnvironmentImage(this.map[i][j].environment);
                     this.mapContext.drawImage(environmentImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
 
                     const building = this.map[i][j].building;
                     const habitat = this.map[i][j].habitat;
                     const quantity = this.map[i][j].quantity;
                     if (building != null) {
-                        let buildingImage = this.getBuildingImage(building, quantity)
+                        let buildingImage = imageService.getBuildingImage(building, quantity)
                         this.mapContext.drawImage(buildingImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
                     } else if (habitat != null) { // If a building is found no need to draw the habitat
-                        let habitatImage = this.getHabitatImage(habitat)
+                        let habitatImage = imageService.getHabitatImage(habitat)
                         this.mapContext.drawImage(habitatImage, i*this.tileSize, j*this.tileSize, this.tileSize, this.tileSize);
                     }
 
@@ -321,12 +226,12 @@ export default class Map extends IdleGameVue {
     }
 
     private drawMouse() {
-        if (this.mouseTileCoord && this.buildingType != null) {
+        if (this.mouseTileCoord && this.building != null) {
             this.mouseContext.clearRect(0, 0, this.tileSize, this.tileSize);
-            let image = this.getBuildingImage(this.buildingType, 20);
+            let image = imageService.getBuildingImage(this.building, 20);
             if (image) {
                 this.mouseContext.globalAlpha = 0.7;
-                if (!this.canBeBuilt(this.mouseTileCoord, this.buildingType).result) {
+                if (!this.canBeBuilt(this.mouseTileCoord, this.building).result) {
                     // Show a red bg when a building can't be built
                     this.mouseContext.fillStyle = '#FF0000';
                     this.mouseContext.fillRect(0, 0, this.tileSize, this.tileSize);
@@ -373,7 +278,7 @@ export default class Map extends IdleGameVue {
         var coord = this.getTileFromCoordinate(event.pageX - this.canvas.offsetLeft, event.pageY - this.canvas.offsetTop);
 
         if (this.isDragging) {
-            if (this.buildingType == null) {
+            if (this.building == null) {
                 if (!this.tooltipTile) {
                     this.tooltipCoord = { x: event.pageX - this.canvas.offsetLeft, y: event.pageY - this.canvas.offsetTop };
                     this.tooltipTile = this.map[coord.x][coord.y];
@@ -382,7 +287,7 @@ export default class Map extends IdleGameVue {
                 }
             } else {
                 //Check if this was a drag or a click
-                this.tryBuild(coord, this.buildingType);
+                this.tryBuild(coord, this.building);
             }
         }
 
@@ -479,26 +384,6 @@ export default class Map extends IdleGameVue {
         return {result: true, reason: null};
     }
 
-    private getEnvironmentImage(environment: Environment): HTMLImageElement {
-        return this.mapEnvironmentImages[environment];
-    }
-
-    private getBuildingImage(building: Building, quantity: number): HTMLImageElement {
-        if (building == Building.forest) {
-            if (quantity <= 33)
-                return this.mapForestImages[1];
-            else if (quantity <= 66)
-                return this.mapForestImages[2];
-            else
-                return this.mapForestImages[3];
-        }
-        return this.mapBuildingImages[building];
-    }
-
-    private getHabitatImage(habitat: Habitat): HTMLImageElement {
-        return this.mapHabitatImages[habitat];
-    }
-
     private getTileFromCoordinate(x: number, y: number) {
         return {
             x: Math.floor((x-this.mapOffset.x)/this.tileSize),
@@ -525,23 +410,5 @@ export default class Map extends IdleGameVue {
 .map {
     margin: auto;
     cursor: pointer;
-}
-
-.menu {
-    margin: 15px;
-}
-
-input {
-    visibility: hidden;
-    width: 0;
-    height: 0;
-    margin: 0;
-}
-label {
-    cursor: pointer;
-    margin: 0 10px 0 10px;
-}
-input:checked + label {
-    border-bottom: 3px solid #3a96dd;
 }
 </style>

@@ -1,19 +1,23 @@
 <template>
-  <div>
-    <span class="title">Buildings</span>
-    <div v-for="(building, key) in buildings" v-bind:key="key">
-      <div class="shop-item" v-if="isKnown(key)">
-        <input type="radio" :id="key" :value="key" v-model="buildingType" v-on:click="buildingClicked(key)">
-        <label :for="key">
-          <PriceTooltip :building="key" :consumables="consumables">
-            <div v-once><img class="shop-img" v-bind:src="getMapBuildingImages(key).src"></div><div class="badge">{{ building.quantity }}</div>
-          </PriceTooltip>
-        </label>
+  <div class="shop-item-list">
+    <div>
+      <span class="title">Research</span>
+    </div>
+    <div class="shop-item-list">
+      <span class="title">Buildings</span>
+      <div v-for="(building, key) in buildings" v-bind:key="key">
+        <PriceTooltip :building="key" :consumables="consumables" v-if="isKnown(key)" class="shop-item-container">
+          <div v-on:click="buildingClicked(key)" class="shop-item" v-bind:class="{ selected: key == buildingType }">
+            <div>
+              <div v-once><img class="shop-img" v-bind:src="getMapBuildingImages(key).src"></div>
+            </div>
+          </div>
+          <div class="badge">{{ building.quantity }}</div>
+        </PriceTooltip>
       </div>
     </div>
   </div>
 </template>
-
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
@@ -41,6 +45,8 @@ export default class ShopMenu extends IdleGameVue {
   public buildingClicked(key: Building) {
     if (this.buildingType == key) {
       this.buildingType = null;
+    } else {
+      this.buildingType = key;
     }
     this.$emit('building-changed', key);
   }
@@ -64,8 +70,48 @@ export default class ShopMenu extends IdleGameVue {
 </script>
 
 <style scoped lang="less">
-.shop-item {
+.shop-item-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.shop-item-container {
   margin-top: 15px;
+}
+
+.shop-item {
+  border: solid 2px #2c3e50;
+  cursor: pointer;
+  border-radius: 2px;
+  &>div {
+    height: 32px;
+    width: 32px;
+    border-top: solid 2px #fff;
+    border-left: solid 2px #fff;
+    border-bottom: solid 2px rgba(0, 0, 0, 0);
+    border-right: solid 2px rgba(0, 0, 0, 0);;
+    padding: 3px;
+  }
+}
+
+.shop-item.selected {
+  border: solid 2px #fff;
+  box-shadow: 0px 0px 5px #fff;
+  background-color: #f5f5f5;
+  &>div {
+    border-top: solid 2px #d6dbd8;
+    border-left: solid 2px #d6dbd8;
+  }
+}
+
+.shop-item:hover {
+  background-color: #f5f5f5;
+  &>div {
+    border-top: solid 2px #d6dbd8;
+    border-left: solid 2px #d6dbd8;
+  }
 }
 
 .badge {
@@ -92,12 +138,5 @@ input {
     width: 0;
     height: 0;
     margin: 0;
-}
-label {
-    cursor: pointer;
-    margin: 0 10px 0 10px;
-}
-input:checked + label {
-    border-bottom: 3px solid #3a96dd;
 }
 </style>

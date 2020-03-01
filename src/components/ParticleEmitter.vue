@@ -1,7 +1,7 @@
 <template>
     <div class="particle-box"><div> <slot></slot> </div>
         <span class="particle particle-positive">
-            <transition name="bounce" v-for="(value, key) in consumables" :key="key">
+            <transition name="bounce " v-for="(value, key) in consumables" :key="key">
                 <div v-if="shows[value].positive"><img v-bind:src="getParticleEmoji(value)"/></div>
             </transition>
         </span>
@@ -32,8 +32,9 @@ export default class ParticleEmitter extends IdleGameVue {
     public constructor() {
         super();
         EventBus.$on('consumable-production', (event: { [id in Consumable]: number }) => {
-            if (event[this.consumable])
-                this.emitParticles(event[this.consumable], this.consumable)
+            //TODO: do better position should be set by the js
+            //if (event[this.consumable])
+                //this.emitParticles(event[this.consumable], this.consumable)
         });
 
         // Init the show array
@@ -141,14 +142,14 @@ export default class ParticleEmitter extends IdleGameVue {
 {
     0% {
         opacity: 0;
-        transform:translateY(-10px);
+        transform: translateY(-10px);
     }
     50% {
         opacity: 1;
     }
     100% {
         opacity: 0;
-        transform:translateY(20px);
+        transform: translateY(20px);
     }
 }
 

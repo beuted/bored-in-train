@@ -112,6 +112,7 @@ i {
 
 html, body {
   height: 100%;
+  background-color: #d6dbd8
 }
 
 #app {
@@ -152,5 +153,15 @@ html, body {
 .router-view {
   margin-top: 10px;
   flex-grow: 1;
+}
+
+// Animations
+
+@keyframes rubberBand {
+  0% {transform: scale(1);}
+  30% {transform: scaleX(1.25) scaleY(0.75);}
+  40% {transform: scaleX(0.75) scaleY(1.25);}
+  60% {transform: scaleX(1.15) scaleY(0.85);}
+  100% {transform: scale(1);}
 }
 </style>

@@ -48,6 +48,7 @@ export default class PriceTooltip extends IdleGameVue {
     @Prop() private building!: Building;
     @Prop() private consumables!: {[id in Consumable]: { quantity: number }};
 
+    //TODO move up to prevent selection
     public get buildableClass() {
         if (!this.isBuildable())
             return 'not-buildable';

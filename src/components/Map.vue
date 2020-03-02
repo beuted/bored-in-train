@@ -226,8 +226,8 @@ export default class Map extends IdleGameVue {
     }
 
     private drawMouse() {
+        this.mouseContext.clearRect(0, 0, this.tileSize, this.tileSize);
         if (this.mouseTileCoord && this.building != null) {
-            this.mouseContext.clearRect(0, 0, this.tileSize, this.tileSize);
             let image = imageService.getBuildingImage(this.building, 20);
             if (image) {
                 this.mouseContext.globalAlpha = 0.7;

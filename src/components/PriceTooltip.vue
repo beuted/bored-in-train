@@ -1,6 +1,6 @@
 <template>
     <div class="tooltip">
-        <div v-bind:class="buildableClass">
+        <div :class="{'not-buildable': !isBuildable}">
             <slot></slot>
         </div>
         <span class="tooltip-content">
@@ -46,27 +46,10 @@ import ConsumableIcon from '@/components/ConsumableIcon.vue';
 })
 export default class PriceTooltip extends IdleGameVue {
     @Prop() private building!: Building;
-    @Prop() private consumables!: {[id in Consumable]: { quantity: number }};
-
-    //TODO move up to prevent selection
-    public get buildableClass() {
-        if (!this.isBuildable())
-            return 'not-buildable';
-
-        return 'buildable';
-    }
+    @Prop() private isBuildable!: boolean
 
     public get buildingInfo() {
         return StaticBuildingInfo[this.building];
-    }
-
-    private isBuildable() {
-        for (const key in StaticBuildingInfo[this.building].price) {
-            var value = StaticBuildingInfo[this.building].price[key as Consumable];
-            if (this.consumables[key as Consumable].quantity < value)
-                return false;
-        }
-        return true;
     }
 }
 </script>
@@ -83,9 +66,10 @@ export default class PriceTooltip extends IdleGameVue {
 .tooltip .tooltip-content {
   visibility: hidden;
   width: 200px;
-  left: 50%;
-  top: 33px;
-  margin-left: -100px; /* Use half of the width (200/2 = 100), to center the tooltip */
+  left: 100%;
+  top: 0%;
+  margin-top: -50%; /* Use half of the width (200/2 = 100), to center the tooltip */
+  margin-left: 15px;
   padding: 5px 0;
   color: #fff;
   text-shadow: 0px 1px 1px #000;
@@ -110,6 +94,7 @@ export default class PriceTooltip extends IdleGameVue {
 }
 
 .not-buildable {
+    cursor: default;
     opacity: 0.3;
 }
 </style>

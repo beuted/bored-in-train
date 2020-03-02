@@ -6,7 +6,7 @@
     <div class="shop-item-list">
       <span class="title">Buildings</span>
       <div v-for="(building, key) in buildings" v-bind:key="key">
-        <PriceTooltip :building="key" :consumables="consumables" v-if="isKnown(key)" class="shop-item-container">
+        <PriceTooltip :building="key" :is-buildable="isBuildable(key)" v-if="isKnown(key)" class="shop-item-container">
           <div v-on:click="buildingClicked(key)" class="shop-item" v-bind:class="{ selected: key == buildingType }">
             <div>
               <div v-once><img class="shop-img" v-bind:src="getMapBuildingImages(key).src"></div>
@@ -45,10 +45,11 @@ export default class ShopMenu extends IdleGameVue {
   public buildingClicked(key: Building) {
     if (this.buildingType == key) {
       this.buildingType = null;
-    } else {
+      this.$emit('building-changed', null);
+    } else if (this.isBuildable(key)) {
       this.buildingType = key;
+      this.$emit('building-changed', key);
     }
-    this.$emit('building-changed', key);
   }
 
   public isKnown(building: Building) {
@@ -66,6 +67,15 @@ export default class ShopMenu extends IdleGameVue {
   public getMapBuildingImages(key: Building) {
     return imageService.getBuildingImage(key, 100);
   }
+
+  private isBuildable(building: Building) {
+    for (const key in StaticBuildingInfo[building].price) {
+        var value = StaticBuildingInfo[building].price[key as Consumable];
+        if (this.consumables[key as Consumable].quantity < value)
+            return false;
+    }
+    return true;
+}
 }
 </script>
 

@@ -58,7 +58,7 @@ export default class ShopMenu extends IdleGameVue {
 
   // Research
   public get availableResearchs() {
-    return this.$store.getters.availableResearchs;
+    return this.$store.getters.availableResearchs.filter((key: Research) => !this.isResearchOwned(key))
   }
 
   public getResearchInfo(research: Research) {

@@ -207,7 +207,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   farm: {
     name: 'Farm',
     icon: './img/farm.png',
-    description: 'Allows you to recruit 3 farmers',
+    description: 'Get food at the cost of wood',
     price: {
       population: 3,
       food: 0,
@@ -251,7 +251,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   sawmill: {
     name: 'Sawmill',
     icon: './img/windmill.png',
-    description: 'Allows you to gather wood at scale',
+    description: 'Gather wood nearby',
     price: {
       population: 3,
       food: 0,
@@ -295,7 +295,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   stoneMine: {
     name: 'Stone Mine',
     icon: './img/minecalcaire.png',
-    description: 'Allows you to recruit 3 stoneminers, must be built on a stone deposite',
+    description: 'Extract stone, must be built on a stone deposite',
     price: {
       population: 3,
       food: 0,
@@ -339,7 +339,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   coalMine: {
     name: 'Coal Mine',
     icon: './img/minecharbon.png',
-    description: 'Allows you to recruit 3 coal miners, must be built on a coal deposite',
+    description: 'Extract coal, must be built on a coal deposite',
     price: {
       population: 3,
       food: 0,
@@ -383,7 +383,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   limestoneMine: {
     name: 'Limestone Mine',
     icon: './img/minecalcaire.png',
-    description: 'Allows you to recruit 3 limestone miners, must be built on a limestone deposite',
+    description: 'Extract limestone, must be built on a limestone deposite',
     price: {
       population: 3,
       food: 0,
@@ -427,7 +427,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   limestoneBrickFactory: {
     name: 'Brick Factory',
     icon: './img/limestone-brick-factory.png',
-    description: 'Allows you to recruit 3 brick workers',
+    description: 'Build bricks out of limestone',
     price: {
       population: 3,
       food: 0,
@@ -445,11 +445,11 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       wood: null,
       stones: null,
       coals: null,
-      limestone: {
+      limestone: null,
+      limestoneBrick: {
         probability: 1,
         quantity: 3
       },
-      limestoneBrick: null,
       knowledge: null,
       energy: null,
     },
@@ -462,7 +462,10 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       wood: null,
       stones: null,
       coals: null,
-      limestone: null,
+      limestone: {
+        probability: 1,
+        quantity: 3
+      },
       limestoneBrick: null,
       knowledge: null,
       energy: null,
@@ -471,7 +474,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   coalPowerStation: {
     name: 'Coal Power Station',
     icon: './img/centralecharbon.png',
-    description: 'Allows you to recruit 3 coal station engineer',
+    description: 'Create energy by burning coal',
     price: {
       population: 3,
       food: 0,

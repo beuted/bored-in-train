@@ -123,7 +123,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     }
   },
   druidHut: {
-    name: 'Gatherer Hut',
+    name: 'Druid Hut',
     icon: './img/sable.png', //TODO: change
     description: 'Hut where a druid can do some experiments and gather knowledge.',
     price: {
@@ -671,6 +671,7 @@ export type IResearchInfo = { [id in Research]: IStaticResearch }
 
 export interface IStaticResearch {
   name: string;
+  icon: string;
   description: string;
   price: number;
   prerequisite: Research[];
@@ -680,6 +681,7 @@ export interface IStaticResearch {
 export const ResearchInfo: IResearchInfo = {
   agriculture: {
     name: 'Agriculture',
+    icon: './img/limestone-brick.png',
     description: 'Aggriculture allows you to build farms',
     price: 10,
     prerequisite: [],
@@ -689,6 +691,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   woodcutting: {
     name: 'Woodcutting',
+    icon: './img/limestone-brick.png',
     description: 'Woodcutting allows you to build Sawmill',
     price: 10,
     prerequisite: [Research.agriculture],
@@ -698,6 +701,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   mining: {
     name: 'Mining',
+    icon: './img/limestone-brick.png',
     description: 'Allows you to build mines',
     price: 100,
     prerequisite: [Research.agriculture],
@@ -707,6 +711,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   factory: {
     name: 'Factory',
+    icon: './img/limestone-brick.png',
     description: 'Allows you to build factories',
     price: 200,
     prerequisite: [Research.mining],
@@ -716,6 +721,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   navigation: {
     name: 'Navigation',
+    icon: './img/limestone-brick.png',
     description: 'Let you discover lands across the sea',
     price: 400,
     prerequisite: [Research.factory],
@@ -725,6 +731,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   steamLocomotive: {
     name: 'Steam Locomotive',
+    icon: './img/limestone-brick.png',
     description: 'Allows you to build coal powered factories',
     price: 400,
     prerequisite: [Research.factory],

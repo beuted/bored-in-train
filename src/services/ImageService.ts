@@ -1,7 +1,8 @@
 import { Environment } from '@/models/Environment';
 import { Building } from '@/models/Building';
 import { Habitat } from '@/models/Habitat';
-import { StaticBuildingInfo } from './GameEngine';
+import { StaticBuildingInfo, ResearchInfo } from './GameEngine';
+import { Research } from '@/models/Research';
 
 
 class ImageService {
@@ -42,6 +43,15 @@ class ImageService {
     [Habitat.LimestoneDeposite]: new Image(),
   };
 
+  private researchImages: { [id in Research]: HTMLImageElement } = {
+    [Research.agriculture]: new Image(),
+    [Research.factory]: new Image(),
+    [Research.mining]: new Image(),
+    [Research.navigation]: new Image(),
+    [Research.steamLocomotive]: new Image(),
+    [Research.woodcutting]: new Image(),
+  };
+
   public constructor() {
     this.mapEnvironmentImages[Environment.Water].src = './img/mer.png';
     this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
@@ -58,6 +68,9 @@ class ImageService {
     this.mapForestImages[1].src = './img/foret-stage1.png';
     this.mapForestImages[2].src = './img/foret-stage2.png';
     this.mapForestImages[3].src = './img/foret-stage3.png';
+
+    for (const research in ResearchInfo)
+      this.researchImages[research as Research].src = ResearchInfo[research as Research].icon;
   }
 
   public getEnvironmentImage(environment: Environment): HTMLImageElement {
@@ -78,6 +91,10 @@ class ImageService {
 
   public getHabitatImage(habitat: Habitat): HTMLImageElement {
     return this.mapHabitatImages[habitat];
+  }
+
+  public getResearchImages(research: Research) {
+    return this.researchImages[research];
   }
 
   public isLoaded() {

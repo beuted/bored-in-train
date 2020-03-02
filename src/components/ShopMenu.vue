@@ -1,10 +1,21 @@
 <template>
-  <div class="shop-item-list">
-    <div>
-      <span class="title">Research</span>
-    </div>
+  <div class="categories">
+    <span class="title">Research</span>
     <div class="shop-item-list">
-      <span class="title">Buildings</span>
+      <div v-for="researchName of availableResearchs" v-bind:key="researchName">
+        <ResearchTooltip
+          :research="researchName"
+          :is-buyable="!isResearchOwned(researchName) && canAffordResearch(researchName)"
+          class="shop-item-container"
+          >
+          <div v-on:click="buyResearch(researchName)" class="shop-item">
+            <div v-once><img class="shop-img" v-bind:src="getResearchImages(researchName).src"></div>
+          </div>
+        </ResearchTooltip>
+      </div>
+    </div>
+    <span class="title">Buildings</span>
+    <div class="shop-item-list">
       <div v-for="(building, key) in buildings" v-bind:key="key">
         <PriceTooltip :building="key" :is-buildable="isBuildable(key)" v-if="isKnown(key)" class="shop-item-container">
           <div v-on:click="buildingClicked(key)" class="shop-item" v-bind:class="{ selected: key == buildingType }">
@@ -32,16 +43,52 @@ import { Research } from '../models/Research';
 import { Keycodes } from '../models/Keycodes';
 
 import PriceTooltip from '@/components/PriceTooltip.vue';
+import ResearchTooltip from '@/components/ResearchTooltip.vue';
 import { imageService } from '../services/ImageService';
+import { MessageService } from '@/services/MessageService';
 
 @Component({
   components: {
-      PriceTooltip,
+    ResearchTooltip,
+    PriceTooltip,
   },
 })
 export default class ShopMenu extends IdleGameVue {
   public buildingType: Building | null = null;
 
+  // Research
+  public get availableResearchs() {
+    return this.$store.getters.availableResearchs;
+  }
+
+  public getResearchInfo(research: Research) {
+    return ResearchInfo[research];
+  }
+
+  public isResearchOwned(researchName: Research) {
+    return this.$store.state.research.research[researchName].owned;
+  }
+
+  public buyResearch(researchName: Research) {
+    if (!this.canAffordResearch(researchName)) {
+      Vue.toasted.error(`You don't have enough "knowledge" to buy this research.`);
+      MessageService.Help(`In order to buy research you must have enough "knowledge". To generate some knowledge hire some druids.`, 'research');
+      return;
+    }
+
+    this.$store.dispatch('BuyResearch', { researchName: researchName });
+    this.$toasted.success(`You discovered ${ResearchInfo[researchName].name}!`);
+  }
+
+  public canAffordResearch(researchName: Research) {
+    return ResearchInfo[researchName].price <= this.$store.state.consumable.knowledge.quantity;
+  }
+
+  public getResearchImages(key: Research) {
+    return imageService.getResearchImages(key);
+  }
+
+  // buildings
   public buildingClicked(key: Building) {
     if (this.buildingType == key) {
       this.buildingType = null;
@@ -60,10 +107,6 @@ export default class ShopMenu extends IdleGameVue {
     return this.$store.state.map.buildings;
   }
 
-  public get consumables() {
-    return this.$store.state.consumable;
-  }
-
   public getMapBuildingImages(key: Building) {
     return imageService.getBuildingImage(key, 100);
   }
@@ -71,24 +114,34 @@ export default class ShopMenu extends IdleGameVue {
   private isBuildable(building: Building) {
     for (const key in StaticBuildingInfo[building].price) {
         var value = StaticBuildingInfo[building].price[key as Consumable];
-        if (this.consumables[key as Consumable].quantity < value)
+        if (this.$store.state.consumable[key as Consumable].quantity < value)
             return false;
     }
     return true;
-}
+  }
 }
 </script>
 
 <style scoped lang="less">
-.shop-item-list {
+.categories {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space;
   align-items: center;
 }
 
+.shop-item-list {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+  width: 160px;
+}
+
 .shop-item-container {
-  margin-top: 15px;
+  margin: 15px 5px 5px 0px;
 }
 
 .shop-item {

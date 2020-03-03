@@ -54,7 +54,7 @@ import { MessageService } from '@/services/MessageService';
   },
 })
 export default class ShopMenu extends IdleGameVue {
-  public buildingType: Building | null = null;
+  @Prop() public buildingType: Building | null = null;
 
   // Research
   public get availableResearchs() {
@@ -91,10 +91,8 @@ export default class ShopMenu extends IdleGameVue {
   // buildings
   public buildingClicked(key: Building) {
     if (this.buildingType == key) {
-      this.buildingType = null;
       this.$emit('building-changed', null);
     } else if (this.isBuildable(key)) {
-      this.buildingType = key;
       this.$emit('building-changed', key);
     }
   }

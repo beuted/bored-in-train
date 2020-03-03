@@ -2,10 +2,10 @@
   <div>
     <div class="flex-container">
       <div class="inventory-item">
-        <ShopMenu v-on:building-changed="buildingChanged"></ShopMenu>
+        <ShopMenu :buildingType="building" v-on:building-changed="buildingChanged"></ShopMenu>
       </div>
       <div class="map-item">
-        <Map :map="map" :buildings="buildings" :building="building" :consumables="consumables"/>
+        <Map :map="map" :buildings="buildings" :building="building" :consumables="consumables" v-on:clear-building="clearBuilding" />
       </div>
       <div class="inventory-item">
         <Inventory />
@@ -57,6 +57,10 @@ export default class Game extends IdleGameVue {
 
   public buildingChanged(building: Building | null) {
     this.building = building;
+  }
+
+  public clearBuilding() {
+    this.building = null;
   }
 
   public mounted() {

@@ -684,7 +684,7 @@ export interface IStaticResearch {
 export const ResearchInfo: IResearchInfo = {
   agriculture: {
     name: 'Agriculture',
-    icon: './img/limestone-brick.png',
+    icon: './img/knowledge.png',
     description: 'Aggriculture allows you to build farms',
     price: 10,
     prerequisite: [],
@@ -694,7 +694,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   woodcutting: {
     name: 'Woodcutting',
-    icon: './img/limestone-brick.png',
+    icon: './img/knowledge.png',
     description: 'Woodcutting allows you to build Sawmill',
     price: 10,
     prerequisite: [Research.agriculture],
@@ -704,7 +704,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   mining: {
     name: 'Mining',
-    icon: './img/limestone-brick.png',
+    icon: './img/knowledge.png',
     description: 'Allows you to build mines',
     price: 100,
     prerequisite: [Research.agriculture],
@@ -714,7 +714,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   factory: {
     name: 'Factory',
-    icon: './img/limestone-brick.png',
+    icon: './img/knowledge.png',
     description: 'Allows you to build factories',
     price: 200,
     prerequisite: [Research.mining],
@@ -724,7 +724,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   navigation: {
     name: 'Navigation',
-    icon: './img/limestone-brick.png',
+    icon: './img/knowledge.png',
     description: 'Let you discover lands across the sea',
     price: 400,
     prerequisite: [Research.factory],
@@ -734,7 +734,7 @@ export const ResearchInfo: IResearchInfo = {
   },
   steamLocomotive: {
     name: 'Steam Locomotive',
-    icon: './img/limestone-brick.png',
+    icon: './img/knowledge.png',
     description: 'Allows you to build coal powered factories',
     price: 400,
     prerequisite: [Research.factory],

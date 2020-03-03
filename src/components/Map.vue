@@ -1,6 +1,6 @@
 <template>
     <div>
-        <TileTooltip :tile="tooltipTile" :coord="tooltipCoord"></TileTooltip>
+        <TileTooltip :tile="tooltipTile" :coord="tooltipCoord" :tileCoord="tooltipTileCoord" v-on:delete-building="deleteBuilding"></TileTooltip>
         <canvas id="canvas" class="map"
             v-on:mousedown="handleMouseDown"
             v-on:mouseup="handleMouseUp"
@@ -65,7 +65,8 @@ export default class Map extends IdleGameVue {
     private isDragging = true;
     private showPollution = false;
     private animLoop: number = -1;
-    private tooltipCoord = {x: 0, y: 0};
+    private tooltipCoord = { x: 0, y: 0 };
+    private tooltipTileCoord = { x: 0, y: 0 };
     private tooltipTile: IMapTile  | null = null;
 
     constructor() {
@@ -149,6 +150,11 @@ export default class Map extends IdleGameVue {
             this.$store.commit('MapNeedsUpdate');
         }
         this.keyBoardService.Reset();
+    }
+
+    public deleteBuilding(coord: { x: number, y: number }) {
+        this.tryBuild(coord, null);
+        this.tooltipTile = null;
     }
 
     private drawMap() {
@@ -281,6 +287,7 @@ export default class Map extends IdleGameVue {
             if (this.building == null) {
                 if (!this.tooltipTile) {
                     this.tooltipCoord = { x: event.pageX - this.canvas.offsetLeft, y: event.pageY - this.canvas.offsetTop };
+                    this.tooltipTileCoord = {x : coord.x, y: coord.y };
                     this.tooltipTile = this.map[coord.x][coord.y];
                 } else {
                     this.tooltipTile = null;
@@ -315,20 +322,23 @@ export default class Map extends IdleGameVue {
         }
     }
 
-    private tryBuild(coord: { x: number, y: number }, building: Building) {
+    private tryBuild(coord: { x: number, y: number }, building: Building | null) {
         const canBeBuilt = this.canBeBuilt(coord, building);
         if (!canBeBuilt.result) {
             Vue.toasted.error(`You cannot build this building here: ${canBeBuilt.reason}`);
+            this.$emit('clear-building', null);
             return;
         }
 
         // Pay the price of your purchase
-        for (let consumable in StaticBuildingInfo[building].price) {
-            let price = StaticBuildingInfo[building].price[consumable as Consumable];
-            if (price && price != 0) {
-                this.$store.commit('IncrementConsumable', { name: consumable, value: -price });
-                if (consumable == Consumable.population) {
-                    this.$store.commit('IncrementPopStorage', { value: -price });
+        if (building != null) {
+            for (let consumable in StaticBuildingInfo[building].price) {
+                let price = StaticBuildingInfo[building].price[consumable as Consumable];
+                if (price && price != 0) {
+                    this.$store.commit('IncrementConsumable', { name: consumable, value: -price });
+                    if (consumable == Consumable.population) {
+                        this.$store.commit('IncrementPopStorage', { value: -price });
+                    }
                 }
             }
         }
@@ -338,23 +348,45 @@ export default class Map extends IdleGameVue {
             this.$store.commit('IncrementPopStorage', { value: 10 });
         }
 
+        // Earn from the recycle of what you destroyed
+        let recycledBuilding = this.map[coord.x][coord.y].building;
+
+        if (recycledBuilding != null) {
+            for (let consumable in StaticBuildingInfo[recycledBuilding].price) {
+                let price = StaticBuildingInfo[recycledBuilding].price[consumable as Consumable];
+                if (price && price != 0) {
+                    this.$store.commit('IncrementConsumable', { name: consumable, value: price });
+                    if (consumable == Consumable.population) {
+                        this.$store.commit('IncrementPopStorage', { value: price });
+                    }
+                }
+            }
+
+            //TODO: not ideal
+            if (recycledBuilding == Building.village) {
+                this.$store.commit('IncrementPopStorage', { value: -10 });
+            }
+        }
+
         this.$store.commit('ChangeTile', { x: coord.x, y: coord.y, type: building });
     }
 
-    private canBeBuilt(coord: { x: number, y: number }, building: Building): {result: boolean, reason: string | null} {
+    private canBeBuilt(coord: { x: number, y: number }, building: Building | null): {result: boolean, reason: string | null} {
         if (coord.x < 0 || coord.y < 0 || coord.x >= this.nbTilesOnRowOrColumn || coord.y >= this.nbTilesOnRowOrColumn)
             return {result: false, reason: 'This tile is outside the map'};
 
         // Check if you can afford your purchase
-        for (let consumableId in StaticBuildingInfo[building].price) {
-            let price = StaticBuildingInfo[building].price[consumableId as Consumable];
+        if (building != null) {
+            for (let consumableId in StaticBuildingInfo[building].price) {
+                let price = StaticBuildingInfo[building].price[consumableId as Consumable];
 
-            if (price && this.consumables[consumableId as Consumable].quantity < price)
-                return {result: false, reason: `You don't have enough ${consumableId}`};
+                if (price && this.consumables[consumableId as Consumable].quantity < price)
+                    return {result: false, reason: `You don't have enough ${consumableId}`};
+            }
         }
 
         // If building is already there
-        if (building == this.map[coord.x][coord.y].building)
+        if (building != null && building == this.map[coord.x][coord.y].building)
             return {result: false, reason: `There is already a ${building} here`};
 
         // If not discovered

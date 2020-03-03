@@ -23,6 +23,11 @@
         <div v-if="tile.pollution > 0">
           <div class="tooltip-title">Pollution: {{tile.pollution.toPrecision(2)}}</div>
         </div>
+        <div class="actions">
+          <button class="delete-btn" v-if="tile.building != null" v-on:click="deleteBuilding()">
+            <img src="img/trash.png" alt="delete">
+          </button>
+        </div>
       </div>
     </span>
   </div>
@@ -45,6 +50,7 @@ import { environmentName } from '@/models/Environment';
 export default class TileTooltip extends IdleGameVue {
   @Prop() private tile!: IMapTile | null;
   @Prop() private coord!: { x: number, y: number };
+  @Prop() private tileCoord!: { x: number, y: number };
 
   public getCoordStyle(): string {
     return 'left:' + this.coord.x + 'px;top:' + this.coord.y + 'px';
@@ -58,6 +64,10 @@ export default class TileTooltip extends IdleGameVue {
   public get environmentName() {
     if (this.tile == null || this.tile.environment == null) return null;
     return environmentName(this.tile.environment);
+  }
+
+  public deleteBuilding() {
+    this.$emit('delete-building', this.tileCoord);
   }
 }
 </script>
@@ -92,5 +102,29 @@ export default class TileTooltip extends IdleGameVue {
 
 .tooltip-title {
     margin-bottom: 10px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-right: 5px;
+}
+
+.delete-btn {
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  background-color: transparent;
+  width: 28px;
+  height: 28px;
+  &>img {
+    width: 16px;
+    height: 16px;
+    image-rendering: pixelated;
+  }
+  &:hover {
+    background-color: rgba(255,255,255,0.2);
+  }
 }
 </style>

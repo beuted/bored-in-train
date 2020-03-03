@@ -23,7 +23,7 @@
               <div v-once><img class="shop-img" v-bind:src="getMapBuildingImages(key).src"></div>
             </div>
           </div>
-          <div class="badge">{{ building.quantity }}</div>
+          <div v-if="building.quantity>0" class="badge">{{ building.quantity }}</div>
         </PriceTooltip>
       </div>
     </div>
@@ -137,11 +137,11 @@ export default class ShopMenu extends IdleGameVue {
   justify-content: center;
   align-items: center;
   margin-bottom: 15px;
-  width: 160px;
+  width: 170px;
 }
 
 .shop-item-container {
-  margin: 15px 5px 5px 0px;
+  margin: 15px 8px 5px 0px;
 }
 
 .shop-item {
@@ -188,6 +188,7 @@ export default class ShopMenu extends IdleGameVue {
   font-size: 12px;
   line-height: 22px;
   color: white;
+  z-index: 10;
 }
 
 .shop-img {

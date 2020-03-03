@@ -152,7 +152,7 @@ export const MapModule: Module<IMapState, IState> = {
           }
 
           if (mapCopy[i][j].building == Building.sawmill) {
-            const quantityToRemove = mapCopy[i][j].population / mapCopy[i][j].closeByTrees;
+            const quantityToRemove = 3 / mapCopy[i][j].closeByTrees;
             if (i > 0 && mapCopy[i-1][j].building == Building.forest)
               mapCopy[i-1][j].quantity -= quantityToRemove;
             if (j > 0 && mapCopy[i][j-1].building == Building.forest)

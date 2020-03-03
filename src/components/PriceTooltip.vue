@@ -1,34 +1,34 @@
 <template>
-    <div class="tooltip">
-        <div :class="{'not-buildable': !isBuildable}">
-            <slot></slot>
-        </div>
-        <span class="tooltip-content">
-            <div class="tooltip-title">{{ buildingInfo.name }}</div>
-            <div>{{ buildingInfo.description }}</div>
-            <br>
-            <div>
-                <div class="tooltip-title">Price:</div>
-                <div v-for="(value, keyPrice) in buildingInfo.price" :key="keyPrice">
-                    <span v-if="value != 0"><consumable-icon :consumable="keyPrice" /> x {{ value }}</span>
-                </div>
-            </div>
-            <br>
-            <div>
-                <div class="tooltip-title">Produce:</div>
-                <div v-for="(value, keyProduce) in buildingInfo.produce" :key="keyProduce">
-                    <span v-if="value != null"><consumable-icon :consumable="keyProduce" /> x {{ value.quantity }}</span>
-                </div>
-            </div>
-            <br>
-            <div>
-                <div class="tooltip-title">Consume:</div>
-                <div v-for="(value, keyConsume) in buildingInfo.consume" :key="keyConsume">
-                    <span v-if="value != null"><consumable-icon :consumable="keyConsume" /> x {{ value.quantity }}</span>
-                </div>
-            </div>
-        </span>
+  <div class="tooltip">
+    <div :class="{'not-buildable': !isBuildable}">
+      <slot></slot>
     </div>
+    <span class="tooltip-content">
+        <div class="tooltip-title">{{ buildingInfo.name }}</div>
+        <div>{{ buildingInfo.description }}</div>
+        <br>
+        <div>
+          <div class="tooltip-title">Price:</div>
+          <div v-for="(value, keyPrice) in buildingInfo.price" :key="keyPrice">
+            <span v-if="value != 0"><consumable-icon :consumable="keyPrice" /> x {{ value }}</span>
+          </div>
+        </div>
+        <br>
+        <div>
+          <div class="tooltip-title">Produce:</div>
+          <div v-for="(value, keyProduce) in buildingInfo.produce" :key="keyProduce">
+            <span v-if="value != null"><consumable-icon :consumable="keyProduce" /> x {{ value.quantity }}</span>
+          </div>
+        </div>
+        <br>
+        <div>
+          <div class="tooltip-title">Consume:</div>
+          <div v-for="(value, keyConsume) in buildingInfo.consume" :key="keyConsume">
+            <span v-if="value != null"><consumable-icon :consumable="keyConsume" /> x {{ value.quantity }}</span>
+          </div>
+        </div>
+      </span>
+  </div>
 </template>
 
 <script lang="ts">
@@ -41,16 +41,16 @@ import ConsumableIcon from '@/components/ConsumableIcon.vue';
 
 @Component({
   components: {
-      ConsumableIcon
+    ConsumableIcon
   },
 })
 export default class PriceTooltip extends IdleGameVue {
-    @Prop() private building!: Building;
-    @Prop() private isBuildable!: boolean
+  @Prop() private building!: Building;
+  @Prop() private isBuildable!: boolean
 
-    public get buildingInfo() {
-        return StaticBuildingInfo[this.building];
-    }
+  public get buildingInfo() {
+    return StaticBuildingInfo[this.building];
+  }
 }
 </script>
 
@@ -60,6 +60,9 @@ export default class PriceTooltip extends IdleGameVue {
 .tooltip {
   position: relative;
   display: inline-block;
+}
+.tooltip-content {
+    z-index: 200;
 }
 
 /* Tooltip text */
@@ -80,7 +83,6 @@ export default class PriceTooltip extends IdleGameVue {
 
   /* Position the tooltip text - see examples below! */
   position: absolute;
-  z-index: 1;
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
@@ -89,12 +91,12 @@ export default class PriceTooltip extends IdleGameVue {
 }
 
 .tooltip-title {
-    font-weight: bold;
-    margin-bottom: 10px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .not-buildable {
-    cursor: default;
-    opacity: 0.3;
+  cursor: default;
+  opacity: 0.3;
 }
 </style>

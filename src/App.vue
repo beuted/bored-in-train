@@ -2,11 +2,11 @@
 <template>
   <div id="app">
     <Controls class="controls"/>
-    <div class="nav">
+    <!--<div class="nav">
       <router-link to="/">Production</router-link>
       <router-link to="/research">Research</router-link>
       <router-link to="/about">About</router-link>
-    </div>
+    </div>-->
     <div class="router-view">
       <router-view />
     </div>
@@ -127,8 +127,7 @@ html, body {
 }
 
 .controls {
-  padding: 10px;
-  border-bottom: solid #ced9e4 1px;
+  padding: 15px;
 }
 
 .nav {
@@ -136,7 +135,7 @@ html, body {
   flex: 0 0 22px;
   margin: auto;
   padding-top: 6px;
-  border-bottom: solid #ced9e4 1px;
+  //border-bottom: solid #ced9e4 1px;
   a {
     border: solid #2c3e50 1px;
     padding: 5px 10px;
@@ -151,7 +150,6 @@ html, body {
 }
 
 .router-view {
-  margin-top: 10px;
   flex-grow: 1;
 }
 

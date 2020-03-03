@@ -61,18 +61,15 @@ export default class PriceTooltip extends IdleGameVue {
   position: relative;
   display: inline-block;
 }
-.tooltip-content {
-    z-index: 200;
-}
 
 /* Tooltip text */
-.tooltip .tooltip-content {
+.tooltip-content {
   visibility: hidden;
   width: 200px;
   left: 100%;
   top: 0%;
   margin-top: -50%; /* Use half of the width (200/2 = 100), to center the tooltip */
-  margin-left: 15px;
+  margin-left: 60px;
   padding: 5px 0;
   color: #fff;
   text-shadow: 0px 1px 1px #000;
@@ -80,6 +77,7 @@ export default class PriceTooltip extends IdleGameVue {
   background-color: rgba(30, 30, 30, 0.90);
   border-radius: 2px;
   box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.2);
+  z-index: 200;
 
   /* Position the tooltip text - see examples below! */
   position: absolute;

@@ -1,5 +1,5 @@
   <template>
-  <div>
+  <div class="flex-container-container">
     <div class="flex-container">
       <div class="inventory-item">
         <ShopMenu :buildingType="building" v-on:building-changed="buildingChanged"></ShopMenu>
@@ -70,17 +70,25 @@ export default class Game extends IdleGameVue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
+.flex-container-container {
+  box-shadow: 0px 0px 15px 0px black;
+  height: 20*32px + 53px;
+  width: 300px + 20*32px + 300px;
+  margin: auto;
+  background-color: white;
+
+}
+
 .flex-container {
-  height: 100%;
-  padding: 0;
-  margin: 0;
+  padding: 30px 0 20px 0;
   display: flex;
   flex-direction: row;
   justify-content: center;
+
+  box-shadow: inset 0px 0px 15px 0px #d6dbd8;
 }
 
 .inventory-item {
-  margin-top: 50px;
   width: 300px;
 }
 </style>

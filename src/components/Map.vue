@@ -7,7 +7,7 @@
             v-on:mousemove="handleMouseMove"
             v-on:mouseout="handleMouseOut"
             :width="canvasSize+'px'" :height="canvasSize+'px'"></canvas>
-        <div v-on:click="showPollution = !showPollution">Show Pollution</div>
+        <div v-if="debugMode" v-on:click="showPollution = !showPollution">Show Pollution</div>
     </div>
 </template>
 
@@ -111,6 +111,10 @@ export default class Map extends IdleGameVue {
 
         this.compute();
         this.draw(false);
+    }
+
+    public get debugMode() {
+        return this.$store.state.debugMode;
     }
 
     private compute() {

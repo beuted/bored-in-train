@@ -50,7 +50,7 @@ export default class Map extends IdleGameVue {
   private tileSize = 32;
 
   private readonly nbTilesOnRowOrColumn = 100;
-  private readonly canvasSize =
+  public readonly canvasSize =
     this.nbTilesOnRowOrColumnOnScreen * this.tileSize;
 
   @Prop() private map!: IMapTile[][];
@@ -82,11 +82,11 @@ export default class Map extends IdleGameVue {
   private isMouseDown = false;
   private draggingStartPoint!: { x: number; y: number };
   private isDragging = true;
-  private showPollution = false;
+  public showPollution = false;
   private animLoop: number = -1;
-  private tooltipCoord = { x: 0, y: 0 };
-  private tooltipTileCoord = { x: 0, y: 0 };
-  private tooltipTile: IMapTile | null = null;
+  public tooltipCoord = { x: 0, y: 0 };
+  public tooltipTileCoord = { x: 0, y: 0 };
+  public tooltipTile: IMapTile | null = null;
 
   constructor() {
     super();
@@ -380,7 +380,7 @@ export default class Map extends IdleGameVue {
       );
   }
 
-  private handleMouseDown(event: MouseEvent) {
+  public handleMouseDown(event: MouseEvent) {
     if (event.button != 0) {
       // if right or middle click
       this.$emit("clear-building", null);
@@ -405,7 +405,7 @@ export default class Map extends IdleGameVue {
     }
   }
 
-  private handleMouseUp(event: MouseEvent) {
+  public handleMouseUp(event: MouseEvent) {
     if (event.button != 0) {
       // if right or middle click
       event.preventDefault();
@@ -439,13 +439,13 @@ export default class Map extends IdleGameVue {
     this.isMouseDown = false;
   }
 
-  private handleMouseOut() {
+  public handleMouseOut() {
     this.mouseTileCoord = null;
     this.isMouseDown = false;
   }
 
   // TODO: could be gathered in the mainLoop
-  private handleMouseMove(event: MouseEvent) {
+  public handleMouseMove(event: MouseEvent) {
     this.mouseTileCoord = this.getTileFromCoordinate(
       event.pageX - this.canvas.offsetLeft,
       event.pageY - this.canvas.offsetTop

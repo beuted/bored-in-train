@@ -2,9 +2,11 @@
   <div class="about">
     <div class="column">
       <p>
-        I started this dumb Idle game because I was bored on the train. I drop it right after (like most of my personnal projects ⚰).
-        Started it over and moved it to vuejs because I wanted to learn, eventually I an idea: What if I made an idle game
-        where you can loose ? Anyway I learned some stuff doing it and had some fun myself. I hope you'll like it.
+        I started this dumb Idle game because I was bored on the train. I drop
+        it right after (like most of my personnal projects ⚰). Started it over
+        and moved it to vuejs because I wanted to learn, eventually I an idea:
+        What if I made an idle game where you can loose ? Anyway I learned some
+        stuff doing it and had some fun myself. I hope you'll like it.
       </p>
       <p>
         @dekajoo

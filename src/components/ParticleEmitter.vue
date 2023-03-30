@@ -1,65 +1,85 @@
 <template>
-    <div class="particle-box"><div> <slot></slot> </div>
-        <span class="particle particle-positive">
-            <transition name="bounce " v-for="(value, key) in consumables" :key="key">
-                <div v-if="shows[value].positive"><img v-bind:src="getParticleEmoji(value)"/></div>
-            </transition>
-        </span>
-        <span class="particle particle-negative">
-            <transition name="unbounce" v-for="(value, key) in consumables" :key="key">
-                <div v-if="shows[value].negative"><img v-bind:src="getParticleEmoji(value)"/></div>
-            </transition>
-        </span>
-    </div>
+  <div class="particle-box">
+    <div><slot></slot></div>
+    <span class="particle particle-positive">
+      <transition name="bounce " v-for="(value, key) in consumables" :key="key">
+        <div v-if="shows[value].positive">
+          <img v-bind:src="getParticleEmoji(value)" />
+        </div>
+      </transition>
+    </span>
+    <span class="particle particle-negative">
+      <transition
+        name="unbounce"
+        v-for="(value, key) in consumables"
+        :key="key"
+      >
+        <div v-if="shows[value].negative">
+          <img v-bind:src="getParticleEmoji(value)" />
+        </div>
+      </transition>
+    </span>
+  </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { IdleGameVue } from '@/store';
-import { StaticConsumableInfo } from '@/services/GameEngine';
-import { EventBus, IProductionEvent } from '@/EventBus';
-import { Consumable } from '@/models/Consumable';
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { IdleGameVue } from "@/store";
+import { StaticConsumableInfo } from "@/services/GameEngine";
+import { EventBus, IProductionEvent } from "@/EventBus";
+import { Consumable } from "@/models/Consumable";
 
 @Component({
-  components: {
-  },
+  components: {},
 })
 export default class ParticleEmitter extends IdleGameVue {
-    @Prop() private consumable!: Consumable;
+  @Prop() private consumable!: Consumable;
 
-    private shows: { [id in Consumable]: { positive: boolean, negative: boolean } } = <any>{};
+  public shows: {
+    [id in Consumable]: { positive: boolean; negative: boolean }
+  } = <any>{};
 
-    public constructor() {
-        super();
-        EventBus.$on('consumable-production', (event: { [id in Consumable]: number }) => {
-            //TODO: do better position should be set by the js
-            //if (event[this.consumable])
-                //this.emitParticles(event[this.consumable], this.consumable)
-        });
+  public constructor() {
+    super();
+    EventBus.$on(
+      "consumable-production",
+      (event: { [id in Consumable]: number }) => {
+        //TODO: do better position should be set by the js
+        //if (event[this.consumable])
+        //this.emitParticles(event[this.consumable], this.consumable)
+      }
+    );
 
-        // Init the show array
-        for (let consumable in Consumable) {
-            this.shows[consumable as Consumable] = { positive: false, negative: false };
-        }
+    // Init the show array
+    for (let consumable in Consumable) {
+      this.shows[consumable as Consumable] = {
+        positive: false,
+        negative: false,
+      };
     }
+  }
 
-    public get consumables() {
-        return Consumable;
-    }
+  public get consumables() {
+    return Consumable;
+  }
 
-    public getParticleEmoji(consumable: Consumable) {
-        return StaticConsumableInfo[consumable].icon;
-    }
+  public getParticleEmoji(consumable: Consumable) {
+    return StaticConsumableInfo[consumable].icon;
+  }
 
-    private emitParticles(nbConsumable: number, consumable: Consumable) {
-        if (nbConsumable > 0) {
-            this.shows[consumable as Consumable].positive = true;
-            setTimeout(() => { this.shows[consumable as Consumable].positive = false; }, 800);
-        } else if (nbConsumable < 0) {
-            this.shows[consumable as Consumable].negative = true;
-            setTimeout(() => { this.shows[consumable as Consumable].negative = false; }, 800);
-        }
+  private emitParticles(nbConsumable: number, consumable: Consumable) {
+    if (nbConsumable > 0) {
+      this.shows[consumable as Consumable].positive = true;
+      setTimeout(() => {
+        this.shows[consumable as Consumable].positive = false;
+      }, 800);
+    } else if (nbConsumable < 0) {
+      this.shows[consumable as Consumable].negative = true;
+      setTimeout(() => {
+        this.shows[consumable as Consumable].negative = false;
+      }, 800);
     }
+  }
 }
 </script>
 
@@ -80,86 +100,81 @@ export default class ParticleEmitter extends IdleGameVue {
   text-align: center;
   padding: 5px 0;
 
-
   /* Position the tooltip text - see examples below! */
   position: absolute;
   z-index: 1;
 }
 
 .particle-box .particle-positive {
-    text-shadow: 0 0 5px green;
-    left: 50%+20px;
+  text-shadow: 0 0 5px green;
+  left: 50%+20px;
 }
 
 .particle-box .particle-negative {
-    text-shadow: 0 0 5px red;
-    left: 50%-30px;
+  text-shadow: 0 0 5px red;
+  left: 50%-30px;
 }
 
 /* transitions */
 .bounce-enter-active {
-    animation: bounce-in 0.8s;
+  animation: bounce-in 0.8s;
 }
 
 .bounce-leave-active {
-    animation: bounce-out 0.1s; //needed to avoid glitch
+  animation: bounce-out 0.1s; //needed to avoid glitch
 }
 
-@keyframes bounce-in
-{
-    0% {
-        opacity: 0;
-        transform:translateY(20px);
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-        transform:translateY(-10px);
-    }
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
 
-@keyframes bounce-out
-{
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 0;
-    }
+@keyframes bounce-out {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .unbounce-enter-active {
-    animation: unbounce-in 0.8s;
+  animation: unbounce-in 0.8s;
 }
 
 .unbounce-leave-active {
-    animation: unbounce-out 0.1s; //needed to avoid glitch
+  animation: unbounce-out 0.1s; //needed to avoid glitch
 }
 
-@keyframes unbounce-in
-{
-    0% {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+@keyframes unbounce-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 }
 
-@keyframes unbounce-out
-{
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 0;
-    }
+@keyframes unbounce-out {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 </style>

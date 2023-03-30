@@ -24,8 +24,6 @@ export interface IStaticBuilding {
   produce: { [id in Consumable]: IStaticBuildingProduction | null };
   consume: { [id in Consumable]: IStaticBuildingProduction | null };
   price: { [id in Consumable]: number };
-  acceptableTiles?: Environment[];
-  neededHabitat?: Habitat;
 }
 
 export interface IConsuming {
@@ -551,10 +549,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     },
     consume: {
       population: null,
-      food: {
-        probability: 1,
-        quantity: 1,
-      },
+      food: null,
       wood: null,
       stones: null,
       coals: null,

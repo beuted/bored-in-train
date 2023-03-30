@@ -1,10 +1,9 @@
-import Vue from 'vue';
-import Vuex, { Store, Module } from 'vuex';
+import Vue from "vue";
+import Vuex, { Store, Module } from "vuex";
 
-import { Consumable } from './models/Consumable';
-import { MapModule, IMapState } from './store/mapStoreModule';
-import { IResearchState, ResearchModule } from './store/researchStoreModule';
-
+import { Consumable } from "./models/Consumable";
+import { MapModule, IMapState } from "./store/mapStoreModule";
+import { IResearchState, ResearchModule } from "./store/researchStoreModule";
 
 Vue.use(Vuex);
 
@@ -24,7 +23,7 @@ export interface IState {
   research: IResearchState;
   debugMode: boolean;
   showHelp: boolean;
-  controls: { speed: number}
+  controls: { speed: number };
   consumable: { [id in Consumable]: { quantity: number } };
   popStorage: number;
 }
@@ -34,12 +33,12 @@ export default new Vuex.Store<IState>({
   strict: true,
   modules: {
     map: MapModule,
-    research: ResearchModule
+    research: ResearchModule,
   },
   state: {
     saveStatus: SaveStatus.Unsaved,
-    map: <IMapState><any>null, // TODO: This hack is required to keep the type system happy
-    research: <IResearchState><any>null, // TODO: This hack is required to keep the type system happy
+    map: <IMapState>(<any>null), // TODO: This hack is required to keep the type system happy
+    research: <IResearchState>(<any>null), // TODO: This hack is required to keep the type system happy
     debugMode: false,
     showHelp: true,
     controls: { speed: 1 },
@@ -72,16 +71,19 @@ export default new Vuex.Store<IState>({
         quantity: 0,
       },
     },
-    popStorage: 10
+    popStorage: 10,
   },
   mutations: {
     // For storeSaverPlugin
-    StoreSaverRestore: function (state: IState, restoredState: IState) {
+    StoreSaverRestore: function(state: IState, restoredState: IState) {
       Object.assign(state, restoredState);
     },
     // For storeSaverPlugin
-    StoreSaverSetSaveStatus: function (state: IState, newSaveStatus: SaveStatus) {
-      state.saveStatus = newSaveStatus
+    StoreSaverSetSaveStatus: function(
+      state: IState,
+      newSaveStatus: SaveStatus
+    ) {
+      state.saveStatus = newSaveStatus;
     },
     // Toggle debug
     ToggleDebugMode(state) {
@@ -101,26 +103,23 @@ export default new Vuex.Store<IState>({
     },
     // Toggle fastforward
     ToggleFastForward(state) {
-      if (state.controls.speed != 2)
-        state.controls.speed = 2;
-      else
-        state.controls.speed = 1;
+      if (state.controls.speed != 2) state.controls.speed = 2;
+      else state.controls.speed = 1;
     },
     // Increment the value of a consumable from 'value'
-    IncrementConsumable(state, obj: { name: Consumable, value: number }) {
+    IncrementConsumable(state, obj: { name: Consumable; value: number }) {
       state.consumable[obj.name].quantity += obj.value;
     },
     // Increment the value of a consumable from 'value'
     IncrementConsumables(state, production: { [id in Consumable]: number }) {
       for (let consumable in production) {
-        state.consumable[consumable as Consumable].quantity += production[consumable as Consumable];
+        state.consumable[consumable as Consumable].quantity +=
+          production[consumable as Consumable];
       }
     },
     IncrementPopStorage(state, obj: { value: number }) {
       state.popStorage += obj.value;
-    }
+    },
   },
-  actions: {
-
-  }
+  actions: {},
 });

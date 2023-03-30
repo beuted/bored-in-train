@@ -1,25 +1,33 @@
-import { Module, createNamespacedHelpers } from 'vuex';
+import { Module, createNamespacedHelpers } from "vuex";
 
-import { Building } from '@/models/Building';
-import { MapBuilder } from '../services/MapBuilder';
-import { Consumable } from '../models/Consumable';
-import { StaticConsumableInfo, StaticBuildingInfo } from '../services/GameEngine';
-import { Environment } from '../models/Environment';
-import { IMapTile } from '../models/IMapTile';
-import { UtilService } from '../services/UtilService';
-import { IState } from '../store';
-import Vue from 'vue';
-import { MessageService } from '@/services/MessageService';
+import { Building } from "@/models/Building";
+import { MapBuilder } from "../services/MapBuilder";
+import { Consumable } from "../models/Consumable";
+import {
+  StaticConsumableInfo,
+  StaticBuildingInfo,
+} from "../services/GameEngine";
+import { Environment } from "../models/Environment";
+import { IMapTile } from "../models/IMapTile";
+import { UtilService } from "../services/UtilService";
+import { IState } from "../store";
+import Vue from "vue";
+import { MessageService } from "@/services/MessageService";
 
 export interface IMapState {
-  mapNbTileFound: number,
-  map: IMapTile[][],
-  mapNeedsUpdate: boolean,
-  buildings: IMapBuildings,
+  mapNbTileFound: number;
+  map: IMapTile[][];
+  mapNeedsUpdate: boolean;
+  buildings: IMapBuildings;
 }
 
 //TODO: remove quantity use lenght
-export type IMapBuildings = { [id in Building]: { quantity: number, coords: { [xThenCommaThenY in string]: { x: number, y: number } } } }
+export type IMapBuildings = {
+  [id in Building]: {
+    quantity: number;
+    coords: { [xThenCommaThenY in string]: { x: number; y: number } };
+  }
+};
 
 export const MapModule: Module<IMapState, IState> = {
   state: {
@@ -29,80 +37,89 @@ export const MapModule: Module<IMapState, IState> = {
     buildings: {
       village: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       gathererHut: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       druidHut: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       watchTower: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       barn: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       farm: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       stoneMine: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       sawmill: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       coalMine: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       limestoneMine: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       limestoneBrickFactory: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       coalPowerStation: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
       forest: {
         quantity: 0,
-        coords: {}
+        coords: {},
       },
-    }
+    },
   },
   actions: {
-    DiscoverTile({ getters, commit, state }) { // Not used anymore
+    DiscoverTile({ getters, commit, state }) {
+      // Not used anymore
       let mapLength = state.map.length;
-      let xSuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(mapLength));
-      let ySuite = UtilService.Shuffle<number>(UtilService.GetNumberSuite(mapLength));
+      let xSuite = UtilService.Shuffle<number>(
+        UtilService.GetNumberSuite(mapLength)
+      );
+      let ySuite = UtilService.Shuffle<number>(
+        UtilService.GetNumberSuite(mapLength)
+      );
       let maxDisco = { value: 0, x: 0, y: 0 };
       let canSail = getters.canSail;
       for (const x of xSuite) {
         for (const y of ySuite) {
           let tile: IMapTile = state.map[x][y];
-          if (tile.discoverable > maxDisco.value && (tile.environment != Environment.Water || canSail)) {
+          if (
+            tile.discoverable > maxDisco.value &&
+            (tile.environment != Environment.Water || canSail)
+          ) {
             maxDisco = { value: tile.discoverable, x: x, y: y };
           }
           if (maxDisco.value > 0 && Math.random() < 0.001) {
-            commit('MakeTileDiscovered', { x: maxDisco.x, y: maxDisco.y });
+            commit("MakeTileDiscovered", { x: maxDisco.x, y: maxDisco.y });
             return;
           }
         }
       }
 
-      if (maxDisco.value > 0) // If we have'nt found any tile discoverable, don't discover anything
-        commit('MakeTileDiscovered', {x: maxDisco.x, y: maxDisco.y });
+      if (maxDisco.value > 0)
+        // If we have'nt found any tile discoverable, don't discover anything
+        commit("MakeTileDiscovered", { x: maxDisco.x, y: maxDisco.y });
     },
   },
   mutations: {
@@ -116,12 +133,15 @@ export const MapModule: Module<IMapState, IState> = {
       state.mapNeedsUpdate = true;
     },
     // Change a tile of a map giving it a certain type
-    ChangeTile(state: IMapState, obj: { x: number, y: number, type: Building | null }) {
+    ChangeTile(
+      state: IMapState,
+      obj: { x: number; y: number; type: Building | null }
+    ) {
       ChangeTile(state.map, state.buildings, obj);
       state.mapNeedsUpdate = true;
     },
-    MakeTileDiscovered(state: IMapState, obj: { x: number, y: number }) {
-      console.log('MakeTileDiscovered start...');
+    MakeTileDiscovered(state: IMapState, obj: { x: number; y: number }) {
+      console.log("MakeTileDiscovered start...");
       let startTime = Date.now();
 
       let mapCopy = JSON.parse(JSON.stringify(state.map)); // TODO: better way to clone T[][] ?
@@ -131,7 +151,11 @@ export const MapModule: Module<IMapState, IState> = {
 
       state.map = mapCopy;
       state.mapNeedsUpdate = true;
-      console.log('MakeTileDiscovered stop, elapsed time:', Date.now() - startTime, 'ms');
+      console.log(
+        "MakeTileDiscovered stop, elapsed time:",
+        Date.now() - startTime,
+        "ms"
+      );
     },
     MapHaveBeenUpdated(state: IMapState) {
       state.mapNeedsUpdate = false;
@@ -147,31 +171,47 @@ export const MapModule: Module<IMapState, IState> = {
       for (let i = 0; i < mapLength; i++) {
         for (let j = 0; j < mapLength; j++) {
           // Add and remove Tree quantity
-          if (mapCopy[i][j].building == Building.forest && mapCopy[i][j].quantity < 100) {
+          if (
+            mapCopy[i][j].building == Building.forest &&
+            mapCopy[i][j].quantity < 100
+          ) {
             mapCopy[i][j].quantity++;
           }
 
           if (mapCopy[i][j].building == Building.sawmill) {
             const quantityToRemove = 3 / mapCopy[i][j].closeByTrees;
-            if (i > 0 && mapCopy[i-1][j].building == Building.forest)
-              mapCopy[i-1][j].quantity -= quantityToRemove;
-            if (j > 0 && mapCopy[i][j-1].building == Building.forest)
-              mapCopy[i][j-1].quantity -= quantityToRemove;
-            if (i < mapLength-1 && mapCopy[i+1][j].building == Building.forest)
-              mapCopy[i+1][j].quantity -= quantityToRemove;
-            if (j < mapLength-1 && mapCopy[i][j+1].building == Building.forest)
-              mapCopy[i][j+1].quantity -= quantityToRemove;
+            if (i > 0 && mapCopy[i - 1][j].building == Building.forest)
+              mapCopy[i - 1][j].quantity -= quantityToRemove;
+            if (j > 0 && mapCopy[i][j - 1].building == Building.forest)
+              mapCopy[i][j - 1].quantity -= quantityToRemove;
+            if (
+              i < mapLength - 1 &&
+              mapCopy[i + 1][j].building == Building.forest
+            )
+              mapCopy[i + 1][j].quantity -= quantityToRemove;
+            if (
+              j < mapLength - 1 &&
+              mapCopy[i][j + 1].building == Building.forest
+            )
+              mapCopy[i][j + 1].quantity -= quantityToRemove;
           }
 
           // Add and remove pollution
-          if (mapCopy[i][j].building == Building.forest && mapCopy[i][j].pollution > 0) {
+          if (
+            mapCopy[i][j].building == Building.forest &&
+            mapCopy[i][j].pollution > 0
+          ) {
             mapCopy[i][j].pollution--;
-          } else if (mapCopy[i][j].building != null && mapCopy[i][j].pollution < 100) {
+          } else if (
+            mapCopy[i][j].building != null &&
+            mapCopy[i][j].pollution < 100
+          ) {
             mapCopy[i][j].pollution++;
           }
 
           // Discover tiles
-          if (mapCopy[i][j].building == Building.watchTower) { //TODO: we might want to be able to tell when a watch tower is useless
+          if (mapCopy[i][j].building == Building.watchTower) {
+            //TODO: we might want to be able to tell when a watch tower is useless
 
             // Generate uniformly random coord inside circle
             const radius = 3;
@@ -181,8 +221,8 @@ export const MapModule: Module<IMapState, IState> = {
             var jFound = j + Math.floor(r * Math.sin(a) + 0.5);
 
             if (!mapCopy[iFound][jFound].discovered) {
-              MakeTileDiscovered(mapCopy, {x: iFound, y: jFound});
-              mapNbTileFoundCopy++
+              MakeTileDiscovered(mapCopy, { x: iFound, y: jFound });
+              mapNbTileFoundCopy++;
             }
           }
         }
@@ -191,17 +231,27 @@ export const MapModule: Module<IMapState, IState> = {
       for (let i = 1; i < mapLength; i++) {
         for (let j = 1; j < mapLength; j++) {
           // Spread polution
-          let pollutionMedian = (mapCopy[i][j].pollution + mapCopy[i-1][j].pollution + mapCopy[i][j-1].pollution) / 3;
-          mapCopy[i-1][j].pollution = pollutionMedian
-          mapCopy[i][j-1].pollution = pollutionMedian
+          let pollutionMedian =
+            (mapCopy[i][j].pollution +
+              mapCopy[i - 1][j].pollution +
+              mapCopy[i][j - 1].pollution) /
+            3;
+          mapCopy[i - 1][j].pollution = pollutionMedian;
+          mapCopy[i][j - 1].pollution = pollutionMedian;
           mapCopy[i][j].pollution = pollutionMedian;
 
           // Remove tree if quantity hit 0
-          if (mapCopy[i][j].building == Building.forest && mapCopy[i][j].quantity <= 0) {
-            console.log('Forest exausted...');
-            MessageService.Help('Your lumberjacks have destroyed a forest... Try to have more trees around your Sawmills to let the forests naturally regenerate.', 'forest-exausted');
+          if (
+            mapCopy[i][j].building == Building.forest &&
+            mapCopy[i][j].quantity <= 0
+          ) {
+            console.log("Forest exausted...");
+            MessageService.Help(
+              "Your lumberjacks have destroyed a forest... Try to have more trees around your Sawmills to let the forests naturally regenerate.",
+              "forest-exausted"
+            );
             Vue.toasted.error(`Your lumberjacks have destroyed a forest`);
-            ChangeTile(mapCopy, state.buildings, {x: i, y: j, type: null});
+            ChangeTile(mapCopy, state.buildings, { x: i, y: j, type: null });
             mapCopy[i][j].quantity = 0;
           }
         }
@@ -210,69 +260,122 @@ export const MapModule: Module<IMapState, IState> = {
       state.mapNbTileFound = mapNbTileFoundCopy++;
       state.map = mapCopy;
       state.mapNeedsUpdate = true;
-    }
+    },
   },
   getters: {
     getRessourceStorage(state): (id: Consumable) => number {
       return (id: Consumable) => {
         var storage = StaticConsumableInfo[id].storage;
-        if (storage === undefined)
-          return -1;
+        if (storage === undefined) return -1;
 
         return state.buildings[storage.name].quantity * storage.capacity;
-      }
+      };
     },
-  }
-}
+  },
+};
 
-function updateCloseByTreeAndSawmill(pos: {x: number, y: number}, map: IMapTile[][], buildings: IMapBuildings, increment: number) {
+function updateCloseByTreeAndSawmill(
+  pos: { x: number; y: number },
+  map: IMapTile[][],
+  buildings: IMapBuildings,
+  increment: number
+) {
   map[pos.x][pos.y].closeByTrees += increment;
-  if (map[pos.x][pos.y].building == Building.sawmill && map[pos.x][pos.y].closeByTrees <= 0) {
-    delete buildings[Building.sawmill].coords[pos.x+','+pos.y];
+  if (
+    map[pos.x][pos.y].building == Building.sawmill &&
+    map[pos.x][pos.y].closeByTrees <= 0
+  ) {
+    delete buildings[Building.sawmill].coords[pos.x + "," + pos.y];
     buildings[Building.sawmill].quantity--;
     // We do not remove the building from state.map so that it still appear on the map
 
     map[pos.x][pos.y].population = 0;
     map[pos.x][pos.y].disabled = true;
 
-    Vue.toasted.error('A sawmill stopped working due to a lack of forest nearby');
-  } else if (map[pos.x][pos.y].building == Building.sawmill && map[pos.x][pos.y].closeByTrees > 0 && !buildings[Building.sawmill].coords[pos.x+','+pos.y]) {
+    Vue.toasted.error(
+      "A sawmill stopped working due to a lack of forest nearby"
+    );
+  } else if (
+    map[pos.x][pos.y].building == Building.sawmill &&
+    map[pos.x][pos.y].closeByTrees > 0 &&
+    !buildings[Building.sawmill].coords[pos.x + "," + pos.y]
+  ) {
     // Once a tree is planted we might reactivate the sawmills next to it
-    buildings[Building.sawmill].coords[pos.x+','+pos.y] = { x: pos.x, y: pos.y };
+    buildings[Building.sawmill].coords[pos.x + "," + pos.y] = {
+      x: pos.x,
+      y: pos.y,
+    };
     buildings[Building.sawmill].quantity++;
     delete map[pos.x][pos.y].disabled;
 
-    Vue.toasted.success('Your sawmill started working again thanks to the new forest');
+    Vue.toasted.success(
+      "Your sawmill started working again thanks to the new forest"
+    );
   }
 }
 
-function UpdateNbTreeNearBy(pos: {x: number, y: number}, map: IMapTile[][], buildings: IMapBuildings, increment: number) {
+function UpdateNbTreeNearBy(
+  pos: { x: number; y: number },
+  map: IMapTile[][],
+  buildings: IMapBuildings,
+  increment: number
+) {
   if (pos.x > 0)
-    updateCloseByTreeAndSawmill({x: pos.x-1, y: pos.y}, map, buildings, increment);
+    updateCloseByTreeAndSawmill(
+      { x: pos.x - 1, y: pos.y },
+      map,
+      buildings,
+      increment
+    );
 
-  if (pos.x < map.length-1)
-    updateCloseByTreeAndSawmill({x: pos.x+1, y: pos.y}, map, buildings, increment);
+  if (pos.x < map.length - 1)
+    updateCloseByTreeAndSawmill(
+      { x: pos.x + 1, y: pos.y },
+      map,
+      buildings,
+      increment
+    );
 
   if (pos.y > 0)
-    updateCloseByTreeAndSawmill({x: pos.x, y: pos.y-1}, map, buildings, increment);
+    updateCloseByTreeAndSawmill(
+      { x: pos.x, y: pos.y - 1 },
+      map,
+      buildings,
+      increment
+    );
 
-  if (pos.y < map.length-1)
-    updateCloseByTreeAndSawmill({x: pos.x, y: pos.y+1}, map, buildings, increment);
+  if (pos.y < map.length - 1)
+    updateCloseByTreeAndSawmill(
+      { x: pos.x, y: pos.y + 1 },
+      map,
+      buildings,
+      increment
+    );
 }
 
-function ChangeTile(map: IMapTile[][], buildings: IMapBuildings, obj: { x: number, y: number, type: Building | null }) {
+function ChangeTile(
+  map: IMapTile[][],
+  buildings: IMapBuildings,
+  obj: { x: number; y: number; type: Building | null }
+) {
   var previousTile = map[obj.x][obj.y];
 
-  console.debug(`Changing tile ${obj.x}, ${obj.y} from ${previousTile.building} to ${obj.type}`);
+  console.debug(
+    `Changing tile ${obj.x}, ${obj.y} from ${previousTile.building} to ${
+      obj.type
+    }`
+  );
 
   if (previousTile.building != null && !previousTile.disabled) {
     buildings[previousTile.building].quantity--;
-    delete buildings[previousTile.building].coords[obj.x + ',' + obj.y];
+    delete buildings[previousTile.building].coords[obj.x + "," + obj.y];
   }
 
   // We need to update nbTreeNearby if a forest is added or deleted
   if (previousTile.building == Building.forest || obj.type == Building.forest) {
-    let increment = (obj.type == Building.forest ? 1 : 0) - (previousTile.building == Building.forest ? 1 : 0)
+    let increment =
+      (obj.type == Building.forest ? 1 : 0) -
+      (previousTile.building == Building.forest ? 1 : 0);
     UpdateNbTreeNearBy(obj, map, buildings, increment);
   }
 
@@ -288,36 +391,39 @@ function ChangeTile(map: IMapTile[][], buildings: IMapBuildings, obj: { x: numbe
 
   if (obj.type != null) {
     buildings[obj.type].quantity++;
-    buildings[obj.type].coords[obj.x + ',' + obj.y] = { x: obj.x, y: obj.y };
+    buildings[obj.type].coords[obj.x + "," + obj.y] = { x: obj.x, y: obj.y };
   }
 }
 
-function MakeTileDiscovered(map: IMapTile[][], coord: { x: number, y: number }) {
+function MakeTileDiscovered(
+  map: IMapTile[][],
+  coord: { x: number; y: number }
+) {
   map[coord.x][coord.y].discovered = true;
   map[coord.x][coord.y].discoverable = 0;
 
   let mapLength = map.length;
-  if (coord.y < mapLength-1) {
-    if (!map[coord.x][coord.y+1].discovered) {
-      map[coord.x][coord.y+1].discoverable++;
+  if (coord.y < mapLength - 1) {
+    if (!map[coord.x][coord.y + 1].discovered) {
+      map[coord.x][coord.y + 1].discoverable++;
     }
   }
 
   if (coord.y > 0) {
-    if (!map[coord.x][coord.y-1].discovered) {
-      map[coord.x][coord.y-1].discoverable++;
+    if (!map[coord.x][coord.y - 1].discovered) {
+      map[coord.x][coord.y - 1].discoverable++;
     }
   }
 
-  if (coord.x < mapLength-1) {
-    if (!map[coord.x+1][coord.y].discovered) {
-      map[coord.x+1][coord.y].discoverable++;
+  if (coord.x < mapLength - 1) {
+    if (!map[coord.x + 1][coord.y].discovered) {
+      map[coord.x + 1][coord.y].discoverable++;
     }
   }
 
   if (coord.x > 0) {
-    if (!map[coord.x-1][coord.y].discovered) {
-      map[coord.x-1][coord.y].discoverable++;
+    if (!map[coord.x - 1][coord.y].discovered) {
+      map[coord.x - 1][coord.y].discoverable++;
     }
   }
 }

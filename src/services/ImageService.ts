@@ -1,9 +1,8 @@
-import { Environment } from '@/models/Environment';
-import { Building } from '@/models/Building';
-import { Habitat } from '@/models/Habitat';
-import { StaticBuildingInfo, ResearchInfo } from './GameEngine';
-import { Research } from '@/models/Research';
-
+import { Environment } from "@/models/Environment";
+import { Building } from "@/models/Building";
+import { Habitat } from "@/models/Habitat";
+import { StaticBuildingInfo, ResearchInfo } from "./GameEngine";
+import { Research } from "@/models/Research";
 
 class ImageService {
   private loaded: boolean = false;
@@ -53,38 +52,42 @@ class ImageService {
   };
 
   public constructor() {
-    this.mapEnvironmentImages[Environment.Water].src = './img/mer.png';
-    this.mapEnvironmentImages[Environment.Field].src = './img/field.png';
-    this.mapEnvironmentImages[Environment.Beach].src = './img/beach.png';
-    this.mapEnvironmentImages[Environment.Snow].src = './img/snow.png';
-    this.mapEnvironmentImages[Environment.Concrete].src = './img/concrete.png';
+    this.mapEnvironmentImages[Environment.Water].src = "./img/mer.png";
+    this.mapEnvironmentImages[Environment.Field].src = "./img/field.png";
+    this.mapEnvironmentImages[Environment.Beach].src = "./img/beach.png";
+    this.mapEnvironmentImages[Environment.Snow].src = "./img/snow.png";
+    this.mapEnvironmentImages[Environment.Concrete].src = "./img/concrete.png";
 
     for (const building in StaticBuildingInfo)
-        this.mapBuildingImages[building as Building].src = StaticBuildingInfo[building as Building].icon;
+      this.mapBuildingImages[building as Building].src =
+        StaticBuildingInfo[building as Building].icon;
 
-    this.mapHabitatImages[Habitat.CoalDeposite].src = './img/coal-deposit.png';
-    this.mapHabitatImages[Habitat.StoneDeposite].src = './img/stone-deposit.png';
-    this.mapHabitatImages[Habitat.LimestoneDeposite].src = './img/limestone-deposit.png';
-    this.mapForestImages[1].src = './img/foret-stage1.png';
-    this.mapForestImages[2].src = './img/foret-stage2.png';
-    this.mapForestImages[3].src = './img/foret-stage3.png';
+    this.mapHabitatImages[Habitat.CoalDeposite].src = "./img/coal-deposit.png";
+    this.mapHabitatImages[Habitat.StoneDeposite].src =
+      "./img/stone-deposit.png";
+    this.mapHabitatImages[Habitat.LimestoneDeposite].src =
+      "./img/limestone-deposit.png";
+    this.mapForestImages[1].src = "./img/foret-stage1.png";
+    this.mapForestImages[2].src = "./img/foret-stage2.png";
+    this.mapForestImages[3].src = "./img/foret-stage3.png";
 
     for (const research in ResearchInfo)
-      this.researchImages[research as Research].src = ResearchInfo[research as Research].icon;
+      this.researchImages[research as Research].src =
+        ResearchInfo[research as Research].icon;
   }
 
   public getEnvironmentImage(environment: Environment): HTMLImageElement {
     return this.mapEnvironmentImages[environment];
   }
 
-  public getBuildingImage(building: Building, quantity: number): HTMLImageElement {
+  public getBuildingImage(
+    building: Building,
+    quantity: number
+  ): HTMLImageElement {
     if (building == Building.forest) {
-      if (quantity <= 33)
-        return this.mapForestImages[1];
-      else if (quantity <= 66)
-        return this.mapForestImages[2];
-      else
-        return this.mapForestImages[3];
+      if (quantity <= 33) return this.mapForestImages[1];
+      else if (quantity <= 66) return this.mapForestImages[2];
+      else return this.mapForestImages[3];
     }
     return this.mapBuildingImages[building];
   }
@@ -99,8 +102,7 @@ class ImageService {
 
   public isLoaded() {
     return new Promise<void>((resolve, reject) => {
-      if (this.loaded)
-        resolve();
+      if (this.loaded) resolve();
       let nbEnvImages = Object.keys(this.mapEnvironmentImages).length;
       let nbBuildingImages = Object.keys(this.mapBuildingImages).length;
 
@@ -111,21 +113,20 @@ class ImageService {
             this.loaded = true;
             resolve();
           }
-        }
+        };
       }
 
-      for (const key in this.mapEnvironmentImages)
-      {
+      for (const key in this.mapEnvironmentImages) {
         (this.mapEnvironmentImages as any)[key].onload = () => {
           nbEnvImages--;
           if (nbEnvImages == 0 && nbBuildingImages == 0) {
             this.loaded = true;
             resolve();
           }
-        }
+        };
       }
     });
   }
 }
 
-export const imageService = new ImageService()
+export const imageService = new ImageService();

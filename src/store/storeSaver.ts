@@ -1,13 +1,13 @@
-import { IState, SaveStatus } from '@/store';
-import store from '@/store'
+import { IState, SaveStatus } from "@/store";
+import store from "@/store";
 
 export class StoreSaver {
-  private static storageKey = 'content';
+  private static storageKey = "content";
   private static saveIntervalMs = 60000;
 
   public static SaveLoop() {
     // Recursive setTimeout for precision
-    setTimeout (() => {
+    setTimeout(() => {
       StoreSaver.Save();
       StoreSaver.SaveLoop();
     }, StoreSaver.saveIntervalMs);
@@ -15,39 +15,38 @@ export class StoreSaver {
   }
 
   public static Restore() {
-    store.commit('StoreSaverRestore', StoreSaver.LoadFromLocalDb());
+    store.commit("StoreSaverRestore", StoreSaver.LoadFromLocalDb());
   }
 
   public static Save() {
-      console.log('Saving...');
-      store.commit('StoreSaverSetSaveStatus', SaveStatus.Saving)
-      StoreSaver.SaveFromLocalDb(store.state, function () {
-        store.commit('StoreSaverSetSaveStatus', SaveStatus.Saved);
-        console.log('Saved.');
-      });
-      return;
+    console.log("Saving...");
+    store.commit("StoreSaverSetSaveStatus", SaveStatus.Saving);
+    StoreSaver.SaveFromLocalDb(store.state, function() {
+      store.commit("StoreSaverSetSaveStatus", SaveStatus.Saved);
+      console.log("Saved.");
+    });
+    return;
   }
 
   public static Reset() {
-    console.log('Resetting...');
+    console.log("Resetting...");
     window.localStorage.setItem(StoreSaver.storageKey, JSON.stringify({}));
-    store.commit('StoreSaverRestore', {});
+    store.commit("StoreSaverRestore", {});
     location.reload();
-    console.log('Reset.');
+    console.log("Reset.");
   }
 
   private static LoadFromLocalDb() {
-    var json = window.localStorage.getItem(StoreSaver.storageKey) || JSON.stringify('')
-    return JSON.parse(json)
+    var json =
+      window.localStorage.getItem(StoreSaver.storageKey) || JSON.stringify("");
+    return JSON.parse(json);
   }
 
   private static SaveFromLocalDb(content: IState, callback: Function) {
-    window.localStorage.setItem(StoreSaver.storageKey, JSON.stringify(content))
+    window.localStorage.setItem(StoreSaver.storageKey, JSON.stringify(content));
     callback();
   }
 }
 
 StoreSaver.Restore();
 StoreSaver.SaveLoop();
-
-

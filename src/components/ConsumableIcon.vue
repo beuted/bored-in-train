@@ -3,14 +3,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IdleGameVue } from '@/store';
-import { StaticConsumableInfo } from '@/services/GameEngine';
-import { Consumable } from '../models/Consumable';
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { IdleGameVue } from "@/store";
+import { StaticConsumableInfo } from "@/services/GameEngine";
+import { Consumable } from "../models/Consumable";
 
 @Component({
-  components: {
-  },
+  components: {},
 })
 export default class ConsumableIcon extends IdleGameVue {
   @Prop() private consumable!: Consumable;
@@ -23,8 +22,8 @@ export default class ConsumableIcon extends IdleGameVue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
-  .consumable-icon {
-    vertical-align: top;
-    margin-right: 5px;
-  }
+.consumable-icon {
+  vertical-align: top;
+  margin-right: 5px;
+}
 </style>

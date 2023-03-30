@@ -2,12 +2,23 @@
   <transition name="fade">
     <div class="popup-container" v-if="isShown" v-on:click="dismiss()">
       <div class="popup" v-on:click="$event.stopPropagation()">
-        <div class="popup-message">{{message}}</div>
+        <div class="popup-message">{{ message }}</div>
         <div class="popup-btns-container">
-          <div class="popup-help-input" v-if="isHelp"><input class="chx" type="checkbox" id="toggleShowHelp" v-bind:checked="showHelp" v-on:click="toggleShowHelp()">
-            <label class="chx-label" for="toggleShowHelp">Show help messages</label>
+          <div class="popup-help-input" v-if="isHelp">
+            <input
+              class="chx"
+              type="checkbox"
+              id="toggleShowHelp"
+              v-bind:checked="showHelp"
+              v-on:click="toggleShowHelp()"
+            />
+            <label class="chx-label" for="toggleShowHelp"
+              >Show help messages</label
+            >
           </div>
-          <button class="popup-dismiss-btn btn" v-on:click="dismiss()">Dismiss</button>
+          <button class="popup-dismiss-btn btn" v-on:click="dismiss()">
+            Dismiss
+          </button>
         </div>
       </div>
     </div>
@@ -15,22 +26,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IState, IdleGameVue } from '@/store';
-import { StaticConsumableInfo, GlobalConfig } from '@/services/GameEngine';
-import { EventBus, IPopupMessageEvent } from '@/EventBus';
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { IState, IdleGameVue } from "@/store";
+import { StaticConsumableInfo, GlobalConfig } from "@/services/GameEngine";
+import { EventBus, IPopupMessageEvent } from "@/EventBus";
 
-
-@Component({
-})
+@Component({})
 export default class Popup extends IdleGameVue {
-  private isShown = false;
-  private isHelp = false;
-  private message = '';
+  public isShown = false;
+  public isHelp = false;
+  public message = "";
   private lastTimeShown: number = 0;
 
   private mounted() {
-    EventBus.$on('show-popup', (event: IPopupMessageEvent) => {
+    EventBus.$on("show-popup", (event: IPopupMessageEvent) => {
       this.message = event.message;
       this.isHelp = event.isHelp;
       this.isShown = true;
@@ -43,14 +52,13 @@ export default class Popup extends IdleGameVue {
   }
 
   public toggleShowHelp() {
-    this.$store.commit('ToggleShowHelp');
+    this.$store.commit("ToggleShowHelp");
   }
 
   public dismiss() {
-    if (Date.now() - this.lastTimeShown <= 500)
-      return;
+    if (Date.now() - this.lastTimeShown <= 500) return;
     this.isShown = false;
-    this.$store.commit('SetPlay', true);
+    this.$store.commit("SetPlay", true);
   }
 }
 </script>
@@ -82,11 +90,11 @@ export default class Popup extends IdleGameVue {
   color: #fff;
   text-shadow: 0px 1px 1px #000;
   background-color: rgba(30, 30, 30, 0.5);
-  box-shadow: 0px 0px 3px 0px rgba(255,255,255,0.1)
+  box-shadow: 0px 0px 3px 0px rgba(255, 255, 255, 0.1);
 }
 
 .popup-message {
-  flex-grow: 1
+  flex-grow: 1;
 }
 
 .popup-btns-container {
@@ -105,11 +113,12 @@ export default class Popup extends IdleGameVue {
   right: 0;
 }
 
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .5s;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
 }
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
-
 </style>

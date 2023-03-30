@@ -1,28 +1,27 @@
 <template>
-    <div>
-        <button v-on:click="toggleDebug()" class="control-debug">Debug</button>
-        <button v-on:click="reset()" class="control-debug">Reset</button>
-        <button v-on:click="save()" class="control-debug">Save</button>
-        <span v-on:click="togglePlay()" class="control">
-            <span v-if="!isPlay">▶️</span>
-            <span v-if="isPlay">⏸</span>
-        </span>
-        <span v-on:click="toggleFastForward()" class="control">
-            ⏩
-        </span>
-        <span>speed: x {{ gameSpeed }}</span>
-    </div>
+  <div>
+    <button v-on:click="toggleDebug()" class="control-debug">Debug</button>
+    <button v-on:click="reset()" class="control-debug">Reset</button>
+    <button v-on:click="save()" class="control-debug">Save</button>
+    <span v-on:click="togglePlay()" class="control">
+      <span v-if="!isPlay">▶️</span>
+      <span v-if="isPlay">⏸</span>
+    </span>
+    <span v-on:click="toggleFastForward()" class="control">
+      ⏩
+    </span>
+    <span>speed: x {{ gameSpeed }}</span>
+  </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IState, IdleGameVue } from '@/store';
-import { Building } from '@/models/Building';
-import { StoreSaver } from '@/store/storeSaver';
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { IState, IdleGameVue } from "@/store";
+import { Building } from "@/models/Building";
+import { StoreSaver } from "@/store/storeSaver";
 
 @Component({
-  components: {
-  },
+  components: {},
 })
 export default class Controls extends IdleGameVue {
   public get isPlay() {
@@ -34,19 +33,19 @@ export default class Controls extends IdleGameVue {
   }
 
   public togglePlay() {
-    this.$store.commit('TogglePlay');
+    this.$store.commit("TogglePlay");
   }
 
   public toggleFastForward() {
-    this.$store.commit('ToggleFastForward');
+    this.$store.commit("ToggleFastForward");
   }
 
   public toggleDebug() {
-    this.$store.commit('ToggleDebugMode');
+    this.$store.commit("ToggleDebugMode");
   }
 
   public reset() {
-    if (confirm('Are you sure you want ot reset your game ?')) {
+    if (confirm("Are you sure you want ot reset your game ?")) {
       StoreSaver.Reset();
     }
   }
@@ -59,11 +58,11 @@ export default class Controls extends IdleGameVue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
-  .control {
-    cursor: pointer;
-  }
-  .control-debug {
-    margin-right: 10px;
-    cursor: pointer;
-  }
+.control {
+  cursor: pointer;
+}
+.control-debug {
+  margin-right: 10px;
+  cursor: pointer;
+}
 </style>

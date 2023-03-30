@@ -1,29 +1,25 @@
 <template>
-    <div class="solid-goods">
-        <h2>Solid goods</h2>
-        <ul>
-            <li>
-            </li>
-        </ul>
-    </div>
+  <div class="solid-goods">
+    <h2>Solid goods</h2>
+    <ul>
+      <li></li>
+    </ul>
+  </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import { IdleGameVue } from '@/store';
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { IdleGameVue } from "@/store";
 
 @Component({
-  components: {
-  },
+  components: {},
 })
 export default class SolidGoods extends IdleGameVue {
-    get debugMode() {
-        return this.$store.state.debugMode;
-    }
+  get debugMode() {
+    return this.$store.state.debugMode;
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="less">
-
-</style>
+<style scoped lang="less"></style>

@@ -13,3 +13,11 @@ export enum Building {
   limestoneBrickFactory = "limestoneBrickFactory",
   coalPowerStation = "coalPowerStation",
 }
+
+export function isAMine(building: Building | null) {
+  return (
+    building == Building.limestoneMine ||
+    building == Building.stoneMine ||
+    building == Building.coalMine
+  );
+}

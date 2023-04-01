@@ -3,7 +3,11 @@ import { Building } from "@/models/Building";
 import { IMapTile } from "@/models/IMapTile";
 import SimplexNoise from "simplex-noise";
 import { Habitat } from "@/models/Habitat";
-import { IMapBuildings } from "@/store/mapStoreModule";
+import {
+  getTilesForCircle,
+  IMapBuildings,
+  sawmillRadius,
+} from "@/store/mapStoreModule";
 
 export class MapBuilder {
   private static simplexHeight = new SimplexNoise();
@@ -11,7 +15,7 @@ export class MapBuilder {
 
   public static InitMap(
     size: number
-  ): { map: IMapTile[][]; buildings: IMapBuildings } {
+  ): { map: IMapTile[][]; mapSize: number; buildings: IMapBuildings } {
     var center = Math.floor(size / 2);
     const mapSize = size;
     // Build Environment and natural Buildings (forests, ...)
@@ -76,22 +80,35 @@ export class MapBuilder {
     map[center - 1][center].building = Building.gathererHut;
 
     // Set discovered
-    map[center][center].discovered = true;
-    map[center][center + 1].discoverable = 1;
-    map[center][center - 1].discoverable = 1;
-    map[center + 1][center].discoverable = 1;
-    map[center - 1][center].discoverable = 1;
+    var discoveredTiles = getTilesForCircle({ x: center, y: center }, 2);
+    for (const tile of discoveredTiles) {
+      map[tile.x][tile.y].discovered = true;
+    }
+    var discoverableTiles = getTilesForCircle({ x: center, y: center }, 3);
+    for (const tile of discoverableTiles) {
+      map[tile.x][tile.y].discoverable = 1;
+    }
 
     // Compute closeByTrees
     for (let i = 0; i < mapSize; i++) {
       for (let j = 0; j < mapSize; j++) {
         let nbTrees = 0;
-        if (i > 0 && map[i - 1][j].building == Building.forest) nbTrees++;
-        if (j > 0 && map[i][j - 1].building == Building.forest) nbTrees++;
-        if (i < mapSize - 1 && map[i + 1][j].building == Building.forest)
-          nbTrees++;
-        if (j < mapSize - 1 && map[i][j + 1].building == Building.forest)
-          nbTrees++;
+        var discoverableTiles = getTilesForCircle(
+          { x: i, y: j },
+          sawmillRadius
+        );
+
+        for (const tile of discoverableTiles) {
+          if (
+            tile.x > 0 &&
+            tile.y > 0 &&
+            tile.x < map.length - 1 &&
+            tile.y < map.length - 1 &&
+            map[tile.x][tile.y].building == Building.forest
+          ) {
+            nbTrees++;
+          }
+        }
 
         map[i][j].closeByTrees = nbTrees;
       }
@@ -99,6 +116,7 @@ export class MapBuilder {
 
     return {
       map: map,
+      mapSize: mapSize,
       buildings: {
         village: {
           quantity: 1,

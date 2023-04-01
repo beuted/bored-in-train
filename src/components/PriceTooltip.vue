@@ -14,10 +14,18 @@
             ><consumable-icon :consumable="keyPrice" /> x {{ value }}</span
           >
         </div>
+        <br />
       </div>
-      <br />
-      <div>
-        <div class="tooltip-title">Produce:</div>
+
+      <div
+        v-if="
+          Object.values(buildingInfo.produce).filter((x) => x != null).length >
+            0
+        "
+      >
+        <div class="tooltip-title">
+          Produce:
+        </div>
         <div
           v-for="(value, keyProduce) in buildingInfo.produce"
           :key="keyProduce"
@@ -27,10 +35,18 @@
             {{ value.quantity }}</span
           >
         </div>
+        <br />
       </div>
-      <br />
-      <div>
-        <div class="tooltip-title">Consume:</div>
+
+      <div
+        v-if="
+          Object.values(buildingInfo.consume).filter((x) => x != null).length >
+            0
+        "
+      >
+        <div class="tooltip-title">
+          Consume:
+        </div>
         <div
           v-for="(value, keyConsume) in buildingInfo.consume"
           :key="keyConsume"
@@ -40,6 +56,7 @@
             {{ value.quantity }}</span
           >
         </div>
+        <br />
       </div>
     </span>
   </div>

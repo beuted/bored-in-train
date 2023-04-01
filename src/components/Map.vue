@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { Building } from "@/models/Building";
+import { Building, isAMine } from "@/models/Building";
 import { Habitat } from "@/models/Habitat";
 import { StaticBuildingInfo, ResearchInfo } from "@/services/GameEngine";
 import { Environment } from "@/models/Environment";
@@ -106,8 +106,8 @@ export default class Map extends IdleGameVue {
     this.mapContext.imageSmoothingEnabled = false;
 
     this.mouseCanvas = document.createElement("canvas");
-    this.mouseCanvas.width = this.tileSize;
-    this.mouseCanvas.height = this.tileSize;
+    this.mouseCanvas.width = this.tileSize * 3;
+    this.mouseCanvas.height = this.tileSize * 3;
     this.mouseContext = <CanvasRenderingContext2D>(
       this.mouseCanvas.getContext("2d")
     );
@@ -187,8 +187,8 @@ export default class Map extends IdleGameVue {
 
   private drawMap() {
     // Refresh canvas layers since their size can have changed
-    this.mouseCanvas.width = this.tileSize;
-    this.mouseCanvas.height = this.tileSize;
+    this.mouseCanvas.width = this.tileSize * 3;
+    this.mouseCanvas.height = this.tileSize * 3;
     this.mapCanvas.width = this.tileSize * this.nbTilesOnRowOrColumn;
     this.mapCanvas.height = this.tileSize * this.nbTilesOnRowOrColumn;
     this.mapContext.imageSmoothingEnabled = false;
@@ -234,13 +234,13 @@ export default class Map extends IdleGameVue {
             );
             this.mapContext.globalAlpha = 1;
 
-            // Show population on the map
-            if (quantity > 0)
+            // Show population / forst amount on the map
+            /*if (quantity > 0)
               this.mapContext.fillText(
                 quantity + "",
                 i * this.tileSize,
                 (j + 0.5) * this.tileSize
-              );
+              );*/
 
             const pop = this.map[i][j].population;
             if (pop > 0)
@@ -333,20 +333,42 @@ export default class Map extends IdleGameVue {
   }
 
   private drawMouse() {
-    this.mouseContext.clearRect(0, 0, this.tileSize, this.tileSize);
+    this.mouseContext.clearRect(0, 0, 3 * this.tileSize, 3 * this.tileSize);
     if (this.mouseTileCoord && this.building != null) {
       let image = imageService.getBuildingImage(this.building, 20);
       if (image) {
         this.mouseContext.globalAlpha = 0.7;
-        if (!this.canBeBuilt(this.mouseTileCoord, this.building).result) {
+        const canBuild = this.canBeBuilt(this.mouseTileCoord, this.building)
+          .result;
+        if (!canBuild) {
           // Show a red bg when a building can't be built
           this.mouseContext.fillStyle = "#FF0000";
-          this.mouseContext.fillRect(0, 0, this.tileSize, this.tileSize);
+          this.mouseContext.fillRect(
+            this.tileSize,
+            this.tileSize,
+            this.tileSize,
+            this.tileSize
+          );
           this.mouseContext.fillStyle = "#000";
-          //this.mouseContext.globalCompositeOperation = "destination-in";
         }
-        this.mouseContext.drawImage(image, 0, 0, this.tileSize, this.tileSize);
-        //this.mouseContext.globalCompositeOperation = "source-over";
+        this.mouseContext.drawImage(
+          image,
+          this.tileSize,
+          this.tileSize,
+          this.tileSize,
+          this.tileSize
+        );
+        if (this.building == Building.sawmill) {
+          this.mouseContext.strokeStyle = canBuild ? "#00a6c6" : "#FF0000";
+          this.mouseContext.lineWidth = 5;
+          this.mouseContext.strokeRect(
+            0,
+            0,
+            3 * this.tileSize,
+            3 * this.tileSize
+          );
+          this.mouseContext.strokeStyle = "#000";
+        }
 
         this.mouseContext.globalAlpha = 1.0;
       }
@@ -375,8 +397,8 @@ export default class Map extends IdleGameVue {
     if (this.mouseTileCoord)
       this.ctx.drawImage(
         this.mouseCanvas,
-        this.mouseTileCoord.x * this.tileSize + this.mapOffset.x,
-        this.mouseTileCoord.y * this.tileSize + this.mapOffset.y
+        (this.mouseTileCoord.x - 1) * this.tileSize + this.mapOffset.x,
+        (this.mouseTileCoord.y - 1) * this.tileSize + this.mapOffset.y
       );
   }
 
@@ -386,6 +408,8 @@ export default class Map extends IdleGameVue {
       this.$emit("clear-building", null);
       event.preventDefault();
       event.stopPropagation();
+
+      this.tooltipTile = null;
       return false;
     }
 
@@ -468,7 +492,7 @@ export default class Map extends IdleGameVue {
       Vue.toasted.error(
         `You cannot build this building here: ${canBeBuilt.reason}`
       );
-      this.$emit("clear-building", null);
+      //this.$emit("clear-building", null);
       return;
     }
 
@@ -607,6 +631,23 @@ export default class Map extends IdleGameVue {
       return {
         result: false,
         reason: `A ${building} must be built next to a forest`,
+      };
+
+    // You cannot build buildings that are not mines on deposits
+    if (!isAMine(building) && this.map[coord.x][coord.y].habitat != null)
+      return {
+        result: false,
+        reason: `A ${building} cannot be built on a deposit`,
+      };
+
+    // You must build farms on a field
+    if (
+      building == Building.farm &&
+      this.map[coord.x][coord.y].environment != Environment.Field
+    )
+      return {
+        result: false,
+        reason: `A ${building} must be built on a field`,
       };
 
     return { result: true, reason: null };

@@ -5,6 +5,7 @@
         <div class="tooltip-title">You haven't discovered this zone yet</div>
       </div>
       <div v-if="tile.discovered || tile.discoverable">
+        <div class="tooltip-title">{{ tileCoord.x }}, {{ tileCoord.y }}</div>
         <div v-if="tile.environment">
           <div class="tooltip-title">Landscape: {{ environmentName }}</div>
         </div>
@@ -13,6 +14,9 @@
         </div>
         <div v-if="tile.building">
           <div class="tooltip-title">Building: {{ tile.building }}</div>
+        </div>
+        <div v-if="tile.closeByTrees">
+          <div class="tooltip-title">closeByTrees: {{ tile.closeByTrees }}</div>
         </div>
         <div v-if="tile.quantity > 0">
           <div class="tooltip-title">
@@ -58,8 +62,8 @@ import { environmentName } from "@/models/Environment";
 })
 export default class TileTooltip extends IdleGameVue {
   @Prop() public tile!: IMapTile | null;
-  @Prop() private coord!: { x: number; y: number };
-  @Prop() private tileCoord!: { x: number; y: number };
+  @Prop() public coord!: { x: number; y: number };
+  @Prop() public tileCoord!: { x: number; y: number };
 
   public getCoordStyle(): string {
     return "left:" + this.coord.x + "px;top:" + this.coord.y + "px";
@@ -91,6 +95,7 @@ export default class TileTooltip extends IdleGameVue {
 
 /* Tooltip text */
 .tooltip .tooltip-content {
+  pointer-events: none; // To let click through
   width: 200px;
   top: 0;
   left: 0;
@@ -120,6 +125,8 @@ export default class TileTooltip extends IdleGameVue {
 }
 
 .delete-btn {
+  pointer-events: auto; // To not let click through
+
   border: none;
   border-radius: 2px;
   cursor: pointer;

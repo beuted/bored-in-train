@@ -67,9 +67,9 @@ class ImageService {
       "./img/stone-deposit.png";
     this.mapHabitatImages[Habitat.LimestoneDeposite].src =
       "./img/limestone-deposit.png";
-    this.mapForestImages[1].src = "./img/foret-stage1.png";
-    this.mapForestImages[2].src = "./img/foret-stage2.png";
-    this.mapForestImages[3].src = "./img/foret-stage3.png";
+    this.mapForestImages[1].src = "./img/arbres-stage1.png";
+    this.mapForestImages[2].src = "./img/arbres-stage2.png";
+    this.mapForestImages[3].src = "./img/arbres-stage3.png";
 
     for (const research in ResearchInfo)
       this.researchImages[research as Research].src =

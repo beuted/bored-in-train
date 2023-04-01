@@ -9,7 +9,7 @@
             <div class="animated" :class="{ rubberBand: shouldBounce(key) }">
               <img v-bind:src="getIcon(key)" />
             </div>
-            {{ consumable.quantity }} / {{ getStorage(key) }}
+            {{ getValue(consumable.quantity) }} / {{ getStorage(key) }}
           </div>
         </ParticleEmitter>
         <div
@@ -37,6 +37,7 @@ import ParticleEmitter from "@/components/ParticleEmitter.vue";
 import { MessageService } from "@/services/MessageService";
 import { Building } from "../models/Building";
 import { EventBus } from "@/EventBus";
+import { GameService } from "@/services/GameService";
 
 @Component({
   components: {
@@ -74,7 +75,14 @@ export default class Inventory extends IdleGameVue {
     return StaticConsumableInfo[consumable].icon;
   }
 
+  getValue(quantity: number) {
+    return Math.floor(quantity);
+  }
+
   public computeProduction(consumable: Consumable) {
+    if (consumable == Consumable.population) {
+      return GameService.PopulationIncr;
+    }
     let production = 0;
     for (let building in this.$store.state.map.buildings) {
       let quantity = this.$store.state.map.buildings[building as Building]

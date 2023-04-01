@@ -17,6 +17,7 @@ import { MessageService } from "@/services/MessageService";
 export interface IMapState {
   mapNbTileFound: number;
   map: IMapTile[][];
+  mapSize: number;
   mapNeedsUpdate: boolean;
   buildings: IMapBuildings;
 }
@@ -29,10 +30,100 @@ export type IMapBuildings = {
   }
 };
 
+const watchTowerOrderOfDiscovery = [
+  [{ i: 0, j: 0 }],
+  [{ i: 0, j: 1 }, { i: 1, j: 0 }, { i: 0, j: -1 }, { i: -1, j: 0 }], // radius 0.1
+  [{ i: 1, j: 1 }, { i: 1, j: -1 }, { i: -1, j: -1 }, { i: -1, j: 1 }], // radius 1
+  [
+    { i: 0, j: 2 },
+    { i: 0, j: -2 },
+    { i: 1, j: 2 },
+    { i: 1, j: -2 },
+    { i: 2, j: 0 },
+    { i: 2, j: 1 },
+    { i: 2, j: -1 },
+    { i: -1, j: 2 },
+    { i: -1, j: -2 },
+    { i: -2, j: 0 },
+    { i: -2, j: 1 },
+    { i: -2, j: -1 },
+  ], // radius 2
+  [
+    { i: 0, j: 3 },
+    { i: 0, j: -3 },
+    { i: 1, j: 3 },
+    { i: 1, j: -3 },
+    { i: 2, j: 2 },
+    { i: 2, j: 3 },
+    { i: 2, j: -2 },
+    { i: 2, j: -3 },
+    { i: 3, j: 0 },
+    { i: 3, j: 1 },
+    { i: 3, j: 2 },
+    { i: 3, j: -1 },
+    { i: 3, j: -2 },
+    { i: -1, j: 3 },
+    { i: -1, j: -3 },
+    { i: -2, j: 2 },
+    { i: -2, j: 3 },
+    { i: -2, j: -2 },
+    { i: -2, j: -3 },
+    { i: -3, j: 0 },
+    { i: -3, j: 1 },
+    { i: -3, j: 2 },
+    { i: -3, j: -1 },
+    { i: -3, j: -2 },
+  ], // radius 3
+];
+
+export const sawmillRadius = 2;
+
+export function getTilesForCircle(
+  center: { x: number; y: number },
+  radius: number,
+  excludeCenter = false
+) {
+  var res: { x: number; y: number }[] = excludeCenter ? [] : [center];
+  if (radius >= 1) {
+    res = res.concat(
+      watchTowerOrderOfDiscovery[1].map((tile) => ({
+        x: tile.i + center.x,
+        y: tile.j + center.y,
+      }))
+    );
+  }
+  if (radius >= 2) {
+    res = res.concat(
+      watchTowerOrderOfDiscovery[2].map((tile) => ({
+        x: tile.i + center.x,
+        y: tile.j + center.y,
+      }))
+    );
+  }
+  if (radius >= 3) {
+    res = res.concat(
+      watchTowerOrderOfDiscovery[3].map((tile) => ({
+        x: tile.i + center.x,
+        y: tile.j + center.y,
+      }))
+    );
+  }
+  if (radius >= 4) {
+    res = res.concat(
+      watchTowerOrderOfDiscovery[4].map((tile) => ({
+        x: tile.i + center.x,
+        y: tile.j + center.y,
+      }))
+    );
+  }
+  return res;
+}
+
 export const MapModule: Module<IMapState, IState> = {
   state: {
     mapNbTileFound: 5,
     map: [],
+    mapSize: 42,
     mapNeedsUpdate: true,
     buildings: {
       village: {
@@ -89,45 +180,14 @@ export const MapModule: Module<IMapState, IState> = {
       },
     },
   },
-  actions: {
-    DiscoverTile({ getters, commit, state }) {
-      // Not used anymore
-      let mapLength = state.map.length;
-      let xSuite = UtilService.Shuffle<number>(
-        UtilService.GetNumberSuite(mapLength)
-      );
-      let ySuite = UtilService.Shuffle<number>(
-        UtilService.GetNumberSuite(mapLength)
-      );
-      let maxDisco = { value: 0, x: 0, y: 0 };
-      let canSail = getters.canSail;
-      for (const x of xSuite) {
-        for (const y of ySuite) {
-          let tile: IMapTile = state.map[x][y];
-          if (
-            tile.discoverable > maxDisco.value &&
-            (tile.environment != Environment.Water || canSail)
-          ) {
-            maxDisco = { value: tile.discoverable, x: x, y: y };
-          }
-          if (maxDisco.value > 0 && Math.random() < 0.001) {
-            commit("MakeTileDiscovered", { x: maxDisco.x, y: maxDisco.y });
-            return;
-          }
-        }
-      }
-
-      if (maxDisco.value > 0)
-        // If we have'nt found any tile discoverable, don't discover anything
-        commit("MakeTileDiscovered", { x: maxDisco.x, y: maxDisco.y });
-    },
-  },
+  actions: {},
   mutations: {
     // Init the map
     InitMap(state: IMapState, size: number) {
       const res = MapBuilder.InitMap(size);
 
       state.map = res.map;
+      state.mapSize = res.mapSize;
       state.buildings = res.buildings;
 
       state.mapNeedsUpdate = true;
@@ -163,7 +223,7 @@ export const MapModule: Module<IMapState, IState> = {
     MapNeedsUpdate(state: IMapState) {
       state.mapNeedsUpdate = true;
     },
-    ApplyMapChanges(state: IMapState) {
+    ApplyMapChanges(state: IMapState, canSail) {
       let mapLength = state.map.length;
       let mapCopy = JSON.parse(JSON.stringify(state.map)) as IMapTile[][]; // TODO: better way to clone T[][] ?
       let mapNbTileFoundCopy = state.mapNbTileFound;
@@ -180,20 +240,19 @@ export const MapModule: Module<IMapState, IState> = {
 
           if (mapCopy[i][j].building == Building.sawmill) {
             const quantityToRemove = 3 / mapCopy[i][j].closeByTrees;
-            if (i > 0 && mapCopy[i - 1][j].building == Building.forest)
-              mapCopy[i - 1][j].quantity -= quantityToRemove;
-            if (j > 0 && mapCopy[i][j - 1].building == Building.forest)
-              mapCopy[i][j - 1].quantity -= quantityToRemove;
-            if (
-              i < mapLength - 1 &&
-              mapCopy[i + 1][j].building == Building.forest
-            )
-              mapCopy[i + 1][j].quantity -= quantityToRemove;
-            if (
-              j < mapLength - 1 &&
-              mapCopy[i][j + 1].building == Building.forest
-            )
-              mapCopy[i][j + 1].quantity -= quantityToRemove;
+            var tiles = getTilesForCircle({ x: i, y: j }, sawmillRadius, true);
+
+            for (const tile of tiles) {
+              if (
+                tile.x > 0 &&
+                tile.y > 0 &&
+                tile.x < mapCopy.length - 1 &&
+                tile.y < mapCopy.length - 1 &&
+                mapCopy[tile.x][tile.y].building == Building.forest
+              ) {
+                mapCopy[tile.x][tile.y].quantity -= quantityToRemove;
+              }
+            }
           }
 
           // Add and remove pollution
@@ -211,18 +270,41 @@ export const MapModule: Module<IMapState, IState> = {
 
           // Discover tiles
           if (mapCopy[i][j].building == Building.watchTower) {
-            //TODO: we might want to be able to tell when a watch tower is useless
+            let TileDiscovered = false;
+            for (let possibleTiles of watchTowerOrderOfDiscovery) {
+              for (let possibleTile of possibleTiles) {
+                // TODO: order not random ?
+                if (
+                  i + possibleTile.i < 0 ||
+                  j + possibleTile.j < 0 ||
+                  i + possibleTile.i >= state.mapSize ||
+                  j + possibleTile.j >= state.mapSize ||
+                  mapCopy[i + possibleTile.i][j + possibleTile.j].discovered ||
+                  (mapCopy[i + possibleTile.i][j + possibleTile.j]
+                    .environment == Environment.Water &&
+                    !canSail)
+                )
+                  continue;
+                console.log(
+                  mapCopy[i + possibleTile.i][j + possibleTile.j].discovered
+                );
+                MakeTileDiscovered(mapCopy, {
+                  x: i + possibleTile.i,
+                  y: j + possibleTile.j,
+                });
+                mapNbTileFoundCopy++;
+                TileDiscovered = true;
+                break;
+              }
+              if (TileDiscovered) break;
+            }
 
-            // Generate uniformly random coord inside circle
-            const radius = 3;
-            let a = Math.random() * 2 * Math.PI;
-            let r = radius * Math.sqrt(Math.random());
-            var iFound = i + Math.floor(r * Math.cos(a) + 0.5);
-            var jFound = j + Math.floor(r * Math.sin(a) + 0.5);
-
-            if (!mapCopy[iFound][jFound].discovered) {
-              MakeTileDiscovered(mapCopy, { x: iFound, y: jFound });
-              mapNbTileFoundCopy++;
+            if (!TileDiscovered) {
+              // watch tower is useless
+              delete state.buildings[Building.watchTower].coords[i + "," + j];
+              mapCopy[i][j].building = null;
+              mapCopy[i][j].quantity = 0;
+              mapCopy[i][j].population = 0;
             }
           }
         }
@@ -320,37 +402,22 @@ function UpdateNbTreeNearBy(
   buildings: IMapBuildings,
   increment: number
 ) {
-  if (pos.x > 0)
-    updateCloseByTreeAndSawmill(
-      { x: pos.x - 1, y: pos.y },
-      map,
-      buildings,
-      increment
-    );
+  var tiles = getTilesForCircle(pos, sawmillRadius, true);
 
-  if (pos.x < map.length - 1)
-    updateCloseByTreeAndSawmill(
-      { x: pos.x + 1, y: pos.y },
-      map,
-      buildings,
-      increment
-    );
-
-  if (pos.y > 0)
-    updateCloseByTreeAndSawmill(
-      { x: pos.x, y: pos.y - 1 },
-      map,
-      buildings,
-      increment
-    );
-
-  if (pos.y < map.length - 1)
-    updateCloseByTreeAndSawmill(
-      { x: pos.x, y: pos.y + 1 },
-      map,
-      buildings,
-      increment
-    );
+  for (const tile of tiles) {
+    if (
+      tile.x > 0 &&
+      tile.y > 0 &&
+      tile.x < map.length - 1 &&
+      tile.y < map.length - 1
+    )
+      updateCloseByTreeAndSawmill(
+        { x: tile.x, y: tile.y },
+        map,
+        buildings,
+        increment
+      );
+  }
 }
 
 function ChangeTile(

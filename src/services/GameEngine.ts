@@ -40,7 +40,7 @@ export interface IStorage {
 export const StaticBuildingInfo: IStaticBuildingInfo = {
   village: {
     name: "Village",
-    icon: "./img/village-2.png",
+    icon: "./img/maison.png",
     description: "Increases your maximum population by 10",
     price: {
       population: 0,
@@ -78,7 +78,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   },
   gathererHut: {
     name: "Gatherer Hut",
-    icon: "./img/village.png", //TODO: change
+    icon: "./img/caravan.png", //TODO: change
     description:
       "Hut from where people will go try to find some rocks and woods. They'll find berries on their journey so you don't need to feed them.",
     price: {
@@ -96,15 +96,15 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       population: null,
       food: {
         probability: 1,
-        quantity: 1,
+        quantity: 0.5,
       },
       wood: {
         probability: 1,
-        quantity: 0.5,
+        quantity: 0.25,
       },
       stones: {
         probability: 1,
-        quantity: 0.5,
+        quantity: 0.25,
       },
       coals: null,
       limestone: null,
@@ -126,7 +126,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   },
   druidHut: {
     name: "Druid Hut",
-    icon: "./img/sable.png", //TODO: change
+    icon: "./img/tente.png",
     description:
       "Hut where a druid can do some experiments and gather knowledge.",
     price: {
@@ -171,8 +171,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   },
   barn: {
     name: "Barns",
-    icon: "./img/entrepot.png",
-    description: "Increases the quantity of food you can store by 20",
+    icon: "./img/entrepot2.png",
+    description: "Increases the quantity of resources you can store by 20 each",
     price: {
       population: 0,
       food: 0,
@@ -209,7 +209,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   },
   farm: {
     name: "Farm",
-    icon: "./img/farm.png",
+    icon: "./img/farm2.png",
     description: "Get food at the cost of wood",
     price: {
       population: 3,
@@ -253,7 +253,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   },
   sawmill: {
     name: "Sawmill",
-    icon: "./img/windmill.png",
+    icon: "./img/sawmill.png",
     description: "Gather wood nearby",
     price: {
       population: 3,
@@ -523,7 +523,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   },
   watchTower: {
     name: "Watch tower",
-    icon: "./img/puitpetrole.png",
+    icon: "./img/watch-tower.png",
     description: "Let you explore the surrounding area",
     price: {
       population: 0,
@@ -561,7 +561,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   },
   forest: {
     name: "Forest",
-    icon: "./img/foret-stage3.png",
+    icon: "./img/arbres-stage3.png",
     description: "Just a bunch of trees",
     price: {
       population: 0,
@@ -602,12 +602,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
 export const StaticConsumableInfo: IStaticConsumableInfo = {
   population: {
     name: "Population",
-    icon: "./img/population.png",
+    icon: "./img/population2.png",
     storage: undefined,
   },
   food: {
     name: "Food",
-    icon: "./img/food.png",
+    icon: "./img/food2.png",
     storage: {
       name: Building.barn,
       capacity: 20,

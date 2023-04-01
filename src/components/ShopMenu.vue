@@ -44,7 +44,7 @@
               </div>
             </div>
           </div>
-          <div v-if="building.quantity > 0" class="badge">
+          <div v-if="building.quantity > 0 && key != 'forest'" class="badge">
             {{ building.quantity }}
           </div>
         </PriceTooltip>

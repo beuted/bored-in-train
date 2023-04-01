@@ -14,6 +14,7 @@ import { MessageService } from "./MessageService";
 import { Building } from "@/models/Building";
 
 export class GameService {
+  public static PopulationIncr = 0.5;
   private readonly LackOfStorageFactor = 1.0; // Portion of disapearing goods when missing storage
 
   private hasBeenInit = false;
@@ -112,7 +113,8 @@ export class GameService {
       }
     }
 
-    newConsumables[Consumable.population].quantity += 0.5;
+    newConsumables[Consumable.population].quantity +=
+      GameService.PopulationIncr;
     //TODO: do better because the number of pop per sec is broken in the UI
 
     // After operation checks (storage, ...)
@@ -172,7 +174,7 @@ export class GameService {
 
   private handleMapChanges() {
     // Add and remove and spread pollution. Add and remove trees and handle discovery
-    store.commit("ApplyMapChanges");
+    store.commit("ApplyMapChanges", store.getters.canSail);
   }
 
   private static getProductionDiff(

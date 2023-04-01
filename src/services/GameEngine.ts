@@ -29,7 +29,6 @@ export interface IStaticBuilding {
 export interface IConsuming {
   name: Consumable;
   consomation: number;
-  probability: number;
 }
 
 export interface IStorage {
@@ -95,15 +94,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     produce: {
       population: null,
       food: {
-        probability: 1,
         quantity: 0.5,
       },
       wood: {
-        probability: 1,
         quantity: 0.25,
       },
       stones: {
-        probability: 1,
         quantity: 0.25,
       },
       coals: null,
@@ -149,7 +145,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       limestone: null,
       limestoneBrick: null,
       knowledge: {
-        probability: 1,
         quantity: 1,
       },
       energy: null,
@@ -157,7 +152,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     consume: {
       population: null,
       food: {
-        probability: 1,
         quantity: 1,
       },
       wood: null,
@@ -225,7 +219,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     produce: {
       population: null,
       food: {
-        probability: 1,
         quantity: 3,
       },
       wood: null,
@@ -240,7 +233,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       population: null,
       food: null,
       wood: {
-        probability: 1,
         quantity: 1,
       },
       stones: null,
@@ -270,7 +262,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       population: null,
       food: null,
       wood: {
-        probability: 1,
         quantity: 3,
       },
       stones: null,
@@ -283,7 +274,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     consume: {
       population: null,
       food: {
-        probability: 1,
         quantity: 1,
       },
       wood: null,
@@ -315,7 +305,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       food: null,
       wood: null,
       stones: {
-        probability: 1,
         quantity: 3,
       },
       coals: null,
@@ -327,7 +316,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     consume: {
       population: null,
       food: {
-        probability: 1,
         quantity: 1,
       },
       wood: null,
@@ -360,7 +348,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       wood: null,
       stones: null,
       coals: {
-        probability: 1,
         quantity: 3,
       },
       limestone: null,
@@ -371,7 +358,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     consume: {
       population: null,
       food: {
-        probability: 1,
         quantity: 1,
       },
       wood: null,
@@ -405,7 +391,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       stones: null,
       coals: null,
       limestone: {
-        probability: 1,
         quantity: 3,
       },
       limestoneBrick: null,
@@ -415,7 +400,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     consume: {
       population: null,
       food: {
-        probability: 1,
         quantity: 1,
       },
       wood: null,
@@ -450,7 +434,6 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       coals: null,
       limestone: null,
       limestoneBrick: {
-        probability: 1,
         quantity: 3,
       },
       knowledge: null,
@@ -459,14 +442,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     consume: {
       population: null,
       food: {
-        probability: 1,
         quantity: 1,
       },
       wood: null,
       stones: null,
       coals: null,
       limestone: {
-        probability: 1,
         quantity: 3,
       },
       limestoneBrick: null,
@@ -499,20 +480,17 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       limestoneBrick: null,
       knowledge: null,
       energy: {
-        probability: 1,
         quantity: 3,
       },
     },
     consume: {
       population: null,
       food: {
-        probability: 1,
         quantity: 1,
       },
       wood: null,
       stones: null,
       coals: {
-        probability: 1,
         quantity: 1,
       },
       limestone: null,
@@ -666,7 +644,6 @@ export const StaticConsumableInfo: IStaticConsumableInfo = {
 };
 
 export interface IStaticBuildingProduction {
-  probability: number;
   quantity: number;
 }
 

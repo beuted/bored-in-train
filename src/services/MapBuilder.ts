@@ -2,12 +2,13 @@ import { Environment } from "@/models/Environment";
 import { Building } from "@/models/Building";
 import { IMapTile } from "@/models/IMapTile";
 import SimplexNoise from "simplex-noise";
-import { Habitat } from "@/models/Habitat";
 import {
   getTilesForCircle,
   IMapBuildings,
+  IMapProduction,
   sawmillRadius,
 } from "@/store/mapStoreModule";
+import { GameService } from "./GameService";
 
 export class MapBuilder {
   private static simplexHeight = new SimplexNoise();
@@ -15,7 +16,12 @@ export class MapBuilder {
 
   public static InitMap(
     size: number
-  ): { map: IMapTile[][]; mapSize: number; buildings: IMapBuildings } {
+  ): {
+    map: IMapTile[][];
+    mapSize: number;
+    buildings: IMapBuildings;
+    production: IMapProduction;
+  } {
     var center = Math.floor(size / 2);
     const mapSize = size;
     // Build Environment and natural Buildings (forests, ...)
@@ -29,28 +35,29 @@ export class MapBuilder {
       for (let j = 0; j < mapSize; j++) {
         let env = MapBuilder.GetHeightEnvironment(i, j, size);
 
-        let habitat: Habitat | null = null;
+        let building = MapBuilder.GetBuilding(env, i, j);
+
         if (
           (env == Environment.Field ||
             env == Environment.Beach ||
             env == Environment.Concrete) &&
           Math.random() > 0.97
         )
-          habitat = MapBuilder.GetHabitat();
-
-        let building = MapBuilder.GetBuilding(env, i, j);
+          building = MapBuilder.GetHabitat();
 
         map[i][j] = {
           building: building,
           environment: env,
-          habitat: habitat,
           discovered: false,
           discoverable: 0,
           pollution: 50,
           temperature: 20,
           closeByTrees: 0,
+          closeByWater: 0,
+          closeByMountain: 0,
+          closeByBeach: 0,
+          closeByField: 0,
           quantity: 0,
-          population: 0,
         };
 
         // All trees start with a quantity of 100
@@ -62,27 +69,13 @@ export class MapBuilder {
       }
     }
 
-    // Build buildings
-    map[center][center].environment = Environment.Field;
-    map[center][center].quantity = 0;
-    map[center][center].building = Building.village;
-
-    map[center][center + 1].environment = Environment.Field;
-    map[center][center + 1].quantity = 0;
-    map[center][center + 1].building = Building.barn;
-
-    map[center][center - 1].environment = Environment.Field;
-    map[center][center - 1].quantity = 0;
-    map[center][center - 1].building = Building.watchTower;
-
-    map[center - 1][center].environment = Environment.Field;
-    map[center - 1][center].quantity = 0;
-    map[center - 1][center].building = Building.gathererHut;
-
     // Set discovered
     var discoveredTiles = getTilesForCircle({ x: center, y: center }, 2);
     for (const tile of discoveredTiles) {
       map[tile.x][tile.y].discovered = true;
+      map[tile.x][tile.y].building = null;
+      map[tile.x][tile.y].quantity = 0;
+      map[tile.x][tile.y].environment = Environment.Field;
     }
     var discoverableTiles = getTilesForCircle({ x: center, y: center }, 3);
     for (const tile of discoverableTiles) {
@@ -93,6 +86,11 @@ export class MapBuilder {
     for (let i = 0; i < mapSize; i++) {
       for (let j = 0; j < mapSize; j++) {
         let nbTrees = 0;
+        let nbWater = 0;
+        let nbBeach = 0;
+        let nbField = 0;
+        let nbMountain = 0;
+
         var discoverableTiles = getTilesForCircle(
           { x: i, y: j },
           sawmillRadius
@@ -103,20 +101,42 @@ export class MapBuilder {
             tile.x > 0 &&
             tile.y > 0 &&
             tile.x < map.length - 1 &&
-            tile.y < map.length - 1 &&
-            map[tile.x][tile.y].building == Building.forest
+            tile.y < map.length - 1
           ) {
-            nbTrees++;
+            const building = map[tile.x][tile.y].building;
+            const environment = map[tile.x][tile.y].environment;
+
+            if (building == Building.forest) nbTrees++;
+
+            if (environment == Environment.Water) nbWater++;
+            else if (environment == Environment.Beach) nbBeach++;
+            else if (environment == Environment.Field) nbField++;
+            else if (environment == Environment.Concrete) nbMountain++;
           }
         }
 
         map[i][j].closeByTrees = nbTrees;
+        map[i][j].closeByWater = nbWater;
+        map[i][j].closeByBeach = nbBeach;
+        map[i][j].closeByField = nbField;
+        map[i][j].closeByMountain = nbMountain;
       }
     }
 
     return {
       map: map,
       mapSize: mapSize,
+      production: {
+        population: { quantity: GameService.PopulationIncr },
+        food: { quantity: 0 },
+        wood: { quantity: 0 },
+        stones: { quantity: 0 },
+        coals: { quantity: 0 },
+        limestone: { quantity: 0 },
+        limestoneBrick: { quantity: 0 },
+        knowledge: { quantity: 0 },
+        energy: { quantity: 0 },
+      },
       buildings: {
         village: {
           quantity: 1,
@@ -170,6 +190,26 @@ export class MapBuilder {
           quantity: 0,
           coords: {},
         },
+        windmill: {
+          quantity: 0,
+          coords: {},
+        },
+        stoneWatchTower: {
+          quantity: 0,
+          coords: {},
+        },
+        coalDeposite: {
+          quantity: 0,
+          coords: {},
+        },
+        limestoneDeposite: {
+          quantity: 0,
+          coords: {},
+        },
+        lighthouse: {
+          quantity: 0,
+          coords: {},
+        },
         forest: forestBuildingEntry,
       },
     };
@@ -189,11 +229,10 @@ export class MapBuilder {
     return null;
   }
 
-  private static GetHabitat(): Habitat {
+  private static GetHabitat(): Building {
     var seed = Math.random();
-    if (seed < 0.33) return Habitat.CoalDeposite;
-    else if (seed < 0.66) return Habitat.StoneDeposite;
-    else return Habitat.LimestoneDeposite;
+    if (seed < 0.5) return Building.coalDeposite;
+    else return Building.limestoneDeposite;
   }
 
   private static GetHeightEnvironment(

@@ -56,14 +56,10 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { Building } from "@/models/Building";
-import { Habitat } from "@/models/Habitat";
 import { StaticBuildingInfo, ResearchInfo } from "@/services/GameEngine";
-import { Environment } from "@/models/Environment";
-import { IMapTile } from "@/models/IMapTile";
 import { IState, IdleGameVue } from "@/store";
 import { Consumable } from "@/models/Consumable";
 import { Research } from "../models/Research";
-import { Keycodes } from "../models/Keycodes";
 
 import PriceTooltip from "@/components/PriceTooltip.vue";
 import ResearchTooltip from "@/components/ResearchTooltip.vue";
@@ -145,7 +141,10 @@ export default class ShopMenu extends IdleGameVue {
   public isBuildable(building: Building) {
     for (const key in StaticBuildingInfo[building].price) {
       var value = StaticBuildingInfo[building].price[key as Consumable];
-      if (this.$store.state.consumable[key as Consumable].quantity < value)
+      if (
+        value != undefined &&
+        this.$store.state.consumable[key as Consumable].quantity < value
+      )
         return false;
     }
     return true;

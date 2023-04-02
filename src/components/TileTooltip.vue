@@ -9,24 +9,8 @@
         <div v-if="tile.environment">
           <div class="tooltip-title">Landscape: {{ environmentName }}</div>
         </div>
-        <div v-if="tile.habitat">
-          <div class="tooltip-title">Floor resources: {{ floorResources }}</div>
-        </div>
         <div v-if="tile.building">
           <div class="tooltip-title">Building: {{ tile.building }}</div>
-        </div>
-        <div v-if="tile.closeByTrees">
-          <div class="tooltip-title">closeByTrees: {{ tile.closeByTrees }}</div>
-        </div>
-        <div v-if="tile.quantity > 0">
-          <div class="tooltip-title">
-            {{ tile.building }} capacity: {{ tile.quantity }}
-          </div>
-        </div>
-        <div v-if="tile.population > 0">
-          <div class="tooltip-title">
-            {{ tile.population }} people are working here
-          </div>
         </div>
         <div v-if="tile.pollution > 0">
           <div class="tooltip-title">
@@ -34,11 +18,7 @@
           </div>
         </div>
         <div class="actions">
-          <button
-            class="delete-btn"
-            v-if="tile.building != null"
-            v-on:click="deleteBuilding()"
-          >
+          <button class="delete-btn" v-if="false" v-on:click="deleteBuilding()">
             <img src="img/trash.png" alt="delete" />
           </button>
         </div>
@@ -54,7 +34,6 @@ import { Consumable } from "@/models/Consumable";
 import { StaticBuildingInfo } from "@/services/GameEngine";
 import { Building } from "@/models/Building";
 import { IMapTile } from "@/models/IMapTile";
-import { habitatName } from "@/models/Habitat";
 import { environmentName } from "@/models/Environment";
 
 @Component({
@@ -67,11 +46,6 @@ export default class TileTooltip extends IdleGameVue {
 
   public getCoordStyle(): string {
     return "left:" + this.coord.x + "px;top:" + this.coord.y + "px";
-  }
-
-  public get floorResources() {
-    if (this.tile == null || this.tile.habitat == null) return null;
-    return habitatName(this.tile.habitat);
   }
 
   public get environmentName() {

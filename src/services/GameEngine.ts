@@ -2,7 +2,6 @@ import { Consumable } from "@/models/Consumable";
 import { Building } from "@/models/Building";
 import { Research } from "@/models/Research";
 import { Environment } from "@/models/Environment";
-import { Habitat } from "@/models/Habitat";
 
 export const GlobalConfig = {
   TickInterval: 5000,
@@ -21,9 +20,16 @@ export interface IStaticBuilding {
   name: string;
   icon: string;
   description: string;
-  produce: { [id in Consumable]: IStaticBuildingProduction | null };
-  consume: { [id in Consumable]: IStaticBuildingProduction | null };
-  price: { [id in Consumable]: number };
+  produce: { [id in Consumable]?: IStaticBuildingProduction };
+  consume: { [id in Consumable]?: IStaticBuildingProduction };
+  transformations: {
+    to: Building;
+    nextToBuilding?: Building;
+    nextToEnvironment?: Environment;
+    onEnvironment?: Environment;
+    buildingPattern?: { building: Building; distance: number };
+  }[];
+  price: { [id in Consumable]?: number };
 }
 
 export interface IConsuming {
@@ -53,27 +59,22 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0,
     },
     produce: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
+      population: {
+        quantity: 0,
+        bonusesForBuilding: [{ for: Building.village, quantity: 0.1 }],
+      },
     },
-    consume: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+    consume: {},
+    transformations: [
+      {
+        to: Building.druidHut,
+        buildingPattern: { building: Building.village, distance: 1 },
+      },
+      {
+        to: Building.coalMine,
+        buildingPattern: { building: Building.druidHut, distance: 1 },
+      },
+    ],
   },
   gathererHut: {
     name: "Gatherer Hut",
@@ -92,33 +93,34 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0,
     },
     produce: {
-      population: null,
-      food: {
-        quantity: 0.5,
-      },
       wood: {
         quantity: 0.25,
+        bonusesForBuilding: [{ for: Building.forest, quantity: 0.5 }],
       },
-      stones: {
-        quantity: 0.25,
+    },
+    consume: {},
+    transformations: [
+      {
+        to: Building.sawmill,
+        buildingPattern: { building: Building.forest, distance: 1 },
       },
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
-    consume: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+      {
+        to: Building.stoneMine,
+        onEnvironment: Environment.Concrete,
+      },
+      {
+        to: Building.stoneMine,
+        onEnvironment: Environment.Snow,
+      },
+      {
+        to: Building.coalMine,
+        nextToBuilding: Building.coalDeposite,
+      },
+      {
+        to: Building.limestoneMine,
+        nextToBuilding: Building.limestoneDeposite,
+      },
+    ],
   },
   druidHut: {
     name: "Druid Hut",
@@ -137,31 +139,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0,
     },
     produce: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
       knowledge: {
         quantity: 1,
       },
-      energy: null,
     },
-    consume: {
-      population: null,
-      food: {
-        quantity: 1,
-      },
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+    consume: {},
+    transformations: [],
   },
   barn: {
     name: "Barns",
@@ -178,28 +161,9 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0,
     },
-    produce: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
-    consume: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+    produce: {},
+    consume: {},
+    transformations: [],
   },
   farm: {
     name: "Farm",
@@ -217,31 +181,40 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0,
     },
     produce: {
-      population: null,
       food: {
         quantity: 3,
       },
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
     },
-    consume: {
-      population: null,
-      food: null,
-      wood: {
-        quantity: 1,
+    consume: {},
+    transformations: [
+      {
+        to: Building.windmill,
+        buildingPattern: { building: Building.farm, distance: 2 },
       },
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
+    ],
+  },
+  windmill: {
+    name: "Windmill",
+    icon: "./img/windmill2.png",
+    description: "Get food at the cost of wood",
+    price: {
+      population: 3,
+      food: 0,
+      wood: 25,
+      stones: 5,
+      coals: 0,
+      limestone: 0,
+      limestoneBrick: 0,
+      energy: 0,
+      knowledge: 0,
     },
+    produce: {
+      food: {
+        quantity: 3,
+      },
+    },
+    consume: {},
+    transformations: [],
   },
   sawmill: {
     name: "Sawmill",
@@ -259,31 +232,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0,
     },
     produce: {
-      population: null,
-      food: null,
       wood: {
         quantity: 3,
       },
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
     },
-    consume: {
-      population: null,
-      food: {
-        quantity: 1,
-      },
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+    consume: {},
+    transformations: [],
   },
   stoneMine: {
     name: "Stone Mine",
@@ -301,31 +255,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0,
     },
     produce: {
-      population: null,
-      food: null,
-      wood: null,
       stones: {
         quantity: 3,
       },
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
     },
-    consume: {
-      population: null,
-      food: {
-        quantity: 1,
-      },
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+    consume: {},
+    transformations: [],
   },
   coalMine: {
     name: "Coal Mine",
@@ -343,31 +278,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0,
     },
     produce: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
       coals: {
         quantity: 3,
       },
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
     },
-    consume: {
-      population: null,
-      food: {
-        quantity: 1,
-      },
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+    consume: {},
+    transformations: [],
   },
   limestoneMine: {
     name: "Limestone Mine",
@@ -385,31 +301,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0,
     },
     produce: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
       limestone: {
         quantity: 3,
       },
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
     },
-    consume: {
-      population: null,
-      food: {
-        quantity: 1,
-      },
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+    consume: {},
+    transformations: [],
   },
   limestoneBrickFactory: {
     name: "Brick Factory",
@@ -427,33 +324,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0,
     },
     produce: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
       limestoneBrick: {
         quantity: 3,
       },
-      knowledge: null,
-      energy: null,
     },
-    consume: {
-      population: null,
-      food: {
-        quantity: 1,
-      },
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: {
-        quantity: 3,
-      },
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+    consume: {},
+    transformations: [],
   },
   coalPowerStation: {
     name: "Coal Power Station",
@@ -471,37 +347,16 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       knowledge: 0,
     },
     produce: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
       energy: {
         quantity: 3,
       },
     },
-    consume: {
-      population: null,
-      food: {
-        quantity: 1,
-      },
-      wood: null,
-      stones: null,
-      coals: {
-        quantity: 1,
-      },
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+    consume: {},
+    transformations: [],
   },
   watchTower: {
     name: "Watch tower",
-    icon: "./img/watch-tower.png",
+    icon: "./img/watch-tower-wood.png",
     description: "Let you explore the surrounding area",
     price: {
       population: 0,
@@ -514,28 +369,37 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0,
     },
-    produce: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
+    produce: {},
+    consume: {},
+    transformations: [
+      {
+        to: Building.stoneWatchTower,
+        buildingPattern: { building: Building.village, distance: 1 },
+      },
+      {
+        to: Building.lighthouse,
+        nextToEnvironment: Environment.Water,
+      },
+    ],
+  },
+  stoneWatchTower: {
+    name: "Stone watch tower",
+    icon: "./img/watch-tower.png",
+    description: "Let you explore the surrounding area on a large radius",
+    price: {
+      population: 0,
+      food: 0,
+      wood: 50,
+      stones: 0,
+      coals: 0,
+      limestone: 0,
+      limestoneBrick: 0,
+      energy: 0,
+      knowledge: 0,
     },
-    consume: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
-    },
+    produce: {},
+    consume: {},
+    transformations: [],
   },
   forest: {
     name: "Forest",
@@ -552,28 +416,66 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       energy: 0,
       knowledge: 0,
     },
-    produce: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
+    produce: {},
+    consume: {},
+    transformations: [],
+  },
+  coalDeposite: {
+    name: "Coal deposite",
+    icon: "./img/coal-deposit.png",
+    description: "Some coal to be gathered",
+    price: {
+      population: 0,
+      food: 0,
+      wood: 20,
+      stones: 0,
+      coals: 0,
+      limestone: 0,
+      limestoneBrick: 0,
+      energy: 0,
+      knowledge: 0,
     },
-    consume: {
-      population: null,
-      food: null,
-      wood: null,
-      stones: null,
-      coals: null,
-      limestone: null,
-      limestoneBrick: null,
-      knowledge: null,
-      energy: null,
+    produce: {},
+    consume: {},
+    transformations: [],
+  },
+  limestoneDeposite: {
+    name: "Limestone deposite",
+    icon: "./img/limestone-deposit.png",
+    description: "Some limestone to be gathered",
+    price: {
+      population: 0,
+      food: 0,
+      wood: 20,
+      stones: 0,
+      coals: 0,
+      limestone: 0,
+      limestoneBrick: 0,
+      energy: 0,
+      knowledge: 0,
     },
+    produce: {},
+    consume: {},
+    transformations: [],
+  },
+  lighthouse: {
+    name: "Lighthouse",
+    icon: "./img/lighthouse.png",
+    description: "Guide boats safely to the shore",
+    price: {
+      population: 0,
+      food: 0,
+      wood: 20,
+      stones: 0,
+      coals: 0,
+      limestone: 0,
+      limestoneBrick: 0,
+      energy: 0,
+      knowledge: 0,
+    },
+    produce: {},
+    consume: {},
+    transformations: [],
   },
 };
 
@@ -645,6 +547,7 @@ export const StaticConsumableInfo: IStaticConsumableInfo = {
 
 export interface IStaticBuildingProduction {
   quantity: number;
+  bonusesForBuilding?: { for: Building; quantity: number }[];
 }
 
 export type IResearchInfo = { [id in Research]: IStaticResearch };
@@ -666,7 +569,7 @@ export const ResearchInfo: IResearchInfo = {
     price: 10,
     prerequisite: [],
     unlocks: {
-      buildings: [Building.farm],
+      buildings: [Building.druidHut],
     },
   },
   woodcutting: {

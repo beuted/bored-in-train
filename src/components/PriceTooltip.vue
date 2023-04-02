@@ -11,7 +11,7 @@
         <div class="tooltip-title">Price:</div>
         <div v-for="(value, keyPrice) in buildingInfo.price" :key="keyPrice">
           <span v-if="value != 0"
-            ><consumable-icon :consumable="keyPrice" /> x {{ value }}</span
+            ><consumable-icon :consumable="keyPrice" /> {{ value }}</span
           >
         </div>
         <br />
@@ -31,9 +31,14 @@
           :key="keyProduce"
         >
           <span v-if="value != null"
-            ><consumable-icon :consumable="keyProduce" /> x
-            {{ value.quantity }}</span
-          >
+            ><consumable-icon :consumable="keyProduce"/>
+            {{ value.quantity }}
+            <span
+              v-if="value.bonusesForBuilding && value.bonusesForBuilding.length"
+              v-for="(v, keyProduce) in value.bonusesForBuilding"
+            >
+              + {{ v.quantity }} x <building-icon :building="v.for" /> </span
+          ></span>
         </div>
         <br />
       </div>
@@ -52,7 +57,7 @@
           :key="keyConsume"
         >
           <span v-if="value != null"
-            ><consumable-icon :consumable="keyConsume" /> x
+            ><consumable-icon :consumable="keyConsume" />
             {{ value.quantity }}</span
           >
         </div>
@@ -72,10 +77,12 @@ import {
 } from "@/services/GameEngine";
 import { Building } from "@/models/Building";
 import ConsumableIcon from "@/components/ConsumableIcon.vue";
+import BuildingIcon from "@/components/BuildingIcon.vue";
 
 @Component({
   components: {
     ConsumableIcon,
+    BuildingIcon,
   },
 })
 export default class PriceTooltip extends IdleGameVue {

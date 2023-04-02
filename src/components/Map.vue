@@ -26,7 +26,6 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { Building, isAMine } from "@/models/Building";
-import { Habitat } from "@/models/Habitat";
 import { StaticBuildingInfo, ResearchInfo } from "@/services/GameEngine";
 import { Environment } from "@/models/Environment";
 import { IMapTile } from "@/models/IMapTile";
@@ -39,6 +38,7 @@ import TileTooltip from "@/components/TileTooltip.vue";
 import ShopMenu from "@/components/ShopMenu.vue";
 import { KeyboardService } from "../services/KeyboardService";
 import { imageService } from "../services/ImageService";
+import { MapSize } from "../store/mapStoreModule";
 
 @Component({
   components: {
@@ -49,7 +49,6 @@ export default class Map extends IdleGameVue {
   private nbTilesOnRowOrColumnOnScreen = 20;
   private tileSize = 32;
 
-  private readonly nbTilesOnRowOrColumn = 100;
   public readonly canvasSize =
     this.nbTilesOnRowOrColumnOnScreen * this.tileSize;
 
@@ -71,13 +70,11 @@ export default class Map extends IdleGameVue {
   // TODO: this should not be init with a neg value... I have screwed up somewhere
   private mapOffset: { x: number; y: number } = {
     x:
-      -Math.floor(
-        this.nbTilesOnRowOrColumn / 2 - this.nbTilesOnRowOrColumnOnScreen / 2
-      ) * this.tileSize,
+      -Math.floor(MapSize / 2 - this.nbTilesOnRowOrColumnOnScreen / 2) *
+      this.tileSize,
     y:
-      -Math.floor(
-        this.nbTilesOnRowOrColumn / 2 - this.nbTilesOnRowOrColumnOnScreen / 2
-      ) * this.tileSize,
+      -Math.floor(MapSize / 2 - this.nbTilesOnRowOrColumnOnScreen / 2) *
+      this.tileSize,
   };
   private isMouseDown = false;
   private draggingStartPoint!: { x: number; y: number };
@@ -94,14 +91,14 @@ export default class Map extends IdleGameVue {
     this.keyBoardService = new KeyboardService();
   }
 
-  private mounted() {
+  public mounted() {
     this.canvas = <HTMLCanvasElement>document.getElementById("canvas");
     this.ctx = <CanvasRenderingContext2D>this.canvas.getContext("2d");
     this.ctx.imageSmoothingEnabled = false;
 
     this.mapCanvas = document.createElement("canvas");
-    this.mapCanvas.width = this.tileSize * this.nbTilesOnRowOrColumn;
-    this.mapCanvas.height = this.tileSize * this.nbTilesOnRowOrColumn;
+    this.mapCanvas.width = this.tileSize * MapSize;
+    this.mapCanvas.height = this.tileSize * MapSize;
     this.mapContext = <CanvasRenderingContext2D>this.mapCanvas.getContext("2d");
     this.mapContext.imageSmoothingEnabled = false;
 
@@ -115,8 +112,7 @@ export default class Map extends IdleGameVue {
 
     this.keyBoardService.Start();
 
-    if (this.map.length <= 0)
-      this.$store.commit("InitMap", this.nbTilesOnRowOrColumn);
+    if (this.map.length <= 0) this.$store.commit("InitMap", MapSize);
 
     imageService.isLoaded().then(() => {
       window.requestAnimationFrame(() => {
@@ -189,8 +185,8 @@ export default class Map extends IdleGameVue {
     // Refresh canvas layers since their size can have changed
     this.mouseCanvas.width = this.tileSize * 3;
     this.mouseCanvas.height = this.tileSize * 3;
-    this.mapCanvas.width = this.tileSize * this.nbTilesOnRowOrColumn;
-    this.mapCanvas.height = this.tileSize * this.nbTilesOnRowOrColumn;
+    this.mapCanvas.width = this.tileSize * MapSize;
+    this.mapCanvas.height = this.tileSize * MapSize;
     this.mapContext.imageSmoothingEnabled = false;
     this.mouseContext.imageSmoothingEnabled = false;
     this.mapContext.font = Math.floor(this.tileSize / 2) + "px Arial";
@@ -198,11 +194,11 @@ export default class Map extends IdleGameVue {
     this.mapContext.clearRect(
       0,
       0,
-      this.tileSize * this.nbTilesOnRowOrColumn,
-      this.tileSize * this.nbTilesOnRowOrColumn
+      this.tileSize * MapSize,
+      this.tileSize * MapSize
     );
-    for (var i = 0; i < this.nbTilesOnRowOrColumn; i++) {
-      for (var j = 0; j < this.nbTilesOnRowOrColumn; j++) {
+    for (var i = 0; i < MapSize; i++) {
+      for (var j = 0; j < MapSize; j++) {
         if (this.map[i][j].discovered) {
           let environmentImage = imageService.getEnvironmentImage(
             this.map[i][j].environment
@@ -216,7 +212,6 @@ export default class Map extends IdleGameVue {
           );
 
           const building = this.map[i][j].building;
-          const habitat = this.map[i][j].habitat;
           const quantity = this.map[i][j].quantity;
           if (building != null) {
             let buildingImage = imageService.getBuildingImage(
@@ -241,24 +236,6 @@ export default class Map extends IdleGameVue {
                 i * this.tileSize,
                 (j + 0.5) * this.tileSize
               );*/
-
-            const pop = this.map[i][j].population;
-            if (pop > 0)
-              this.mapContext.fillText(
-                pop + "",
-                i * this.tileSize,
-                (j + 1) * this.tileSize
-              );
-          } else if (habitat != null) {
-            // If a building is found no need to draw the habitat
-            let habitatImage = imageService.getHabitatImage(habitat);
-            this.mapContext.drawImage(
-              habitatImage,
-              i * this.tileSize,
-              j * this.tileSize,
-              this.tileSize,
-              this.tileSize
-            );
           }
 
           // Pollution
@@ -293,7 +270,6 @@ export default class Map extends IdleGameVue {
           );
 
           const building = this.map[i][j].building;
-          const habitat = this.map[i][j].habitat;
           const quantity = this.map[i][j].quantity;
           if (building != null) {
             let buildingImage = imageService.getBuildingImage(
@@ -302,16 +278,6 @@ export default class Map extends IdleGameVue {
             );
             this.mapContext.drawImage(
               buildingImage,
-              i * this.tileSize,
-              j * this.tileSize,
-              this.tileSize,
-              this.tileSize
-            );
-          } else if (habitat != null) {
-            // If a building is found no need to draw the habitat
-            let habitatImage = imageService.getHabitatImage(habitat);
-            this.mapContext.drawImage(
-              habitatImage,
               i * this.tileSize,
               j * this.tileSize,
               this.tileSize,
@@ -358,7 +324,10 @@ export default class Map extends IdleGameVue {
           this.tileSize,
           this.tileSize
         );
-        if (this.building == Building.sawmill) {
+        if (
+          this.building == Building.sawmill ||
+          this.building == Building.gathererHut
+        ) {
           this.mouseContext.strokeStyle = canBuild ? "#00a6c6" : "#FF0000";
           this.mouseContext.lineWidth = 5;
           this.mouseContext.strokeRect(
@@ -377,12 +346,7 @@ export default class Map extends IdleGameVue {
 
   private draw(forced: boolean) {
     this.ctx.fillStyle = "#000";
-    this.ctx.fillRect(
-      0,
-      0,
-      this.tileSize * this.nbTilesOnRowOrColumn,
-      this.tileSize * this.nbTilesOnRowOrColumn
-    );
+    this.ctx.fillRect(0, 0, this.tileSize * MapSize, this.tileSize * MapSize);
 
     if (forced || this.$store.state.map.mapNeedsUpdate) {
       this.drawMap();
@@ -413,7 +377,7 @@ export default class Map extends IdleGameVue {
       return false;
     }
 
-    var canvasSize = this.tileSize * this.nbTilesOnRowOrColumn;
+    var canvasSize = this.tileSize * MapSize;
     if (
       event.pageX < canvasSize + this.canvas.offsetLeft &&
       event.pageX > this.canvas.offsetLeft &&
@@ -518,30 +482,6 @@ export default class Map extends IdleGameVue {
       this.$store.commit("IncrementPopStorage", { value: 10 });
     }
 
-    // Earn from the recycle of what you destroyed
-    let recycledBuilding = this.map[coord.x][coord.y].building;
-
-    if (recycledBuilding != null) {
-      for (let consumable in StaticBuildingInfo[recycledBuilding].price) {
-        let price =
-          StaticBuildingInfo[recycledBuilding].price[consumable as Consumable];
-        if (price && price != 0) {
-          this.$store.commit("IncrementConsumable", {
-            name: consumable,
-            value: price,
-          });
-          if (consumable == Consumable.population) {
-            this.$store.commit("IncrementPopStorage", { value: price });
-          }
-        }
-      }
-
-      //TODO: not ideal
-      if (recycledBuilding == Building.village) {
-        this.$store.commit("IncrementPopStorage", { value: -10 });
-      }
-    }
-
     this.$store.commit("ChangeTile", {
       x: coord.x,
       y: coord.y,
@@ -553,12 +493,7 @@ export default class Map extends IdleGameVue {
     coord: { x: number; y: number },
     building: Building | null
   ): { result: boolean; reason: string | null } {
-    if (
-      coord.x < 0 ||
-      coord.y < 0 ||
-      coord.x >= this.nbTilesOnRowOrColumn ||
-      coord.y >= this.nbTilesOnRowOrColumn
-    )
+    if (coord.x < 0 || coord.y < 0 || coord.x >= MapSize || coord.y >= MapSize)
       return { result: false, reason: "This tile is outside the map" };
 
     // Check if you can afford your purchase
@@ -579,8 +514,13 @@ export default class Map extends IdleGameVue {
     }
 
     // If building is already there
-    if (building != null && building == this.map[coord.x][coord.y].building)
-      return { result: false, reason: `There is already a ${building} here` };
+    if (this.map[coord.x][coord.y].building != null)
+      return {
+        result: false,
+        reason: `There is already a ${
+          this.map[coord.x][coord.y].building
+        } here`,
+      };
 
     // If not discovered
     if (!this.map[coord.x][coord.y].discovered)
@@ -593,36 +533,6 @@ export default class Map extends IdleGameVue {
     if (this.map[coord.x][coord.y].environment == Environment.Water)
       return { result: false, reason: `You cannot build this on water` };
 
-    // You must build coalMine on coalDeposite
-    if (
-      building == Building.coalMine &&
-      this.map[coord.x][coord.y].habitat !== Habitat.CoalDeposite
-    )
-      return {
-        result: false,
-        reason: `A ${building} must be built on a coal deposite`,
-      };
-
-    // You must build stoneMine on stoneDeposite
-    if (
-      building == Building.stoneMine &&
-      this.map[coord.x][coord.y].habitat !== Habitat.StoneDeposite
-    )
-      return {
-        result: false,
-        reason: `A ${building} must be built on a stone deposite`,
-      };
-
-    // You must build limestoneMine on limestoneDeposite
-    if (
-      building == Building.limestoneMine &&
-      this.map[coord.x][coord.y].habitat !== Habitat.LimestoneDeposite
-    )
-      return {
-        result: false,
-        reason: `A ${building} must be built on a limestone deposite`,
-      };
-
     // You must build sawmill next to a forest
     if (
       building == Building.sawmill &&
@@ -631,13 +541,6 @@ export default class Map extends IdleGameVue {
       return {
         result: false,
         reason: `A ${building} must be built next to a forest`,
-      };
-
-    // You cannot build buildings that are not mines on deposits
-    if (!isAMine(building) && this.map[coord.x][coord.y].habitat != null)
-      return {
-        result: false,
-        reason: `A ${building} cannot be built on a deposit`,
       };
 
     // You must build farms on a field
@@ -663,22 +566,18 @@ export default class Map extends IdleGameVue {
   private boundMapOffset() {
     if (
       this.mapOffset.x <
-      (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) *
-        this.tileSize
+      (-MapSize + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize
     )
       this.mapOffset.x =
-        (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) *
-        this.tileSize;
+        (-MapSize + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize;
     if (this.mapOffset.x > 0) this.mapOffset.x = 0;
 
     if (
       this.mapOffset.y <
-      (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) *
-        this.tileSize
+      (-MapSize + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize
     )
       this.mapOffset.y =
-        (-this.nbTilesOnRowOrColumn + this.nbTilesOnRowOrColumnOnScreen) *
-        this.tileSize;
+        (-MapSize + this.nbTilesOnRowOrColumnOnScreen) * this.tileSize;
     if (this.mapOffset.y > 0) this.mapOffset.y = 0;
   }
 }

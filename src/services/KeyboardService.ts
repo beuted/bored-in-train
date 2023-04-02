@@ -9,11 +9,17 @@ export class KeyboardService {
     window.onkeyup = ((that: any) => {
       return (e: KeyboardEvent) => {
         that.keyPressed[e.keyCode] = false;
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
       };
     })(this);
     window.onkeydown = ((that: any) => {
       return (e: KeyboardEvent) => {
         that.keyPressed[e.keyCode] = true;
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
       };
     })(this);
     window.onwheel = ((that: any) => {

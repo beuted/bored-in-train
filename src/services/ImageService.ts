@@ -1,6 +1,5 @@
 import { Environment } from "@/models/Environment";
 import { Building } from "@/models/Building";
-import { Habitat } from "@/models/Habitat";
 import { StaticBuildingInfo, ResearchInfo } from "./GameEngine";
 import { Research } from "@/models/Research";
 
@@ -34,12 +33,11 @@ class ImageService {
     limestoneMine: new Image(),
     limestoneBrickFactory: new Image(),
     coalPowerStation: new Image(),
-  };
-
-  private mapHabitatImages: { [id in number]: HTMLImageElement } = {
-    [Habitat.CoalDeposite]: new Image(),
-    [Habitat.StoneDeposite]: new Image(),
-    [Habitat.LimestoneDeposite]: new Image(),
+    windmill: new Image(),
+    stoneWatchTower: new Image(),
+    coalDeposite: new Image(),
+    limestoneDeposite: new Image(),
+    lighthouse: new Image(),
   };
 
   private researchImages: { [id in Research]: HTMLImageElement } = {
@@ -62,11 +60,6 @@ class ImageService {
       this.mapBuildingImages[building as Building].src =
         StaticBuildingInfo[building as Building].icon;
 
-    this.mapHabitatImages[Habitat.CoalDeposite].src = "./img/coal-deposit.png";
-    this.mapHabitatImages[Habitat.StoneDeposite].src =
-      "./img/stone-deposit.png";
-    this.mapHabitatImages[Habitat.LimestoneDeposite].src =
-      "./img/limestone-deposit.png";
     this.mapForestImages[1].src = "./img/arbres-stage1.png";
     this.mapForestImages[2].src = "./img/arbres-stage2.png";
     this.mapForestImages[3].src = "./img/arbres-stage3.png";
@@ -90,10 +83,6 @@ class ImageService {
       else return this.mapForestImages[3];
     }
     return this.mapBuildingImages[building];
-  }
-
-  public getHabitatImage(habitat: Habitat): HTMLImageElement {
-    return this.mapHabitatImages[habitat];
   }
 
   public getResearchImages(research: Research) {

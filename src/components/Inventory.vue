@@ -80,25 +80,9 @@ export default class Inventory extends IdleGameVue {
   }
 
   public computeProduction(consumable: Consumable) {
-    if (consumable == Consumable.population) {
-      return GameService.PopulationIncr;
-    }
-    let production = 0;
-    for (let building in this.$store.state.map.buildings) {
-      let quantity = this.$store.state.map.buildings[building as Building]
-        .quantity;
-
-      let consumeObj =
-        StaticBuildingInfo[building as Building].consume[consumable];
-      let consume = consumeObj ? consumeObj.quantity : 0;
-
-      let produceObj =
-        StaticBuildingInfo[building as Building].produce[consumable];
-      let produce = produceObj ? produceObj.quantity : 0;
-
-      production +=
-        ((produce - consume) / (GlobalConfig.TickInterval / 1000)) * quantity;
-    }
+    let production =
+      (this.$store.state.map.production[consumable].quantity * 1000) /
+      GlobalConfig.TickInterval;
 
     if (production < -0.01) {
       MessageService.Help(

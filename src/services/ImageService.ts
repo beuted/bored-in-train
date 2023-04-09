@@ -1,6 +1,10 @@
 import { Environment } from "@/models/Environment";
 import { Building } from "@/models/Building";
-import { StaticBuildingInfo, ResearchInfo } from "./GameEngine";
+import {
+  StaticBuildingInfo,
+  ResearchInfo,
+  StaticEnvironmentInfo,
+} from "./GameEngine";
 import { Research } from "@/models/Research";
 
 class ImageService {
@@ -19,42 +23,44 @@ class ImageService {
     3: new Image(),
   };
 
-  private mapBuildingImages: { [id in Building]: HTMLImageElement } = {
-    forest: new Image(),
-    village: new Image(),
-    watchTower: new Image(),
-    gathererHut: new Image(),
-    druidHut: new Image(),
-    barn: new Image(),
-    farm: new Image(),
-    stoneMine: new Image(),
-    sawmill: new Image(),
-    coalMine: new Image(),
-    limestoneMine: new Image(),
-    limestoneBrickFactory: new Image(),
-    coalPowerStation: new Image(),
-    windmill: new Image(),
-    stoneWatchTower: new Image(),
-    coalDeposite: new Image(),
-    limestoneDeposite: new Image(),
-    lighthouse: new Image(),
-  };
+  private static GetInitialMapBuildingImages(): {
+    [id in Building]: HTMLImageElement
+  } {
+    let initialBuildingImages = Object.keys(StaticBuildingInfo).reduce<
+      Partial<{ [id in Building]: HTMLImageElement }>
+    >((accumulator, building) => {
+      accumulator[building as Building] = new Image();
+      return accumulator;
+    }, {}) as { [id in Building]: HTMLImageElement };
 
-  private researchImages: { [id in Research]: HTMLImageElement } = {
-    [Research.agriculture]: new Image(),
-    [Research.factory]: new Image(),
-    [Research.mining]: new Image(),
-    [Research.navigation]: new Image(),
-    [Research.steamLocomotive]: new Image(),
-    [Research.woodcutting]: new Image(),
-  };
+    return initialBuildingImages;
+  }
+
+  private mapBuildingImages: {
+    [id in Building]: HTMLImageElement
+  } = ImageService.GetInitialMapBuildingImages();
+
+  private static GetInitialResearchImages(): {
+    [id in Research]: HTMLImageElement
+  } {
+    let initialResearchImages = Object.keys(ResearchInfo).reduce<
+      Partial<{ [id in Research]: HTMLImageElement }>
+    >((accumulator, research) => {
+      accumulator[research as Research] = new Image();
+      return accumulator;
+    }, {}) as { [id in Research]: HTMLImageElement };
+
+    return initialResearchImages;
+  }
+
+  private researchImages: {
+    [id in Research]: HTMLImageElement
+  } = ImageService.GetInitialResearchImages();
 
   public constructor() {
-    this.mapEnvironmentImages[Environment.Water].src = "./img/mer.png";
-    this.mapEnvironmentImages[Environment.Field].src = "./img/field.png";
-    this.mapEnvironmentImages[Environment.Beach].src = "./img/beach.png";
-    this.mapEnvironmentImages[Environment.Snow].src = "./img/snow.png";
-    this.mapEnvironmentImages[Environment.Concrete].src = "./img/concrete.png";
+    for (const environment in StaticEnvironmentInfo)
+      this.mapEnvironmentImages[environment].src =
+        StaticEnvironmentInfo[environment].icon;
 
     for (const building in StaticBuildingInfo)
       this.mapBuildingImages[building as Building].src =

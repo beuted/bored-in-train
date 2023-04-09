@@ -4,11 +4,12 @@ import { Research } from "@/models/Research";
 import { Environment } from "@/models/Environment";
 
 export const GlobalConfig = {
-  TickInterval: 5000,
+  TickInterval: 500,
 };
 
 export type IStaticConsumableInfo = { [id in Consumable]: IStaticConsumable };
 export type IStaticBuildingInfo = { [id in Building]: IStaticBuilding };
+export type IStaticEnvironmentInfo = { [id: number]: { icon: string } };
 
 export interface IStaticConsumable {
   name: string;
@@ -20,6 +21,8 @@ export interface IStaticBuilding {
   name: string;
   icon: string;
   description: string;
+  highlightAdjacentTiles: boolean;
+  canBeBuilt: boolean;
   produce: { [id in Consumable]?: IStaticBuildingProduction };
   consume: { [id in Consumable]?: IStaticBuildingProduction };
   transformations: {
@@ -41,27 +44,35 @@ export interface IStorage {
   name: Building;
   capacity: number;
 }
+export const StaticEnvironmentInfo: IStaticEnvironmentInfo = {
+  [Environment.Beach]: { icon: "./img/beach.png" },
+  [Environment.Concrete]: { icon: "./img/concrete.png" },
+  [Environment.Field]: { icon: "./img/field.png" },
+  [Environment.Snow]: { icon: "./img/snow.png" },
+  [Environment.Water]: { icon: "./img/mer.png" },
+};
 
 export const StaticBuildingInfo: IStaticBuildingInfo = {
   village: {
     name: "Village",
     icon: "./img/maison.png",
     description: "Increases your maximum population by 10",
+    highlightAdjacentTiles: true,
+    canBeBuilt: true,
     price: {
       population: 0,
       food: 0,
-      wood: 10,
+      wood: 2,
       stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
       population: {
-        quantity: 0,
-        bonusesForBuilding: [{ for: Building.village, quantity: 0.1 }],
+        quantity: 2,
+        bonusesForAdjacentBuilding: [{ for: Building.village, quantity: 1 }],
       },
     },
     consume: {},
@@ -71,7 +82,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
         buildingPattern: { building: Building.village, distance: 1 },
       },
       {
-        to: Building.coalMine,
+        to: Building.school,
         buildingPattern: { building: Building.druidHut, distance: 1 },
       },
     ],
@@ -81,44 +92,32 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     icon: "./img/caravan.png", //TODO: change
     description:
       "Hut from where people will go try to find some rocks and woods. They'll find berries on their journey so you don't need to feed them.",
+    highlightAdjacentTiles: true,
+    canBeBuilt: true,
     price: {
       population: 2,
       food: 0,
-      wood: 10,
+      wood: 0,
       stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
       wood: {
-        quantity: 0.25,
-        bonusesForBuilding: [{ for: Building.forest, quantity: 0.5 }],
+        quantity: 5,
       },
     },
     consume: {},
     transformations: [
       {
-        to: Building.sawmill,
-        buildingPattern: { building: Building.forest, distance: 1 },
-      },
-      {
         to: Building.stoneMine,
         onEnvironment: Environment.Concrete,
       },
       {
-        to: Building.stoneMine,
-        onEnvironment: Environment.Snow,
-      },
-      {
-        to: Building.coalMine,
-        nextToBuilding: Building.coalDeposite,
-      },
-      {
-        to: Building.limestoneMine,
-        nextToBuilding: Building.limestoneDeposite,
+        to: Building.sawmill,
+        nextToBuilding: Building.forest,
       },
     ],
   },
@@ -127,20 +126,45 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     icon: "./img/tente.png",
     description:
       "Hut where a druid can do some experiments and gather knowledge.",
+    highlightAdjacentTiles: false,
+    canBeBuilt: false,
     price: {
       population: 1,
       food: 0,
-      wood: 50,
+      wood: 20,
       stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
       knowledge: {
-        quantity: 1,
+        quantity: 5,
+      },
+    },
+    consume: {},
+    transformations: [],
+  },
+  school: {
+    name: "School",
+    icon: "./img/maison2.png",
+    description: "School is dope!",
+    highlightAdjacentTiles: false,
+    canBeBuilt: false,
+    price: {
+      population: 1,
+      food: 0,
+      wood: 20,
+      stones: 0,
+      coals: 0,
+      brick: 0,
+      energy: 0,
+      knowledge: 0,
+    },
+    produce: {
+      knowledge: {
+        quantity: 20,
       },
     },
     consume: {},
@@ -149,40 +173,52 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   barn: {
     name: "Barns",
     icon: "./img/entrepot2.png",
-    description: "Increases the quantity of resources you can store by 20 each",
+    description: "Increases the quantity of resources you can store by 20",
+    highlightAdjacentTiles: true,
+    canBeBuilt: true,
     price: {
       population: 0,
-      food: 0,
-      wood: 20,
-      stones: 0,
+      food: 5,
+      wood: 10,
+      stones: 10,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {},
     consume: {},
-    transformations: [],
+    transformations: [
+      {
+        to: Building.coalMine,
+        nextToBuilding: Building.coalDeposite,
+      },
+      {
+        to: Building.stoneMine,
+        nextToBuilding: Building.stoneMine,
+      },
+    ],
   },
   farm: {
     name: "Farm",
     icon: "./img/farm2.png",
     description: "Get food at the cost of wood",
+    highlightAdjacentTiles: true,
+    canBeBuilt: true,
     price: {
       population: 3,
       food: 0,
-      wood: 25,
+      wood: 2,
       stones: 5,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
       food: {
-        quantity: 3,
+        quantity: 2,
+        bonusesForAdjacentBuilding: [{ for: Building.farm, quantity: 1 }],
       },
     },
     consume: {},
@@ -197,20 +233,22 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     name: "Windmill",
     icon: "./img/windmill2.png",
     description: "Get food at the cost of wood",
+    highlightAdjacentTiles: false,
+    canBeBuilt: false,
     price: {
       population: 3,
       food: 0,
-      wood: 25,
+      wood: 5,
       stones: 5,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
       food: {
-        quantity: 3,
+        quantity: 5,
+        bonusesForAdjacentBuilding: [{ for: Building.farm, quantity: 1 }],
       },
     },
     consume: {},
@@ -220,20 +258,22 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     name: "Sawmill",
     icon: "./img/sawmill.png",
     description: "Gather wood nearby",
+    highlightAdjacentTiles: true,
+    canBeBuilt: false,
     price: {
-      population: 3,
+      population: 2,
       food: 0,
-      wood: 30,
+      wood: 0,
       stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
       wood: {
-        quantity: 3,
+        quantity: 10,
+        bonusesForAdjacentBuilding: [{ for: Building.forest, quantity: 2 }],
       },
     },
     consume: {},
@@ -241,22 +281,26 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   },
   stoneMine: {
     name: "Stone Mine",
-    icon: "./img/minecalcaire.png",
+    icon: "./img/mine.png",
     description: "Extract stone, must be built on a stone deposite",
+    highlightAdjacentTiles: true,
+    canBeBuilt: false,
     price: {
-      population: 3,
+      population: 2,
       food: 0,
-      wood: 50,
-      stones: 30,
+      wood: 0,
+      stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
       stones: {
-        quantity: 3,
+        quantity: 10,
+        bonusesForAdjacentEnvironment: [
+          { for: Environment.Concrete, quantity: 5 },
+        ],
       },
     },
     consume: {},
@@ -264,91 +308,155 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   },
   coalMine: {
     name: "Coal Mine",
-    icon: "./img/minecharbon.png",
+    icon: "./img/minecharbon2.png",
     description: "Extract coal, must be built on a coal deposite",
+    highlightAdjacentTiles: true,
+    canBeBuilt: false,
     price: {
-      population: 3,
+      population: 2,
       food: 0,
-      wood: 50,
-      stones: 100,
+      wood: 0,
+      stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
       coals: {
-        quantity: 3,
+        quantity: 10,
+        bonusesForAdjacentBuilding: [
+          { for: Building.coalDeposite, quantity: 5 },
+        ],
       },
     },
     consume: {},
     transformations: [],
   },
-  limestoneMine: {
-    name: "Limestone Mine",
-    icon: "./img/minecalcaire.png",
-    description: "Extract limestone, must be built on a limestone deposite",
+  factory: {
+    name: "Factory",
+    icon: "./img/factory.png",
+    description: "Base building to transform resources",
+    highlightAdjacentTiles: true,
+    canBeBuilt: true,
     price: {
       population: 3,
       food: 0,
-      wood: 100,
-      stones: 150,
+      wood: 10,
+      stones: 10,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
+      energy: 0,
+      knowledge: 0,
+    },
+    produce: {},
+    consume: {},
+    transformations: [
+      {
+        to: Building.brickFactory,
+        nextToBuilding: Building.stoneMine,
+      },
+      {
+        to: Building.plankFactory,
+        nextToBuilding: Building.sawmill,
+      },
+    ],
+  },
+  plankFactory: {
+    name: "Plank Factory",
+    icon: "./img/plankfactory.png",
+    description: "Build planks out of wood",
+    highlightAdjacentTiles: true,
+    canBeBuilt: false,
+    price: {
+      population: 3,
+      food: 0,
+      wood: 0,
+      stones: 0,
+      coals: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
-      limestone: {
-        quantity: 3,
+      plank: {
+        quantity: 10,
+        bonusesForAdjacentBuilding: [{ for: Building.sawmill, quantity: 5 }],
       },
     },
     consume: {},
     transformations: [],
   },
-  limestoneBrickFactory: {
+  brickFactory: {
     name: "Brick Factory",
-    icon: "./img/limestone-brick-factory.png",
-    description: "Build bricks out of limestone",
+    icon: "./img/brick-factory2.png",
+    description: "Build bricks out of stone",
+    highlightAdjacentTiles: true,
+    canBeBuilt: false,
     price: {
       population: 3,
       food: 0,
-      wood: 200,
-      stones: 200,
+      wood: 0,
+      stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
-      limestoneBrick: {
-        quantity: 3,
+      brick: {
+        quantity: 10,
+        bonusesForAdjacentBuilding: [{ for: Building.stoneMine, quantity: 5 }],
       },
     },
     consume: {},
     transformations: [],
   },
-  coalPowerStation: {
-    name: "Coal Power Station",
-    icon: "./img/centralecharbon.png",
+  coalPlant: {
+    name: "Coal Plant",
+    icon: "./img/centralecharbon2.png",
     description: "Create energy by burning coal",
+    highlightAdjacentTiles: true,
+    canBeBuilt: false,
     price: {
       population: 3,
       food: 0,
-      wood: 200,
-      stones: 50,
+      wood: 0,
+      stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 150,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {
       energy: {
-        quantity: 3,
+        quantity: 10,
+        bonusesForAdjacentBuilding: [{ for: Building.coalMine, quantity: 5 }],
+      },
+    },
+    consume: {},
+    transformations: [],
+  },
+  woodPlant: {
+    name: "Wood power Plant",
+    icon: "./img/centralebois.png",
+    description: "Create energy by burning wood",
+    highlightAdjacentTiles: true,
+    canBeBuilt: false,
+    price: {
+      population: 3,
+      food: 0,
+      wood: 0,
+      stones: 0,
+      coals: 0,
+      brick: 0,
+      energy: 0,
+      knowledge: 0,
+    },
+    produce: {
+      energy: {
+        quantity: 2,
+        bonusesForAdjacentBuilding: [{ for: Building.sawmill, quantity: 2 }],
       },
     },
     consume: {},
@@ -358,20 +466,25 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     name: "Watch tower",
     icon: "./img/watch-tower-wood.png",
     description: "Let you explore the surrounding area",
+    highlightAdjacentTiles: true,
+    canBeBuilt: true,
     price: {
-      population: 0,
+      population: 1,
       food: 0,
-      wood: 50,
+      wood: 10,
       stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
     produce: {},
     consume: {},
     transformations: [
+      {
+        to: Building.castle,
+        buildingPattern: { building: Building.village, distance: 2 },
+      },
       {
         to: Building.stoneWatchTower,
         buildingPattern: { building: Building.village, distance: 1 },
@@ -380,20 +493,50 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
         to: Building.lighthouse,
         nextToEnvironment: Environment.Water,
       },
+      {
+        to: Building.village,
+        buildingPattern: { building: Building.village, distance: 3 },
+      },
     ],
   },
   stoneWatchTower: {
     name: "Stone watch tower",
     icon: "./img/watch-tower.png",
     description: "Let you explore the surrounding area on a large radius",
+    highlightAdjacentTiles: false,
+    canBeBuilt: false,
+    price: {
+      population: 0,
+      food: 0,
+      wood: 10,
+      stones: 10,
+      coals: 0,
+      brick: 0,
+      energy: 0,
+      knowledge: 0,
+    },
+    produce: {},
+    consume: {},
+    transformations: [
+      {
+        to: Building.castle,
+        buildingPattern: { building: Building.village, distance: 2 },
+      },
+    ],
+  },
+  castle: {
+    name: "Castle",
+    icon: "./img/watch-tower2.png",
+    description: "Let you explore the surrounding area on a huge radius",
+    highlightAdjacentTiles: false,
+    canBeBuilt: false,
     price: {
       population: 0,
       food: 0,
       wood: 50,
       stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
@@ -405,14 +548,15 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     name: "Forest",
     icon: "./img/arbres-stage3.png",
     description: "Just a bunch of trees",
+    highlightAdjacentTiles: false,
+    canBeBuilt: false,
     price: {
       population: 0,
       food: 0,
       wood: 20,
       stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
@@ -424,33 +568,15 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     name: "Coal deposite",
     icon: "./img/coal-deposit.png",
     description: "Some coal to be gathered",
+    highlightAdjacentTiles: false,
+    canBeBuilt: false,
     price: {
       population: 0,
       food: 0,
       wood: 20,
       stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
-      energy: 0,
-      knowledge: 0,
-    },
-    produce: {},
-    consume: {},
-    transformations: [],
-  },
-  limestoneDeposite: {
-    name: "Limestone deposite",
-    icon: "./img/limestone-deposit.png",
-    description: "Some limestone to be gathered",
-    price: {
-      population: 0,
-      food: 0,
-      wood: 20,
-      stones: 0,
-      coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
     },
@@ -462,16 +588,72 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     name: "Lighthouse",
     icon: "./img/lighthouse.png",
     description: "Guide boats safely to the shore",
+    highlightAdjacentTiles: false,
+    canBeBuilt: false,
     price: {
       population: 0,
       food: 0,
-      wood: 20,
+      wood: 10,
       stones: 0,
       coals: 0,
-      limestone: 0,
-      limestoneBrick: 0,
+      brick: 0,
       energy: 0,
       knowledge: 0,
+    },
+    produce: {},
+    consume: {},
+    transformations: [],
+  },
+  powerfarm: {
+    name: "Power farm",
+    icon: "./img/powerfarm.png",
+    description:
+      "Produce some energy by letting some population pedal to create it",
+    highlightAdjacentTiles: true,
+    canBeBuilt: true,
+    price: {
+      population: 5,
+      food: 0,
+      wood: 0,
+      stones: 0,
+      coals: 10,
+      brick: 10,
+      plank: 10,
+      energy: 0,
+      knowledge: 0,
+    },
+    produce: {
+      energy: {
+        quantity: 2,
+        bonusesForAdjacentBuilding: [{ for: Building.sawmill, quantity: 2 }],
+      },
+    },
+    consume: {},
+    transformations: [
+      {
+        to: Building.coalPlant,
+        nextToBuilding: Building.coalMine,
+      },
+      {
+        to: Building.woodPlant,
+        nextToBuilding: Building.sawmill,
+      },
+    ],
+  },
+  rocketSilo: {
+    name: "Rocket silo",
+    icon: "./img/rocket-silo.png",
+    description: "We've got to find another planet",
+    highlightAdjacentTiles: false,
+    canBeBuilt: true,
+    price: {
+      population: 50,
+      food: 50,
+      coals: 50,
+      plank: 50,
+      brick: 50,
+      energy: 50,
+      knowledge: 50,
     },
     produce: {},
     consume: {},
@@ -509,6 +691,14 @@ export const StaticConsumableInfo: IStaticConsumableInfo = {
       capacity: 20,
     },
   },
+  plank: {
+    name: "Plank",
+    icon: "./img/plank2.png",
+    storage: {
+      name: Building.barn,
+      capacity: 20,
+    },
+  },
   coals: {
     name: "Coals",
     icon: "./img/coal-particle.png",
@@ -517,17 +707,9 @@ export const StaticConsumableInfo: IStaticConsumableInfo = {
       capacity: 20,
     },
   },
-  limestone: {
-    name: "Limestones",
-    icon: "./img/limestone-particle.png",
-    storage: {
-      name: Building.barn,
-      capacity: 20,
-    },
-  },
-  limestoneBrick: {
+  brick: {
     name: "Bricks",
-    icon: "./img/limestone-brick.png",
+    icon: "./img/brick.png",
     storage: {
       name: Building.barn,
       capacity: 20,
@@ -547,7 +729,8 @@ export const StaticConsumableInfo: IStaticConsumableInfo = {
 
 export interface IStaticBuildingProduction {
   quantity: number;
-  bonusesForBuilding?: { for: Building; quantity: number }[];
+  bonusesForAdjacentBuilding?: { for: Building; quantity: number }[];
+  bonusesForAdjacentEnvironment?: { for: Environment; quantity: number }[];
 }
 
 export type IResearchInfo = { [id in Research]: IStaticResearch };
@@ -556,8 +739,9 @@ export interface IStaticResearch {
   name: string;
   icon: string;
   description: string;
-  price: number;
+  price: { [id in Consumable]?: number };
   prerequisite: Research[];
+  neededBuildings: Building[];
   unlocks: { buildings: Building[] };
 }
 
@@ -565,65 +749,75 @@ export const ResearchInfo: IResearchInfo = {
   agriculture: {
     name: "Agriculture",
     icon: "./img/knowledge.png",
-    description: "Aggriculture allows you to build farms",
-    price: 10,
+    description: "Allows you to build farms",
+    price: {
+      [Consumable.wood]: 50,
+      [Consumable.stones]: 10,
+      [Consumable.population]: 15,
+    },
     prerequisite: [],
+    neededBuildings: [Building.sawmill, Building.stoneMine],
     unlocks: {
-      buildings: [Building.druidHut],
+      buildings: [Building.farm],
     },
   },
-  woodcutting: {
-    name: "Woodcutting",
+  storage: {
+    name: "Storage",
     icon: "./img/knowledge.png",
-    description: "Woodcutting allows you to build Sawmill",
-    price: 10,
-    prerequisite: [Research.agriculture],
-    unlocks: {
-      buildings: [Building.sawmill],
+    description: "Allows you to build barns to store more resources",
+    price: {
+      [Consumable.food]: 50,
+      [Consumable.knowledge]: 5,
     },
-  },
-  mining: {
-    name: "Mining",
-    icon: "./img/knowledge.png",
-    description: "Allows you to build mines",
-    price: 100,
     prerequisite: [Research.agriculture],
+    neededBuildings: [Building.windmill, Building.druidHut],
     unlocks: {
-      buildings: [
-        Building.coalMine,
-        Building.stoneMine,
-        Building.limestoneMine,
-      ],
+      buildings: [Building.barn],
     },
   },
   factory: {
     name: "Factory",
     icon: "./img/knowledge.png",
     description: "Allows you to build factories",
-    price: 200,
-    prerequisite: [Research.mining],
+    price: {
+      [Consumable.wood]: 100,
+      [Consumable.stones]: 100,
+      [Consumable.coals]: 20,
+    },
+    prerequisite: [Research.storage],
+    neededBuildings: [Building.coalMine, Building.stoneMine],
     unlocks: {
-      buildings: [Building.limestoneBrickFactory],
+      buildings: [Building.factory],
     },
   },
-  navigation: {
-    name: "Navigation",
+  energy: {
+    name: "Energy",
     icon: "./img/knowledge.png",
-    description: "Let you discover lands across the sea",
-    price: 400,
+    description: "Allows you to build powerfarms",
+    price: {
+      [Consumable.plank]: 50,
+      [Consumable.brick]: 50,
+      [Consumable.knowledge]: 15,
+    },
     prerequisite: [Research.factory],
+    neededBuildings: [Building.plankFactory, Building.brickFactory],
     unlocks: {
-      buildings: [],
+      buildings: [Building.powerfarm],
     },
   },
-  steamLocomotive: {
-    name: "Steam Locomotive",
+  spaceProgram: {
+    name: "Space Program",
     icon: "./img/knowledge.png",
-    description: "Allows you to build coal powered factories",
-    price: 400,
-    prerequisite: [Research.factory],
+    description:
+      "Look at what we've done withthis place, we've got to find a new one planet",
+    price: {
+      [Consumable.energy]: 100,
+      [Consumable.knowledge]: 50,
+    },
+    prerequisite: [Research.energy],
+    neededBuildings: [Building.woodPlant, Building.coalPlant],
     unlocks: {
-      buildings: [Building.coalPowerStation],
+      buildings: [Building.rocketSilo],
     },
   },
 };

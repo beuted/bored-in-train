@@ -8,48 +8,58 @@ import { Building } from "@/models/Building";
 
 export interface IResearchState {
   research: { [id in Research]: { owned: boolean } };
+  buildingsKnown: { [key in Building]?: boolean };
+}
+
+function GetInitialResearchState(): { [id in Research]: { owned: boolean } } {
+  let initialResearchState = Object.keys(ResearchInfo).reduce<
+    Partial<{ [id in Research]: { owned: boolean } }>
+  >((accumulator, research) => {
+    accumulator[research as Research] = { owned: false };
+    return accumulator;
+  }, {}) as { [id in Research]: { owned: boolean } };
+
+  return initialResearchState;
 }
 
 export const ResearchModule: Module<IResearchState, IState> = {
   state: {
-    research: {
-      agriculture: {
-        owned: false,
-      },
-      woodcutting: {
-        owned: false,
-      },
-      mining: {
-        owned: false,
-      },
-      factory: {
-        owned: false,
-      },
-      navigation: {
-        owned: false,
-      },
-      steamLocomotive: {
-        owned: false,
-      },
+    research: GetInitialResearchState(),
+    buildingsKnown: {
+      [Building.village]: true,
+      [Building.gathererHut]: true,
+      [Building.watchTower]: true,
     },
   },
   mutations: {
     OwnResearch(state, obj: { researchName: Research }) {
       state.research[obj.researchName].owned = true;
+      for (const building of ResearchInfo[obj.researchName as Research].unlocks
+        .buildings) {
+        state.buildingsKnown[building] = true;
+      }
+    },
+    AddKnownBuilding(state, obj: { building: Building }) {
+      state.buildingsKnown[obj.building] = true;
     },
   },
   actions: {
     BuyResearch(context, obj: { researchName: Research }) {
       console.debug(`Buying research ${obj.researchName}`);
       context.commit("OwnResearch", obj);
-      context.commit(
-        "IncrementConsumable",
-        {
-          name: Consumable.knowledge,
-          value: -ResearchInfo[obj.researchName as Research].price,
-        },
-        { root: true }
-      );
+
+      for (let consumable in ResearchInfo[obj.researchName].price) {
+        context.commit(
+          "IncrementConsumable",
+          {
+            name: consumable,
+            value: -ResearchInfo[obj.researchName as Research].price[
+              consumable as Consumable
+            ]!,
+          },
+          { root: true }
+        );
+      }
     },
   },
   getters: {
@@ -73,28 +83,7 @@ export const ResearchModule: Module<IResearchState, IState> = {
     },
 
     researchBuildingsKnown(state) {
-      let buildingKnown: any = {};
-      for (let building in Building) {
-        for (let research in Research) {
-          if (
-            ResearchInfo[research as Research].unlocks.buildings.findIndex(
-              (x) => x == building
-            ) != -1 &&
-            !state.research[research as Research].owned
-          ) {
-            buildingKnown[building] = false;
-            break;
-          }
-        }
-
-        if (buildingKnown[building] === undefined)
-          buildingKnown[building] = true;
-      }
-      return buildingKnown;
-    },
-
-    canSail(state) {
-      return state.research[Research.navigation].owned;
+      return state.buildingsKnown;
     },
   },
 };

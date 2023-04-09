@@ -9,7 +9,6 @@ export class MessageService {
     if (MessageService.alreadySentHelp[uniqueId]) return;
 
     MessageService.alreadySentHelp[uniqueId] = true;
-    store.commit("SetPlay", false);
 
     var evt: IPopupMessageEvent = { message: message, isHelp: true };
     EventBus.$emit("show-popup", evt);

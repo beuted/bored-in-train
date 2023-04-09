@@ -58,7 +58,6 @@ export default class Popup extends IdleGameVue {
   public dismiss() {
     if (Date.now() - this.lastTimeShown <= 500) return;
     this.isShown = false;
-    this.$store.commit("SetPlay", true);
   }
 }
 </script>

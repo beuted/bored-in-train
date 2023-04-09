@@ -8,6 +8,17 @@
         ></ShopMenu>
       </div>
       <div class="map-item">
+        <div class="title">Our wonderful planet</div>
+        <div class="winning-overlay" v-if="hasWonTheGame">
+          <span
+            >Humans managed to leave the planet before depleting all resources.
+            Hopefuly they will reach a new planet and have a more sustainable
+            exploitation of the resources there...</span
+          >
+          <button v-on:click="reset()" class="control-debug">
+            Land on the new planet
+          </button>
+        </div>
         <Map
           :map="map"
           :buildings="buildings"
@@ -16,7 +27,7 @@
           v-on:clear-building="clearBuilding"
         />
       </div>
-      <div class="inventory-item">
+      <div class="inventory-item-right">
         <Inventory />
       </div>
     </div>
@@ -25,23 +36,14 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { Store } from "vuex";
-import {
-  StaticConsumableInfo,
-  IStaticConsumable,
-  IConsuming,
-} from "@/services/GameEngine";
-import { IState, IdleGameVue } from "@/store";
-import { Consumable } from "@/models/Consumable";
-import { EventBus } from "@/EventBus";
+import { IdleGameVue } from "@/store";
 import { GameService } from "@/services/GameService";
 
 import Inventory from "@/components/Inventory.vue";
 import ShopMenu from "@/components/ShopMenu.vue";
 import Map from "@/components/Map.vue";
-import Controls from "@/components/Controls.vue";
-import { StoreSaver } from "../store/storeSaver";
 import { Building } from "../models/Building";
+import { StoreSaver } from "@/store/storeSaver";
 
 const gameService = new GameService();
 
@@ -56,16 +58,20 @@ export default class Game extends IdleGameVue {
   @Prop() private msg!: string;
   public building: Building | null = null;
 
-  private get map() {
+  public get map() {
     return this.$store.state.map.map;
   }
 
-  private get buildings() {
+  public get buildings() {
     return this.$store.state.map.buildings;
   }
 
-  private get consumables() {
+  public get consumables() {
     return this.$store.state.consumable;
+  }
+
+  public get hasWonTheGame() {
+    return this.$store.state.hasWonTheGame;
   }
 
   public buildingChanged(building: Building | null) {
@@ -76,6 +82,12 @@ export default class Game extends IdleGameVue {
     this.building = null;
   }
 
+  public reset() {
+    if (confirm("Land on the new planete ?")) {
+      StoreSaver.Reset();
+    }
+  }
+
   public mounted() {}
 }
 </script>
@@ -83,11 +95,10 @@ export default class Game extends IdleGameVue {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
 .flex-container-container {
-  box-shadow: 0px 0px 15px 0px black;
-  height: 20 * 32px + 53px;
-  width: 300px + 20 * 32px + 300px;
-  margin: auto;
-  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .flex-container {
@@ -95,11 +106,50 @@ export default class Game extends IdleGameVue {
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
 
-  box-shadow: inset 0px 0px 15px 0px #d6dbd8;
+.map-item > .title {
+  margin-bottom: 15px;
 }
 
 .inventory-item {
+  width: 400px;
+}
+
+.inventory-item-right {
   width: 300px;
+}
+
+.winning-overlay {
+  width: 560px;
+  height: 560px;
+  padding: 40px;
+  background-color: black;
+  color: white;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 25px;
+
+  opacity: 1;
+  animation-name: fadeInOpacity;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in;
+  animation-duration: 2s;
+}
+
+.winning-overlay > button {
+  margin-top: 50px;
+}
+
+@keyframes fadeInOpacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 </style>

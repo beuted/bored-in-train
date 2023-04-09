@@ -9,25 +9,21 @@
       <br />
       <div>
         <div class="tooltip-title">Price:</div>
-        <span
-          ><consumable-icon consumable="knowledge" /> x
-          {{ researchInfo.price }}</span
-        >
+
+        <div v-for="(value, keyPrice) in researchInfo.price" :key="keyPrice">
+          <span v-if="value != 0"
+            ><consumable-icon :consumable="keyPrice" /> {{ value }}</span
+          >
+        </div>
       </div>
     </span>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { IState, IdleGameVue } from "@/store";
-import { Consumable } from "@/models/Consumable";
-import {
-  StaticBuildingInfo,
-  StaticConsumableInfo,
-  ResearchInfo,
-} from "@/services/GameEngine";
-import { Building } from "@/models/Building";
+import { Component, Prop } from "vue-property-decorator";
+import { IdleGameVue } from "@/store";
+import { ResearchInfo } from "@/services/GameEngine";
 import ConsumableIcon from "@/components/ConsumableIcon.vue";
 import { Research } from "../models/Research";
 

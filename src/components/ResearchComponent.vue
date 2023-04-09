@@ -7,15 +7,22 @@
         class="research-item"
         v-bind:class="{
           owned: isResearchOwned(researchName),
-          'cant-afford': !canAffordResearch(researchName),
+          'cant-afford': !canBuyResearch(researchName),
         }"
         v-on:click="buyResearch(researchName)"
         :disabled="isResearchOwned(researchName)"
       >
         <div>{{ getResearchInfo(researchName).name }}</div>
         <div class="price">
-          Price: <consumable-icon consumable="knowledge" />x
-          {{ getResearchInfo(researchName).price }}
+          Price:
+          <div
+            v-for="(value, keyPrice) in getResearchInfo(researchName).price"
+            :key="keyPrice"
+          >
+            <span v-if="value != 0"
+              ><consumable-icon :consumable="keyPrice" /> {{ value }}</span
+            >
+          </div>
         </div>
       </button>
     </div>
@@ -52,7 +59,7 @@ export default class ResearchComponent extends IdleGameVue {
   }
 
   public buyResearch(researchName: Research) {
-    if (!this.canAffordResearch(researchName)) {
+    if (!this.canBuyResearch(researchName)) {
       Vue.toasted.error(
         `You don't have enough "knowledge" to buy this research.`
       );
@@ -67,7 +74,12 @@ export default class ResearchComponent extends IdleGameVue {
     this.$toasted.success(`You discovered ${ResearchInfo[researchName].name}!`);
   }
 
-  public canAffordResearch(researchName: Research) {
+  public canBuyResearch(researchName: Research) {
+    console.log(ResearchInfo[researchName].neededBuildings);
+
+    for (let building of ResearchInfo[researchName].neededBuildings) {
+      if (!this.$store.state.research.buildingsKnown[building]) return false;
+    }
     return (
       ResearchInfo[researchName].price <=
       this.$store.state.consumable.knowledge.quantity

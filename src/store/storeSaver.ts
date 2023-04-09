@@ -32,6 +32,7 @@ export class StoreSaver {
     console.log("Resetting...");
     window.localStorage.setItem(StoreSaver.storageKey, JSON.stringify({}));
     store.commit("StoreSaverRestore", {});
+    store.commit("WonTheGame", { value: false });
     location.reload();
     console.log("Reset.");
   }

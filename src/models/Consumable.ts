@@ -3,9 +3,9 @@ export enum Consumable {
   food = "food",
   wood = "wood",
   stones = "stones",
+  plank = "plank",
+  brick = "brick",
   coals = "coals",
-  limestone = "limestone",
-  limestoneBrick = "limestoneBrick",
   knowledge = "knowledge",
   energy = "energy",
 }

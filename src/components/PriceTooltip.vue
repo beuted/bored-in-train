@@ -7,10 +7,12 @@
       <div class="tooltip-title">{{ buildingInfo.name }}</div>
       <div>{{ buildingInfo.description }}</div>
       <br />
-      <div>
+      <div v-if="!hidePrice">
         <div class="tooltip-title">Price:</div>
         <div v-for="(value, keyPrice) in buildingInfo.price" :key="keyPrice">
-          <span v-if="value != 0"
+          <span
+            v-if="value != 0"
+            :class="{ 'not-enough': hasNotEnough(keyPrice, value) }"
             ><consumable-icon :consumable="keyPrice" /> {{ value }}</span
           >
         </div>
@@ -31,14 +33,27 @@
           :key="keyProduce"
         >
           <span v-if="value != null"
-            ><consumable-icon :consumable="keyProduce"/>
+            ><consumable-icon :consumable="keyProduce" />
             {{ value.quantity }}
             <span
-              v-if="value.bonusesForBuilding && value.bonusesForBuilding.length"
-              v-for="(v, keyProduce) in value.bonusesForBuilding"
+              v-if="
+                value.bonusesForAdjacentBuilding &&
+                  value.bonusesForAdjacentBuilding.length
+              "
+              v-for="(v, keyProduce) in value.bonusesForAdjacentBuilding"
             >
-              + {{ v.quantity }} x <building-icon :building="v.for" /> </span
-          ></span>
+              + {{ v.quantity }} x <building-icon :building="v.for" />
+            </span>
+            <span
+              v-if="
+                value.bonusesForAdjacentEnvironment &&
+                  value.bonusesForAdjacentEnvironment.length
+              "
+              v-for="(v, keyProduce) in value.bonusesForAdjacentEnvironment"
+            >
+              + {{ v.quantity }} x <environment-icon :environment="v.for" />
+            </span>
+          </span>
         </div>
         <br />
       </div>
@@ -68,29 +83,33 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { IState, IdleGameVue } from "@/store";
-import { Consumable } from "@/models/Consumable";
-import {
-  StaticBuildingInfo,
-  StaticConsumableInfo,
-} from "@/services/GameEngine";
+import { Component, Prop } from "vue-property-decorator";
+import { IdleGameVue } from "@/store";
+import { StaticBuildingInfo } from "@/services/GameEngine";
 import { Building } from "@/models/Building";
 import ConsumableIcon from "@/components/ConsumableIcon.vue";
 import BuildingIcon from "@/components/BuildingIcon.vue";
+import EnvironmentIcon from "@/components/EnvironmentIcon.vue";
+import { Consumable } from "@/models/Consumable";
 
 @Component({
   components: {
     ConsumableIcon,
     BuildingIcon,
+    EnvironmentIcon,
   },
 })
 export default class PriceTooltip extends IdleGameVue {
   @Prop() private building!: Building;
   @Prop() public isBuildable!: boolean;
+  @Prop() public hidePrice!: boolean;
 
   public get buildingInfo() {
     return StaticBuildingInfo[this.building];
+  }
+
+  public hasNotEnough(consumable: Consumable, price: number | undefined) {
+    return this.$store.state.consumable[consumable].quantity < (price || 0);
   }
 }
 </script>
@@ -111,7 +130,7 @@ export default class PriceTooltip extends IdleGameVue {
   top: 0%;
   margin-top: -50%; /* Use half of the width (200/2 = 100), to center the tooltip */
   margin-left: 60px;
-  padding: 5px 0;
+  padding: 10px 5px;
   color: #fff;
   text-shadow: 0px 1px 1px #000;
   text-align: center;
@@ -129,6 +148,9 @@ export default class PriceTooltip extends IdleGameVue {
   visibility: visible;
 }
 
+.not-enough {
+  color: red;
+}
 .tooltip-title {
   font-weight: bold;
   margin-bottom: 10px;

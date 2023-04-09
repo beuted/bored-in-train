@@ -1,12 +1,35 @@
 <template>
   <div class="categories">
-    <span class="title">Research</span>
-    <div class="shop-item-list">
-      <div v-for="researchName of availableResearchs" v-bind:key="researchName">
+    <span v-if="availableResearchs.length > 0" class="title">Research</span>
+
+    <div v-for="researchName of availableResearchs" v-bind:key="researchName">
+      <div class="shop-item-list">
+        <div
+          class="shop-item-container"
+          v-for="building of getResearchBuildingDependencyList(researchName)"
+          v-bind:key="building.building"
+        >
+          <div
+            class="research-dependency-item"
+            v-bind:class="{ unknown: !building.known }"
+          >
+            <div v-once>
+              <img
+                class="shop-img"
+                v-bind:src="getMapBuildingImages(building.building).src"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div v-if="getResearchBuildingDependencyList(researchName).length > 0">
+          <img class="shop-arrow" v-bind:src="'./img/arrow-right.png'" />
+        </div>
+
         <ResearchTooltip
           :research="researchName"
           :is-buyable="
-            !isResearchOwned(researchName) && canAffordResearch(researchName)
+            !isResearchOwned(researchName) && canBuyResearch(researchName)
           "
           class="shop-item-container"
         >
@@ -21,35 +44,67 @@
         </ResearchTooltip>
       </div>
     </div>
-    <span class="title">Buildings</span>
+
+    <span class="title">Base buildings</span>
+
     <div class="shop-item-list">
-      <div v-for="(building, key) in buildings" v-bind:key="key">
+      <div v-for="building in buildings()" v-bind:key="building">
         <PriceTooltip
-          :building="key"
-          :is-buildable="isBuildable(key)"
-          v-if="isKnown(key)"
+          :building="building"
+          :is-buildable="isBuildable(building)"
           class="shop-item-container"
         >
           <div
-            v-on:click="buildingClicked(key)"
+            v-on:click="buildingClicked(building)"
             class="shop-item"
-            v-bind:class="{ selected: key == buildingType }"
+            v-bind:class="{ selected: building == buildingType }"
           >
             <div>
               <div v-once>
                 <img
                   class="shop-img"
-                  v-bind:src="getMapBuildingImages(key).src"
+                  v-bind:src="getMapBuildingImages(building).src"
                 />
               </div>
             </div>
           </div>
-          <div v-if="building.quantity > 0 && key != 'forest'" class="badge">
-            {{ building.quantity }}
+          <div
+            v-if="buildingsOnMap[building].quantity > 0 && building != 'forest'"
+            class="badge"
+          >
+            {{ buildingsOnMap[building].quantity }}
           </div>
         </PriceTooltip>
       </div>
     </div>
+    <span class="title" v-if="knownTransformations().length > 0"
+      >Known transformations</span
+    >
+    <div class="shop-item-list">
+      <div v-for="building in knownTransformations()" v-bind:key="building">
+        <PriceTooltip
+          :building="building"
+          :is-buildable="true"
+          :hide-price="true"
+          class="shop-item-container"
+        >
+          <div
+            class="known-item"
+            v-bind:class="{ selected: building == buildingType }"
+          >
+            <div>
+              <div v-once>
+                <img
+                  class="shop-img"
+                  v-bind:src="getMapBuildingImages(building).src"
+                />
+              </div>
+            </div>
+          </div>
+        </PriceTooltip>
+      </div>
+    </div>
+    <Controls class="controls" />
   </div>
 </template>
 
@@ -65,11 +120,13 @@ import PriceTooltip from "@/components/PriceTooltip.vue";
 import ResearchTooltip from "@/components/ResearchTooltip.vue";
 import { imageService } from "../services/ImageService";
 import { MessageService } from "@/services/MessageService";
+import Controls from "./Controls.vue";
 
 @Component({
   components: {
     ResearchTooltip,
     PriceTooltip,
+    Controls,
   },
 })
 export default class ShopMenu extends IdleGameVue {
@@ -91,7 +148,7 @@ export default class ShopMenu extends IdleGameVue {
   }
 
   public buyResearch(researchName: Research) {
-    if (!this.canAffordResearch(researchName)) {
+    if (!this.canBuyResearch(researchName)) {
       Vue.toasted.error(
         `You don't have enough "knowledge" to buy this research.`
       );
@@ -104,13 +161,23 @@ export default class ShopMenu extends IdleGameVue {
 
     this.$store.dispatch("BuyResearch", { researchName: researchName });
     this.$toasted.success(`You discovered ${ResearchInfo[researchName].name}!`);
+    this.$forceUpdate();
   }
 
-  public canAffordResearch(researchName: Research) {
-    return (
-      ResearchInfo[researchName].price <=
-      this.$store.state.consumable.knowledge.quantity
-    );
+  public canBuyResearch(researchName: Research) {
+    for (let building of ResearchInfo[researchName].neededBuildings) {
+      if (!this.$store.state.research.buildingsKnown[building]) return false;
+    }
+
+    for (let consumable in ResearchInfo[researchName].price) {
+      if (
+        ResearchInfo[researchName].price[consumable as Consumable]! >
+        this.$store.state.consumable[consumable as Consumable].quantity
+      )
+        return false;
+    }
+
+    return true;
   }
 
   public getResearchImages(key: Research) {
@@ -130,8 +197,25 @@ export default class ShopMenu extends IdleGameVue {
     return this.$store.getters.researchBuildingsKnown[building];
   }
 
-  public get buildings() {
+  public buildings(): Building[] {
+    console.log("can be built");
+    return Object.keys(this.$store.state.research.buildingsKnown).filter(
+      (building) =>
+        this.$store.state.research.buildingsKnown[building as Building] &&
+        StaticBuildingInfo[building as Building].canBeBuilt
+    ) as Building[];
+  }
+
+  public get buildingsOnMap() {
     return this.$store.state.map.buildings;
+  }
+
+  public knownTransformations(): Building[] {
+    return Object.keys(this.$store.state.research.buildingsKnown).filter(
+      (building) =>
+        this.$store.state.research.buildingsKnown[building as Building] &&
+        !StaticBuildingInfo[building as Building].canBeBuilt
+    ) as Building[];
   }
 
   public getMapBuildingImages(key: Building) {
@@ -148,6 +232,13 @@ export default class ShopMenu extends IdleGameVue {
         return false;
     }
     return true;
+  }
+
+  public getResearchBuildingDependencyList(research: Research) {
+    return ResearchInfo[research].neededBuildings.map((b) => ({
+      building: b,
+      known: this.$store.state.research.buildingsKnown[b],
+    }));
   }
 }
 </script>
@@ -167,7 +258,7 @@ export default class ShopMenu extends IdleGameVue {
   justify-content: center;
   align-items: center;
   margin-bottom: 15px;
-  width: 170px;
+  width: 300px;
 }
 
 .shop-item-container {
@@ -190,33 +281,83 @@ export default class ShopMenu extends IdleGameVue {
 }
 
 .shop-item.selected {
+  border: solid 2px #00a6c6;
+  box-shadow: 0px 0px 5px #fff;
+  background-color: #e1f4f7;
+  & > div {
+    border: solid 2px #f5f5f5;
+  }
+}
+
+.shop-item:hover {
+  border: solid 2px #d6dbd8;
+  box-shadow: 0px 0px 5px #fff;
+  background-color: #d6dbd8;
+  & > div {
+    border: solid 2px #f5f5f5;
+  }
+}
+
+.known-item {
+  background-color: #f5f5f5;
+  border: solid 2px #d6dbd8;
+  cursor: default;
+  border-radius: 2px;
+  & > div {
+    height: 32px;
+    width: 32px;
+    border-top: solid 2px #f5f5f5;
+    border-left: solid 2px #f5f5f5;
+    border-bottom: solid 2px #f5f5f5;
+    border-right: solid 2px #f5f5f5;
+    padding: 3px;
+  }
+}
+
+.known-item:hover {
+  background-color: #d6dbd8;
+  & > div {
+    border: solid 2px #f5f5f5;
+  }
+}
+
+.research-dependency-item {
+  border: solid 2px #2c3e50;
+  cursor: pointer;
+  border-radius: 2px;
+  & > div {
+    height: 32px;
+    width: 32px;
+    border-top: solid 2px #fff;
+    border-left: solid 2px #fff;
+    border-bottom: solid 2px rgba(0, 0, 0, 0);
+    border-right: solid 2px rgba(0, 0, 0, 0);
+    padding: 3px;
+  }
+}
+.research-dependency-item.unknown {
   border: solid 2px #fff;
   box-shadow: 0px 0px 5px #fff;
   background-color: #f5f5f5;
   & > div {
     border-top: solid 2px #d6dbd8;
     border-left: solid 2px #d6dbd8;
-  }
-}
-
-.shop-item:hover {
-  background-color: #f5f5f5;
-  & > div {
-    border-top: solid 2px #d6dbd8;
-    border-left: solid 2px #d6dbd8;
+    & > img {
+      filter: contrast(0);
+    }
   }
 }
 
 .badge {
   position: absolute;
-  top: -11px;
-  right: -11px;
+  top: -9px;
+  right: -9px;
   background-color: #3a96dd;
-  height: 22px;
-  width: 22px;
-  border-radius: 11px;
-  font-size: 12px;
-  line-height: 22px;
+  height: 18px;
+  width: 18px;
+  border-radius: 9px;
+  font-size: 10px;
+  line-height: 18px;
   color: white;
   z-index: 10;
 }
@@ -227,6 +368,13 @@ export default class ShopMenu extends IdleGameVue {
   image-rendering: pixelated;
 }
 
+.shop-arrow {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+  margin-top: 8px;
+  margin-right: 8px;
+}
 input {
   visibility: hidden;
   width: 0;

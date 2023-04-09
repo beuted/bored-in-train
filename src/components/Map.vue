@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { Building, isAMine } from "@/models/Building";
+import { Building } from "@/models/Building";
 import { StaticBuildingInfo, ResearchInfo } from "@/services/GameEngine";
 import { Environment } from "@/models/Environment";
 import { IMapTile } from "@/models/IMapTile";
@@ -324,10 +324,7 @@ export default class Map extends IdleGameVue {
           this.tileSize,
           this.tileSize
         );
-        if (
-          this.building == Building.sawmill ||
-          this.building == Building.gathererHut
-        ) {
+        if (StaticBuildingInfo[this.building].highlightAdjacentTiles) {
           this.mouseContext.strokeStyle = canBuild ? "#00a6c6" : "#FF0000";
           this.mouseContext.lineWidth = 5;
           this.mouseContext.strokeRect(
@@ -470,16 +467,8 @@ export default class Map extends IdleGameVue {
             name: consumable,
             value: -price,
           });
-          if (consumable == Consumable.population) {
-            this.$store.commit("IncrementPopStorage", { value: -price });
-          }
         }
       }
-    }
-
-    //TODO: not ideal
-    if (building == Building.village) {
-      this.$store.commit("IncrementPopStorage", { value: 10 });
     }
 
     this.$store.commit("ChangeTile", {

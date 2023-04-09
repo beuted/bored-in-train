@@ -5,10 +5,9 @@ import SimplexNoise from "simplex-noise";
 import {
   getTilesForCircle,
   IMapBuildings,
-  IMapProduction,
   sawmillRadius,
 } from "@/store/mapStoreModule";
-import { GameService } from "./GameService";
+import { StaticBuildingInfo } from "./GameEngine";
 
 export class MapBuilder {
   private static simplexHeight = new SimplexNoise();
@@ -20,7 +19,6 @@ export class MapBuilder {
     map: IMapTile[][];
     mapSize: number;
     buildings: IMapBuildings;
-    production: IMapProduction;
   } {
     var center = Math.floor(size / 2);
     const mapSize = size;
@@ -123,95 +121,21 @@ export class MapBuilder {
       }
     }
 
+    let buildings: Partial<IMapBuildings> = {};
+
+    for (let building in StaticBuildingInfo) {
+      buildings[building as Building] = {
+        quantity: 0,
+        coords: {},
+      };
+    }
+
+    buildings.forest = forestBuildingEntry;
+
     return {
       map: map,
       mapSize: mapSize,
-      production: {
-        population: { quantity: GameService.PopulationIncr },
-        food: { quantity: 0 },
-        wood: { quantity: 0 },
-        stones: { quantity: 0 },
-        coals: { quantity: 0 },
-        limestone: { quantity: 0 },
-        limestoneBrick: { quantity: 0 },
-        knowledge: { quantity: 0 },
-        energy: { quantity: 0 },
-      },
-      buildings: {
-        village: {
-          quantity: 1,
-          coords: { [center + "," + center]: { x: center, y: center } },
-        },
-        gathererHut: {
-          quantity: 1,
-          coords: { [center - 1 + "," + center]: { x: center - 1, y: center } },
-        },
-        druidHut: {
-          quantity: 0,
-          coords: {},
-        },
-        watchTower: {
-          quantity: 1,
-          coords: {
-            [center + "," + (center - 1)]: { x: center, y: center - 1 },
-          },
-        },
-        barn: {
-          quantity: 1,
-          coords: {
-            [center + "," + (center + 1)]: { x: center, y: center + 1 },
-          },
-        },
-        farm: {
-          quantity: 0,
-          coords: {},
-        },
-        stoneMine: {
-          quantity: 0,
-          coords: {},
-        },
-        sawmill: {
-          quantity: 0,
-          coords: {},
-        },
-        coalMine: {
-          quantity: 0,
-          coords: {},
-        },
-        limestoneMine: {
-          quantity: 0,
-          coords: {},
-        },
-        limestoneBrickFactory: {
-          quantity: 0,
-          coords: {},
-        },
-        coalPowerStation: {
-          quantity: 0,
-          coords: {},
-        },
-        windmill: {
-          quantity: 0,
-          coords: {},
-        },
-        stoneWatchTower: {
-          quantity: 0,
-          coords: {},
-        },
-        coalDeposite: {
-          quantity: 0,
-          coords: {},
-        },
-        limestoneDeposite: {
-          quantity: 0,
-          coords: {},
-        },
-        lighthouse: {
-          quantity: 0,
-          coords: {},
-        },
-        forest: forestBuildingEntry,
-      },
+      buildings: buildings as IMapBuildings,
     };
   }
 
@@ -220,19 +144,17 @@ export class MapBuilder {
     i: number,
     j: number
   ): Building | null {
-    if (
-      (env == Environment.Field || env == Environment.Concrete) &&
-      MapBuilder.NoiseTrees(i, j) > 0.5
-    ) {
-      return Building.forest;
+    if (MapBuilder.NoiseTrees(i, j) > 0.5) {
+      if (env == Environment.Field) return Building.forest;
+      if (env == Environment.Concrete)
+        return Math.random() > 0.3 ? Building.forest : null;
     }
     return null;
   }
 
   private static GetHabitat(): Building {
-    var seed = Math.random();
-    if (seed < 0.5) return Building.coalDeposite;
-    else return Building.limestoneDeposite;
+    return Building.coalDeposite;
+    //TODO: add here more habitats
   }
 
   private static GetHeightEnvironment(
@@ -244,7 +166,7 @@ export class MapBuilder {
     if (height <= 0.01) return Environment.Water;
     if (height <= 0.2) return Environment.Beach;
     if (height <= 0.75) return Environment.Field;
-    if (height <= 0.95) return Environment.Concrete;
+    if (height <= 0.97) return Environment.Concrete;
 
     return Environment.Snow;
   }

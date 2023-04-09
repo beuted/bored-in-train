@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <Controls class="controls" />
     <!--<div class="nav">
       <router-link to="/">Production</router-link>
       <router-link to="/research">Research</router-link>
@@ -22,7 +21,6 @@ import { IState, IdleGameVue } from "@/store";
 @Component({
   components: {
     Popup,
-    Controls,
   },
 })
 export default class App extends IdleGameVue {}
@@ -156,11 +154,6 @@ table {
 }
 // CSS reset END
 
-html,
-body {
-  background-color: #fefffe;
-}
-
 .btn {
   cursor: pointer;
 }
@@ -193,7 +186,7 @@ i {
 html,
 body {
   height: 100%;
-  background-color: #d6dbd8;
+  background-color: white;
 }
 
 #app {

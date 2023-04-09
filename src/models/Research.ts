@@ -1,8 +1,7 @@
 export enum Research {
-  agriculture = "agriculture",
-  woodcutting = "woodcutting",
-  mining = "mining",
   factory = "factory",
-  navigation = "navigation",
-  steamLocomotive = "steamLocomotive",
+  storage = "storage",
+  agriculture = "agriculture",
+  energy = "energy",
+  spaceProgram = "spaceProgram",
 }

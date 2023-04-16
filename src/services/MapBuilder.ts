@@ -13,9 +13,7 @@ export class MapBuilder {
   private static simplexHeight = new SimplexNoise();
   private static simplexTrees = new SimplexNoise();
 
-  public static InitMap(
-    size: number
-  ): {
+  public static InitMap(size: number): {
     map: IMapTile[][];
     mapSize: number;
     buildings: IMapBuildings;
@@ -44,23 +42,18 @@ export class MapBuilder {
           building = MapBuilder.GetHabitat();
 
         map[i][j] = {
-          building: building,
-          environment: env,
+          b: building,
+          e: env,
           discovered: false,
           discoverable: 0,
-          pollution: 50,
-          temperature: 20,
           closeByTrees: 0,
-          closeByWater: 0,
-          closeByMountain: 0,
-          closeByBeach: 0,
-          closeByField: 0,
-          quantity: 0,
+          q: 0,
+          r: Math.floor(Math.random() * 100),
         };
 
         // All trees start with a quantity of 100
         if (building == Building.forest) {
-          map[i][j].quantity = Math.floor(Math.random() * 100) + 1;
+          map[i][j].q = Math.floor(Math.random() * 100) + 1;
           forestBuildingEntry.quantity++;
           forestBuildingEntry.coords[i + "," + j] = { x: i, y: j };
         }
@@ -71,9 +64,9 @@ export class MapBuilder {
     var discoveredTiles = getTilesForCircle({ x: center, y: center }, 2);
     for (const tile of discoveredTiles) {
       map[tile.x][tile.y].discovered = true;
-      map[tile.x][tile.y].building = null;
-      map[tile.x][tile.y].quantity = 0;
-      map[tile.x][tile.y].environment = Environment.Field;
+      map[tile.x][tile.y].b = null;
+      map[tile.x][tile.y].q = 0;
+      map[tile.x][tile.y].e = Environment.Field;
     }
     var discoverableTiles = getTilesForCircle({ x: center, y: center }, 3);
     for (const tile of discoverableTiles) {
@@ -101,8 +94,8 @@ export class MapBuilder {
             tile.x < map.length - 1 &&
             tile.y < map.length - 1
           ) {
-            const building = map[tile.x][tile.y].building;
-            const environment = map[tile.x][tile.y].environment;
+            const building = map[tile.x][tile.y].b;
+            const environment = map[tile.x][tile.y].e;
 
             if (building == Building.forest) nbTrees++;
 
@@ -114,10 +107,6 @@ export class MapBuilder {
         }
 
         map[i][j].closeByTrees = nbTrees;
-        map[i][j].closeByWater = nbWater;
-        map[i][j].closeByBeach = nbBeach;
-        map[i][j].closeByField = nbField;
-        map[i][j].closeByMountain = nbMountain;
       }
     }
 
@@ -147,7 +136,7 @@ export class MapBuilder {
     if (MapBuilder.NoiseTrees(i, j) > 0.5) {
       if (env == Environment.Field) return Building.forest;
       if (env == Environment.Concrete)
-        return Math.random() > 0.3 ? Building.forest : null;
+        return Math.random() > 0.5 ? Building.forest : null;
     }
     return null;
   }
@@ -164,9 +153,9 @@ export class MapBuilder {
   ): Environment {
     let height = MapBuilder.Mask(i, j, size) * MapBuilder.NoiseHeight(i, j);
     if (height <= 0.01) return Environment.Water;
-    if (height <= 0.2) return Environment.Beach;
-    if (height <= 0.75) return Environment.Field;
-    if (height <= 0.97) return Environment.Concrete;
+    if (height <= 0.1) return Environment.Beach;
+    if (height <= 0.6) return Environment.Field;
+    if (height <= 0.98) return Environment.Concrete;
 
     return Environment.Snow;
   }

@@ -155,15 +155,15 @@ table {
 // CSS reset END
 
 .btn {
-  cursor: pointer;
+  cursor: url("../public/img/cursors/cursor-hand.png"), auto;
 }
 
 .chx {
-  cursor: pointer;
+  cursor: url("../public/img/cursors/cursor-hand.png"), auto;
 }
 
 .chx-label {
-  cursor: pointer;
+  cursor: url("../public/img/cursors/cursor-hand.png"), auto;
 }
 
 .title {
@@ -225,6 +225,10 @@ body {
 
 .router-view {
   flex-grow: 1;
+}
+
+.toasted {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
 
 // Animations

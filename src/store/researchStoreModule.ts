@@ -1,10 +1,11 @@
 import { Module } from "vuex";
 
-import { ResearchInfo } from "../services/GameEngine";
+import { ResearchInfo, StaticBuildingInfo } from "../services/GameEngine";
 import { IState } from "../store";
 import { Research } from "@/models/Research";
 import { Consumable } from "@/models/Consumable";
 import { Building } from "@/models/Building";
+import { Vue } from "vue-property-decorator";
 
 export interface IResearchState {
   research: { [id in Research]: { owned: boolean } };
@@ -27,7 +28,7 @@ export const ResearchModule: Module<IResearchState, IState> = {
     research: GetInitialResearchState(),
     buildingsKnown: {
       [Building.village]: true,
-      [Building.gathererHut]: true,
+      [Building.gathererCamp]: true,
       [Building.watchTower]: true,
     },
   },
@@ -40,7 +41,13 @@ export const ResearchModule: Module<IResearchState, IState> = {
       }
     },
     AddKnownBuilding(state, obj: { building: Building }) {
+      if (!!state.buildingsKnown[obj.building]) return;
       state.buildingsKnown[obj.building] = true;
+      Vue.toasted.success(
+        `You discovered the building "${
+          StaticBuildingInfo[obj.building].name
+        }"!`
+      );
     },
   },
   actions: {

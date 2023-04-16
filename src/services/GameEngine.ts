@@ -9,7 +9,7 @@ export const GlobalConfig = {
 
 export type IStaticConsumableInfo = { [id in Consumable]: IStaticConsumable };
 export type IStaticBuildingInfo = { [id in Building]: IStaticBuilding };
-export type IStaticEnvironmentInfo = { [id: number]: { icon: string } };
+export type IStaticEnvironmentInfo = { [id: number]: { icons: string[] } };
 
 export interface IStaticConsumable {
   name: string;
@@ -45,18 +45,32 @@ export interface IStorage {
   capacity: number;
 }
 export const StaticEnvironmentInfo: IStaticEnvironmentInfo = {
-  [Environment.Beach]: { icon: "./img/beach.png" },
-  [Environment.Concrete]: { icon: "./img/concrete.png" },
-  [Environment.Field]: { icon: "./img/field.png" },
-  [Environment.Snow]: { icon: "./img/snow.png" },
-  [Environment.Water]: { icon: "./img/mer.png" },
+  [Environment.Beach]: { icons: ["./img/beach.png", "./img/beach2.png"] },
+  [Environment.Concrete]: {
+    icons: ["./img/concrete.png", "./img/concrete2.png"],
+  },
+  [Environment.Field]: {
+    icons: [
+      "./img/field.png",
+      "./img/field.png",
+      "./img/field2.png",
+      "./img/field2.png",
+      "./img/field3.png",
+      "./img/field3.png",
+      "./img/field4.png",
+      "./img/field5.png",
+    ],
+  },
+  [Environment.Snow]: { icons: ["./img/snow.png", "./img/snow2.png"] },
+  [Environment.Water]: { icons: ["./img/mer.png", "./img/mer2.png"] },
 };
 
 export const StaticBuildingInfo: IStaticBuildingInfo = {
   village: {
     name: "Village",
     icon: "./img/maison.png",
-    description: "Increases your maximum population by 10",
+    description:
+      "Increases your population. The more villages there are around it the more population it will produce.",
     highlightAdjacentTiles: true,
     canBeBuilt: true,
     price: {
@@ -87,11 +101,11 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
       },
     ],
   },
-  gathererHut: {
-    name: "Gatherer Hut",
+  gathererCamp: {
+    name: "Gatherer Camp",
     icon: "./img/caravan.png", //TODO: change
     description:
-      "Hut from where people will go try to find some rocks and woods. They'll find berries on their journey so you don't need to feed them.",
+      "Camp from where people will collect some woods. They will collect different resources depending on their location.",
     highlightAdjacentTiles: true,
     canBeBuilt: true,
     price: {
@@ -122,10 +136,10 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     ],
   },
   druidHut: {
-    name: "Druid Hut",
+    name: "Druid hut",
     icon: "./img/tente.png",
     description:
-      "Hut where a druid can do some experiments and gather knowledge.",
+      "Hut where a druid can do some experiments and gather knowledge. Can be created by building villages around a village.",
     highlightAdjacentTiles: false,
     canBeBuilt: false,
     price: {
@@ -149,7 +163,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   school: {
     name: "School",
     icon: "./img/maison2.png",
-    description: "School is dope!",
+    description:
+      "School is dope for learning! Can be created by building druid huts around a village.",
     highlightAdjacentTiles: false,
     canBeBuilt: false,
     price: {
@@ -193,16 +208,13 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
         to: Building.coalMine,
         nextToBuilding: Building.coalDeposite,
       },
-      {
-        to: Building.stoneMine,
-        nextToBuilding: Building.stoneMine,
-      },
     ],
   },
   farm: {
     name: "Farm",
     icon: "./img/farm2.png",
-    description: "Get food at the cost of wood",
+    description:
+      "Get food for your population. The more farms there are around it the more food it will produce.",
     highlightAdjacentTiles: true,
     canBeBuilt: true,
     price: {
@@ -225,14 +237,15 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     transformations: [
       {
         to: Building.windmill,
-        buildingPattern: { building: Building.farm, distance: 2 },
+        buildingPattern: { building: Building.farm, distance: 1 },
       },
     ],
   },
   windmill: {
     name: "Windmill",
     icon: "./img/windmill2.png",
-    description: "Get food at the cost of wood",
+    description:
+      "Get more food for your population. Can be created by building a custer of farms.",
     highlightAdjacentTiles: false,
     canBeBuilt: false,
     price: {
@@ -257,7 +270,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   sawmill: {
     name: "Sawmill",
     icon: "./img/sawmill.png",
-    description: "Gather wood nearby",
+    description:
+      "Gather wood nearby. Can be created by building a gatherer camp next to a forest. The more forests there are around it the more wood it will produce.",
     highlightAdjacentTiles: true,
     canBeBuilt: false,
     price: {
@@ -282,7 +296,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   stoneMine: {
     name: "Stone Mine",
     icon: "./img/mine.png",
-    description: "Extract stone, must be built on a stone deposite",
+    description:
+      "Extract stone from the ground. Can be created by building a gatherer camp on a mountain tile. The more mountains there are around it the more stone it will produce.",
     highlightAdjacentTiles: true,
     canBeBuilt: false,
     price: {
@@ -309,7 +324,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   coalMine: {
     name: "Coal Mine",
     icon: "./img/minecharbon2.png",
-    description: "Extract coal, must be built on a coal deposite",
+    description:
+      "Extract coal from the ground. Can be created by building a barn next to a coal deposit. The more coal deposites there are around it the more coal it will produce.",
     highlightAdjacentTiles: true,
     canBeBuilt: false,
     price: {
@@ -336,7 +352,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   factory: {
     name: "Factory",
     icon: "./img/factory.png",
-    description: "Base building to transform resources",
+    description: "Base building to transform resources.",
     highlightAdjacentTiles: true,
     canBeBuilt: true,
     price: {
@@ -365,7 +381,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   plankFactory: {
     name: "Plank Factory",
     icon: "./img/plankfactory.png",
-    description: "Build planks out of wood",
+    description:
+      "Build planks out of wood. Can be created by building a factory next to a sawmill. The more sawmills there are around it the more planks it will produce.",
     highlightAdjacentTiles: true,
     canBeBuilt: false,
     price: {
@@ -390,7 +407,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   brickFactory: {
     name: "Brick Factory",
     icon: "./img/brick-factory2.png",
-    description: "Build bricks out of stone",
+    description:
+      "Build bricks out of stone. Can be created by building a factory next to a stone mine. The more stone mines there are around it the more bricks it will produce.",
     highlightAdjacentTiles: true,
     canBeBuilt: false,
     price: {
@@ -415,7 +433,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   coalPlant: {
     name: "Coal Plant",
     icon: "./img/centralecharbon2.png",
-    description: "Create energy by burning coal",
+    description:
+      "Create energy by burning coal. Can be created by building a powerfarm next to a coal mine. The more coal mines there are around it the more energy it will produce.",
     highlightAdjacentTiles: true,
     canBeBuilt: false,
     price: {
@@ -440,7 +459,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   woodPlant: {
     name: "Wood power Plant",
     icon: "./img/centralebois.png",
-    description: "Create energy by burning wood",
+    description:
+      "Create energy by burning wood. Can be created by building a powerfarm next to a sawmill. The more sawmills there are around it the more energy it will produce.",
     highlightAdjacentTiles: true,
     canBeBuilt: false,
     price: {
@@ -465,7 +485,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   watchTower: {
     name: "Watch tower",
     icon: "./img/watch-tower-wood.png",
-    description: "Let you explore the surrounding area",
+    description: "Let you explore the surrounding land.",
     highlightAdjacentTiles: true,
     canBeBuilt: true,
     price: {
@@ -502,7 +522,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   stoneWatchTower: {
     name: "Stone watch tower",
     icon: "./img/watch-tower.png",
-    description: "Let you explore the surrounding area on a large radius",
+    description:
+      "Let you explore the surrounding land on a large radius. Can be created by building villages around a watch tower.",
     highlightAdjacentTiles: false,
     canBeBuilt: false,
     price: {
@@ -527,7 +548,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   castle: {
     name: "Castle",
     icon: "./img/watch-tower2.png",
-    description: "Let you explore the surrounding area on a huge radius",
+    description:
+      "Let you explore the surrounding land on a huge radius. Can be created by building villages around a stone watch tower.",
     highlightAdjacentTiles: false,
     canBeBuilt: false,
     price: {
@@ -587,7 +609,8 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   lighthouse: {
     name: "Lighthouse",
     icon: "./img/lighthouse.png",
-    description: "Guide boats safely to the shore",
+    description:
+      "Let you explore the surrounding land and sea. Can be created by building a watch tower next to the sea.",
     highlightAdjacentTiles: false,
     canBeBuilt: false,
     price: {
@@ -607,8 +630,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   powerfarm: {
     name: "Power farm",
     icon: "./img/powerfarm.png",
-    description:
-      "Produce some energy by letting some population pedal to create it",
+    description: "Base building for energy production.",
     highlightAdjacentTiles: true,
     canBeBuilt: true,
     price: {
@@ -643,7 +665,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
   rocketSilo: {
     name: "Rocket silo",
     icon: "./img/rocket-silo.png",
-    description: "We've got to find another planet",
+    description: "We've got to find another planet now.",
     highlightAdjacentTiles: false,
     canBeBuilt: true,
     price: {
@@ -669,7 +691,7 @@ export const StaticConsumableInfo: IStaticConsumableInfo = {
   },
   food: {
     name: "Food",
-    icon: "./img/food2.png",
+    icon: "./img/food3.png",
     storage: {
       name: Building.barn,
       capacity: 20,
@@ -685,7 +707,7 @@ export const StaticConsumableInfo: IStaticConsumableInfo = {
   },
   stones: {
     name: "Stone",
-    icon: "./img/stone-particle.png",
+    icon: "./img/stone.png",
     storage: {
       name: Building.barn,
       capacity: 20,
@@ -701,7 +723,7 @@ export const StaticConsumableInfo: IStaticConsumableInfo = {
   },
   coals: {
     name: "Coals",
-    icon: "./img/coal-particle.png",
+    icon: "./img/coal.png",
     storage: {
       name: Building.barn,
       capacity: 20,
@@ -748,12 +770,11 @@ export interface IStaticResearch {
 export const ResearchInfo: IResearchInfo = {
   agriculture: {
     name: "Agriculture",
-    icon: "./img/knowledge.png",
-    description: "Allows you to build farms",
+    icon: "./img/farm2.png",
+    description: "Allows you to build farms to create food",
     price: {
-      [Consumable.wood]: 50,
+      [Consumable.wood]: 40,
       [Consumable.stones]: 10,
-      [Consumable.population]: 15,
     },
     prerequisite: [],
     neededBuildings: [Building.sawmill, Building.stoneMine],
@@ -763,10 +784,11 @@ export const ResearchInfo: IResearchInfo = {
   },
   storage: {
     name: "Storage",
-    icon: "./img/knowledge.png",
+    icon: "./img/entrepot2.png",
     description: "Allows you to build barns to store more resources",
     price: {
-      [Consumable.food]: 50,
+      [Consumable.food]: 40,
+      [Consumable.population]: 20,
       [Consumable.knowledge]: 5,
     },
     prerequisite: [Research.agriculture],
@@ -777,8 +799,8 @@ export const ResearchInfo: IResearchInfo = {
   },
   factory: {
     name: "Factory",
-    icon: "./img/knowledge.png",
-    description: "Allows you to build factories",
+    icon: "./img/factory.png",
+    description: "Allows you to build factories to refine materials",
     price: {
       [Consumable.wood]: 100,
       [Consumable.stones]: 100,
@@ -792,8 +814,8 @@ export const ResearchInfo: IResearchInfo = {
   },
   energy: {
     name: "Energy",
-    icon: "./img/knowledge.png",
-    description: "Allows you to build powerfarms",
+    icon: "./img/powerfarm.png",
+    description: "Allows you to build powerfarms to create energy",
     price: {
       [Consumable.plank]: 50,
       [Consumable.brick]: 50,
@@ -807,9 +829,9 @@ export const ResearchInfo: IResearchInfo = {
   },
   spaceProgram: {
     name: "Space Program",
-    icon: "./img/knowledge.png",
+    icon: "./img/rocket-silo.png",
     description:
-      "Look at what we've done withthis place, we've got to find a new one planet",
+      "Look at what we've done with this place, we've got to find a new planet",
     price: {
       [Consumable.energy]: 100,
       [Consumable.knowledge]: 50,

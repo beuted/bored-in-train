@@ -1,5 +1,5 @@
 <template>
-  <Game msg="Boring Idle Game" />
+  <Game />
 </template>
 
 <script lang="ts">

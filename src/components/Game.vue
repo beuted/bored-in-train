@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-container-container">
+  <div class="flex-container-container" id="game">
     <div class="flex-container">
       <div class="inventory-item">
         <ShopMenu
@@ -11,16 +11,15 @@
         <div class="title">Our wonderful planet</div>
         <div class="winning-overlay" v-if="hasWonTheGame">
           <span
-            >Humans managed to leave the planet before depleting all resources.
-            Hopefuly they will reach a new planet and have a more sustainable
-            exploitation of the resources there...</span
-          >
+            >You managed to leave the planet before depleting all resources,
+            yeay!
+          </span>
+          <span>Off to the next one now.</span>
           <button v-on:click="reset()" class="control-debug">
             Land on the new planet
           </button>
         </div>
         <Map
-          :map="map"
           :buildings="buildings"
           :building="building"
           :consumables="consumables"
@@ -55,12 +54,7 @@ const gameService = new GameService();
   },
 })
 export default class Game extends IdleGameVue {
-  @Prop() private msg!: string;
   public building: Building | null = null;
-
-  public get map() {
-    return this.$store.state.map.map;
-  }
 
   public get buildings() {
     return this.$store.state.map.buildings;
@@ -88,13 +82,22 @@ export default class Game extends IdleGameVue {
     }
   }
 
-  public mounted() {}
+  public mounted() {
+    // Prevent scrolling on the page when you scroll on the canvas
+    const gameElt = document.getElementById("game");
+    if (gameElt)
+      gameElt.onwheel = function (event) {
+        event.preventDefault();
+      };
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
 .flex-container-container {
+  cursor: url("../../public/img/cursors/cursor-hand-can-grab.png"), auto;
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,11 +116,11 @@ export default class Game extends IdleGameVue {
 }
 
 .inventory-item {
-  width: 400px;
+  width: 250px;
 }
 
 .inventory-item-right {
-  width: 300px;
+  width: 250px;
 }
 
 .winning-overlay {

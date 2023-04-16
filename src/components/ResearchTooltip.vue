@@ -11,9 +11,15 @@
         <div class="tooltip-title">Price:</div>
 
         <div v-for="(value, keyPrice) in researchInfo.price" :key="keyPrice">
-          <span v-if="value != 0"
+          <span
+            v-if="value != 0"
+            :class="{ 'not-enough': hasNotEnough(keyPrice, value) }"
             ><consumable-icon :consumable="keyPrice" /> {{ value }}</span
           >
+        </div>
+        <br />
+        <div class="not-enough" v-if="!knowAllBuildings">
+          There are buildings that you need to discover before
         </div>
       </div>
     </span>
@@ -26,6 +32,7 @@ import { IdleGameVue } from "@/store";
 import { ResearchInfo } from "@/services/GameEngine";
 import ConsumableIcon from "@/components/ConsumableIcon.vue";
 import { Research } from "../models/Research";
+import { Consumable } from "@/models/Consumable";
 
 @Component({
   components: {
@@ -35,9 +42,16 @@ import { Research } from "../models/Research";
 export default class ResearchTooltip extends IdleGameVue {
   @Prop() private research!: Research;
   @Prop() public isBuyable!: boolean;
+  @Prop() public knowAllBuildings!: boolean;
 
   public get researchInfo() {
     return ResearchInfo[this.research];
+  }
+  public hasNotEnough(
+    consumable: Consumable,
+    price: number | undefined
+  ): boolean {
+    return this.$store.state.consumable[consumable].quantity < (price || 0);
   }
 }
 </script>
@@ -58,7 +72,7 @@ export default class ResearchTooltip extends IdleGameVue {
   top: 0%;
   margin-top: -50%; /* Use half of the width (200/2 = 100), to center the tooltip */
   margin-left: 15px;
-  padding: 5px 0;
+  padding: 10px 5px;
   color: #fff;
   text-shadow: 0px 1px 1px #000;
   text-align: center;
@@ -82,7 +96,10 @@ export default class ResearchTooltip extends IdleGameVue {
 }
 
 .not-buildable {
-  cursor: default;
+  cursor: url("../../public/img/cursors/cursor-hand-can-grab.png"), auto;
   opacity: 0.3;
+}
+.not-enough {
+  color: red;
 }
 </style>

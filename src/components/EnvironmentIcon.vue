@@ -15,7 +15,7 @@ export default class EnvironmentIcon extends IdleGameVue {
   @Prop() private environment!: Environment;
 
   public getEnvironmentIcon() {
-    return StaticEnvironmentInfo[this.environment].icon;
+    return StaticEnvironmentInfo[this.environment].icons[0];
   }
 }
 </script>

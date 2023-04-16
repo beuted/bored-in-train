@@ -31,6 +31,7 @@
           :is-buyable="
             !isResearchOwned(researchName) && canBuyResearch(researchName)
           "
+          :knowAllBuildings="knowAllBuildings(researchName)"
           class="shop-item-container"
         >
           <div v-on:click="buyResearch(researchName)" class="shop-item">
@@ -74,6 +75,28 @@
           >
             {{ buildingsOnMap[building].quantity }}
           </div>
+          <div
+            class="particle-container"
+            v-if="shouldShowParticles()"
+            :style="{
+              left: `0px`,
+              top: `0px`,
+            }"
+          >
+            <img
+              class="particle"
+              :src="'./img/star.png'"
+              v-for="(particle, i) of new Array(10)"
+              v-bind:key="i"
+              :style="{
+                transform: `translate(${200 * Math.random() - 100 + 100}px, ${
+                  200 * Math.random() - 100 + 100
+                }px)`,
+                'animation-duration': 0.5 * Math.random() + 0.3 + 's',
+                'animation-delay': 0 + 's',
+              }"
+            />
+          </div>
         </PriceTooltip>
       </div>
     </div>
@@ -100,6 +123,28 @@
                 />
               </div>
             </div>
+          </div>
+          <div
+            class="particle-container"
+            v-if="shouldShowParticles()"
+            :style="{
+              left: `0px`,
+              top: `0px`,
+            }"
+          >
+            <img
+              class="particle"
+              :src="'./img/star.png'"
+              v-for="(particle, i) of new Array(10)"
+              v-bind:key="i"
+              :style="{
+                transform: `translate(${200 * Math.random() - 100 + 100}px, ${
+                  200 * Math.random() - 100 + 100
+                }px)`,
+                'animation-duration': 0.5 * Math.random() + 0.3 + 's',
+                'animation-delay': 0 + 's',
+              }"
+            />
           </div>
         </PriceTooltip>
       </div>
@@ -160,7 +205,11 @@ export default class ShopMenu extends IdleGameVue {
     }
 
     this.$store.dispatch("BuyResearch", { researchName: researchName });
-    this.$toasted.success(`You discovered ${ResearchInfo[researchName].name}!`);
+    let newBuilding = ResearchInfo[researchName].unlocks
+      .buildings[0] as Building;
+    this.$toasted.success(
+      `You discovered ${ResearchInfo[researchName].name}! You can now create ${StaticBuildingInfo[newBuilding].name}.`
+    );
     this.$forceUpdate();
   }
 
@@ -177,6 +226,13 @@ export default class ShopMenu extends IdleGameVue {
         return false;
     }
 
+    return true;
+  }
+
+  public knowAllBuildings(researchName: Research) {
+    for (let building of ResearchInfo[researchName].neededBuildings) {
+      if (!this.$store.state.research.buildingsKnown[building]) return false;
+    }
     return true;
   }
 
@@ -240,6 +296,10 @@ export default class ShopMenu extends IdleGameVue {
       known: this.$store.state.research.buildingsKnown[b],
     }));
   }
+
+  public shouldShowParticles() {
+    return true;
+  }
 }
 </script>
 
@@ -258,16 +318,17 @@ export default class ShopMenu extends IdleGameVue {
   justify-content: center;
   align-items: center;
   margin-bottom: 15px;
-  width: 300px;
+  width: 250px;
 }
 
 .shop-item-container {
   margin: 15px 8px 5px 0px;
+  position: relative;
 }
 
 .shop-item {
   border: solid 2px #2c3e50;
-  cursor: pointer;
+  cursor: url("../../public/img/cursors/cursor-hand.png"), auto;
   border-radius: 2px;
   & > div {
     height: 32px;
@@ -300,8 +361,7 @@ export default class ShopMenu extends IdleGameVue {
 
 .known-item {
   background-color: #f5f5f5;
-  border: solid 2px #d6dbd8;
-  cursor: default;
+  cursor: url("../../public/img/cursors/cursor-hand-can-grab.png"), auto;
   border-radius: 2px;
   & > div {
     height: 32px;
@@ -316,22 +376,19 @@ export default class ShopMenu extends IdleGameVue {
 
 .known-item:hover {
   background-color: #d6dbd8;
-  & > div {
-    border: solid 2px #f5f5f5;
-  }
 }
 
 .research-dependency-item {
-  border: solid 2px #2c3e50;
-  cursor: pointer;
+  background-color: #f5f5f5;
+  cursor: url("../../public/img/cursors/cursor-hand-can-grab.png"), auto;
   border-radius: 2px;
   & > div {
     height: 32px;
     width: 32px;
-    border-top: solid 2px #fff;
-    border-left: solid 2px #fff;
-    border-bottom: solid 2px rgba(0, 0, 0, 0);
-    border-right: solid 2px rgba(0, 0, 0, 0);
+    border-top: solid 2px #f5f5f5;
+    border-left: solid 2px #f5f5f5;
+    border-bottom: solid 2px #f5f5f5;
+    border-right: solid 2px #f5f5f5;
     padding: 3px;
   }
 }
@@ -375,10 +432,51 @@ export default class ShopMenu extends IdleGameVue {
   margin-top: 8px;
   margin-right: 8px;
 }
+
 input {
   visibility: hidden;
   width: 0;
   height: 0;
   margin: 0;
+}
+
+.particle-container {
+  background-color: red;
+  position: absolute;
+  pointer-events: none;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+
+@d: 32px;
+
+.particle {
+  position: absolute;
+  left: -100px;
+  top: -100px;
+  width: @d;
+  height: @d;
+  animation: shoot 3s ease-out;
+  animation-name: shoot, fade;
+  image-rendering: pixelated;
+  opacity: 0;
+}
+
+@keyframes shoot {
+  0% {
+    transform: translate(100px, 100px);
+  }
+}
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+  1% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 </style>

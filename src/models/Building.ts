@@ -4,7 +4,7 @@ export enum Building {
   watchTower = "watchTower",
   stoneWatchTower = "stoneWatchTower",
   castle = "castle",
-  gathererHut = "gathererHut",
+  gathererCamp = "gathererCamp",
   druidHut = "druidHut",
   school = "school",
   barn = "barn",

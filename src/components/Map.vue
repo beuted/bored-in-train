@@ -6,9 +6,44 @@
       :tileCoord="tooltipTileCoord"
       v-on:delete-building="deleteBuilding"
     ></TileTooltip>
+    <div
+      class="particle-container"
+      v-if="shouldShowParticles()"
+      :style="{
+        left: `${
+          lastMouseTileCoord ? lastMouseTileCoord.x * tileSize + mapOffset.x : 0
+        }px`,
+        top: `${
+          lastMouseTileCoord
+            ? (lastMouseTileCoord.y - 0.5) * tileSize + mapOffset.y
+            : 0
+        }px`,
+      }"
+    >
+      <img
+        class="particle"
+        :src="getConsumableIcon()"
+        v-for="(particle, i) of new Array(10)"
+        v-bind:key="i"
+        :style="{
+          transform: `translate(${200 * Math.random() - 100 + 100}px, ${
+            200 * Math.random() - 100 + 100
+          }px)`,
+          'animation-duration': 0.5 * Math.random() + 0.3 + 's',
+          'animation-delay': 0 + 's',
+        }"
+      />
+    </div>
+    <div v-if="showCursorHelp" class="cursor-help">
+      <img src="img/cursors/cursor-gif.gif" />
+    </div>
     <canvas
       id="canvas"
       class="map"
+      :class="{
+        'cursor-grabbing': showDraggingHand,
+        'cursor-pointing': building != null,
+      }"
       v-on:mousedown="handleMouseDown"
       v-on:mouseup="handleMouseUp"
       v-on:mousemove="handleMouseMove"
@@ -26,7 +61,11 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import { Building } from "@/models/Building";
-import { StaticBuildingInfo, ResearchInfo } from "@/services/GameEngine";
+import {
+  StaticBuildingInfo,
+  ResearchInfo,
+  StaticConsumableInfo,
+} from "@/services/GameEngine";
 import { Environment } from "@/models/Environment";
 import { IMapTile } from "@/models/IMapTile";
 import { IState, IdleGameVue } from "@/store";
@@ -39,6 +78,7 @@ import ShopMenu from "@/components/ShopMenu.vue";
 import { KeyboardService } from "../services/KeyboardService";
 import { imageService } from "../services/ImageService";
 import { MapSize } from "../store/mapStoreModule";
+import { EventBus } from "@/EventBus";
 
 @Component({
   components: {
@@ -47,14 +87,14 @@ import { MapSize } from "../store/mapStoreModule";
 })
 export default class Map extends IdleGameVue {
   private nbTilesOnRowOrColumnOnScreen = 20;
-  private tileSize = 32;
+  public tileSize = 32;
 
   public readonly canvasSize =
     this.nbTilesOnRowOrColumnOnScreen * this.tileSize;
 
-  @Prop() private map!: IMapTile[][];
+  private map!: IMapTile[][];
   @Prop() private buildings!: { [id in Building]: { quantity: number } };
-  @Prop() private building!: Building | null; // The selected building
+  @Prop() public building!: Building | null; // The selected building
   @Prop() private consumables!: { [id in Consumable]: { quantity: number } };
 
   private keyBoardService: KeyboardService;
@@ -66,9 +106,10 @@ export default class Map extends IdleGameVue {
   private mouseCanvas!: HTMLCanvasElement;
   private mouseContext!: CanvasRenderingContext2D;
 
-  private mouseTileCoord: { x: number; y: number } | null = null;
+  public mouseTileCoord: { x: number; y: number } | null = null;
+  public lastMouseTileCoord: { x: number; y: number } = { x: 0, y: 0 };
   // TODO: this should not be init with a neg value... I have screwed up somewhere
-  private mapOffset: { x: number; y: number } = {
+  public mapOffset: { x: number; y: number } = {
     x:
       -Math.floor(MapSize / 2 - this.nbTilesOnRowOrColumnOnScreen / 2) *
       this.tileSize,
@@ -76,14 +117,16 @@ export default class Map extends IdleGameVue {
       -Math.floor(MapSize / 2 - this.nbTilesOnRowOrColumnOnScreen / 2) *
       this.tileSize,
   };
-  private isMouseDown = false;
+  public isMouseDown = false;
   private draggingStartPoint!: { x: number; y: number };
-  private isDragging = true;
+  public isDragging = true;
+  public showDraggingHand = false;
   public showPollution = false;
   private animLoop: number = -1;
   public tooltipCoord = { x: 0, y: 0 };
   public tooltipTileCoord = { x: 0, y: 0 };
   public tooltipTile: IMapTile | null = null;
+  public showCursorHelp = true;
 
   constructor() {
     super();
@@ -112,7 +155,10 @@ export default class Map extends IdleGameVue {
 
     this.keyBoardService.Start();
 
-    if (this.map.length <= 0) this.$store.commit("InitMap", MapSize);
+    if (this.$store.state.map.map.length <= 0) {
+      this.$store.commit("InitMap", MapSize);
+    }
+    this.map = this.$store.state.map.map;
 
     imageService.isLoaded().then(() => {
       window.requestAnimationFrame(() => {
@@ -120,10 +166,52 @@ export default class Map extends IdleGameVue {
         this.mapLoop();
       });
     });
+
+    // Prevent scrolling on the page when you scroll on the canvas
+    this.canvas.onwheel = function (event) {
+      event.preventDefault();
+    };
+
+    EventBus.$on(
+      "consumable-production",
+      (event: { [id in Consumable]: number }) => {
+        this.lastMouseTileCoord = this.mouseTileCoord!;
+        this.$forceUpdate(); // I don't know why I fucking need this faoce update but hey
+      }
+    );
   }
 
   private beforeDestroy() {
     window.cancelAnimationFrame(this.animLoop);
+  }
+
+  public shouldShowParticles() {
+    return (
+      this.$store.state.consumablesProduced &&
+      Object.keys(this.$store.state.consumablesProduced).length != 0
+    );
+  }
+
+  public getConsumableIcon() {
+    const possibleIcons = Object.keys(this.$store.state.consumablesProduced)
+      .filter(
+        (x) => this.$store.state.consumablesProduced[x as Consumable]! > 0
+      )
+      .map((consumable) => {
+        return StaticConsumableInfo[consumable as Consumable].icon;
+      });
+
+    possibleIcons.push("./img/star.png");
+
+    if (possibleIcons.length == 1) {
+      return "./img/star.png";
+    }
+
+    let icon: Consumable = possibleIcons[
+      Math.floor(Math.random() * possibleIcons.length)
+    ] as Consumable;
+
+    return icon;
   }
 
   public mapLoop() {
@@ -201,7 +289,8 @@ export default class Map extends IdleGameVue {
       for (var j = 0; j < MapSize; j++) {
         if (this.map[i][j].discovered) {
           let environmentImage = imageService.getEnvironmentImage(
-            this.map[i][j].environment
+            this.map[i][j].e,
+            this.map[i][j].r
           );
           this.mapContext.drawImage(
             environmentImage,
@@ -211,15 +300,14 @@ export default class Map extends IdleGameVue {
             this.tileSize
           );
 
-          const building = this.map[i][j].building;
-          const quantity = this.map[i][j].quantity;
+          const building = this.map[i][j].b;
+          const quantity = this.map[i][j].q;
           if (building != null) {
             let buildingImage = imageService.getBuildingImage(
               building,
               quantity
             );
 
-            if (this.map[i][j].disabled) this.mapContext.globalAlpha = 0.7;
             this.mapContext.drawImage(
               buildingImage,
               i * this.tileSize,
@@ -228,38 +316,13 @@ export default class Map extends IdleGameVue {
               this.tileSize
             );
             this.mapContext.globalAlpha = 1;
-
-            // Show population / forst amount on the map
-            /*if (quantity > 0)
-              this.mapContext.fillText(
-                quantity + "",
-                i * this.tileSize,
-                (j + 0.5) * this.tileSize
-              );*/
-          }
-
-          // Pollution
-          if (this.showPollution && this.map[i][j].pollution > 0) {
-            this.mapContext.fillStyle = "#FF0000";
-
-            this.mapContext.globalAlpha = Math.min(
-              this.map[i][j].pollution / 100,
-              1
-            );
-            this.mapContext.fillRect(
-              i * this.tileSize,
-              j * this.tileSize,
-              this.tileSize,
-              this.tileSize
-            );
-            this.mapContext.globalAlpha = 1;
-            this.mapContext.fillStyle = "#000000";
           }
 
           // The following statement is cached
         } else if (this.$store.state.map.map[i][j].discoverable > 0) {
           let environmentImage = imageService.getEnvironmentImage(
-            this.map[i][j].environment
+            this.map[i][j].e,
+            this.map[i][j].r
           );
           this.mapContext.drawImage(
             environmentImage,
@@ -269,8 +332,8 @@ export default class Map extends IdleGameVue {
             this.tileSize
           );
 
-          const building = this.map[i][j].building;
-          const quantity = this.map[i][j].quantity;
+          const building = this.map[i][j].b;
+          const quantity = this.map[i][j].q;
           if (building != null) {
             let buildingImage = imageService.getBuildingImage(
               building,
@@ -304,8 +367,10 @@ export default class Map extends IdleGameVue {
       let image = imageService.getBuildingImage(this.building, 20);
       if (image) {
         this.mouseContext.globalAlpha = 0.7;
-        const canBuild = this.canBeBuilt(this.mouseTileCoord, this.building)
-          .result;
+        const canBuild = this.canBeBuilt(
+          this.mouseTileCoord,
+          this.building
+        ).result;
         if (!canBuild) {
           // Show a red bg when a building can't be built
           this.mouseContext.fillStyle = "#FF0000";
@@ -401,6 +466,7 @@ export default class Map extends IdleGameVue {
       event.pageX - this.canvas.offsetLeft,
       event.pageY - this.canvas.offsetTop
     );
+    this.showDraggingHand = false;
 
     if (this.isDragging) {
       if (this.building == null) {
@@ -427,6 +493,7 @@ export default class Map extends IdleGameVue {
   public handleMouseOut() {
     this.mouseTileCoord = null;
     this.isMouseDown = false;
+    this.showDraggingHand = false;
   }
 
   // TODO: could be gathered in the mainLoop
@@ -442,8 +509,11 @@ export default class Map extends IdleGameVue {
 
       this.boundMapOffset();
 
-      // Of a drag happened do not consider it as a click
+      // If a drag happened do not consider it as a click
       this.isDragging = false;
+      this.showDraggingHand = true;
+      this.showCursorHelp = false;
+      this.$forceUpdate();
     }
   }
 
@@ -503,12 +573,10 @@ export default class Map extends IdleGameVue {
     }
 
     // If building is already there
-    if (this.map[coord.x][coord.y].building != null)
+    if (this.map[coord.x][coord.y].b != null)
       return {
         result: false,
-        reason: `There is already a ${
-          this.map[coord.x][coord.y].building
-        } here`,
+        reason: `There is already a ${this.map[coord.x][coord.y].b} here`,
       };
 
     // If not discovered
@@ -519,7 +587,7 @@ export default class Map extends IdleGameVue {
       };
 
     // You can't build on water
-    if (this.map[coord.x][coord.y].environment == Environment.Water)
+    if (this.map[coord.x][coord.y].e == Environment.Water)
       return { result: false, reason: `You cannot build this on water` };
 
     // You must build sawmill next to a forest
@@ -535,7 +603,7 @@ export default class Map extends IdleGameVue {
     // You must build farms on a field
     if (
       building == Building.farm &&
-      this.map[coord.x][coord.y].environment != Environment.Field
+      this.map[coord.x][coord.y].e != Environment.Field
     )
       return {
         result: false,
@@ -576,6 +644,59 @@ export default class Map extends IdleGameVue {
 <style scoped lang="less">
 .map {
   margin: auto;
-  cursor: pointer;
+  //cursor: url("../../public/img/cursors/cursor-hand-can-grab.png"), auto;
+}
+
+.map.cursor-grabbing {
+  cursor: url("../../public/img/cursors/cursor-hand-grabbing.png"), auto !important;
+}
+
+.map.cursor-pointing {
+  cursor: url("../../public/img/cursors/cursor-hand.png"), auto;
+}
+
+.cursor-help {
+  position: absolute;
+  margin-top: 32px;
+  margin-left: 32px;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.particle-container {
+  background-color: red;
+  position: relative;
+  pointer-events: none;
+}
+
+@d: 32px;
+
+.particle {
+  position: absolute;
+  left: -100px;
+  top: -100px;
+  width: @d;
+  height: @d;
+  animation: shoot 3s ease-out;
+  animation-name: shoot, fade;
+  image-rendering: pixelated;
+  opacity: 0;
+}
+
+@keyframes shoot {
+  0% {
+    transform: translate(100px, 100px);
+  }
+}
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+  1% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 </style>

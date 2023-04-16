@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
 import ProductionPage from "./views/ProductionPage.vue";
-import ResearchPage from "./views/ResearchPage.vue";
 
 Vue.use(Router);
 
@@ -11,11 +10,6 @@ export default new Router({
       path: "/",
       name: "production",
       component: ProductionPage,
-    },
-    {
-      path: "/research",
-      name: "research",
-      component: ResearchPage,
     },
     {
       path: "/about",

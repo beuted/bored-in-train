@@ -22,6 +22,7 @@ export default class Controls extends IdleGameVue {
   }
 
   public save() {
+    Vue.toasted.success(`Game saved`);
     StoreSaver.Save();
   }
 }
@@ -30,10 +31,10 @@ export default class Controls extends IdleGameVue {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
 .control {
-  cursor: pointer;
+  cursor: url("../../public/img/cursors/cursor-hand.png"), auto;
 }
 .control-debug {
   margin-right: 10px;
-  cursor: pointer;
+  cursor: url("../../public/img/cursors/cursor-hand.png"), auto;
 }
 </style>

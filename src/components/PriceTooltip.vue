@@ -22,12 +22,10 @@
       <div
         v-if="
           Object.values(buildingInfo.produce).filter((x) => x != null).length >
-            0
+          0
         "
       >
-        <div class="tooltip-title">
-          Produce:
-        </div>
+        <div class="tooltip-title">Produce:</div>
         <div
           v-for="(value, keyProduce) in buildingInfo.produce"
           :key="keyProduce"
@@ -38,7 +36,7 @@
             <span
               v-if="
                 value.bonusesForAdjacentBuilding &&
-                  value.bonusesForAdjacentBuilding.length
+                value.bonusesForAdjacentBuilding.length
               "
               v-for="(v, keyProduce) in value.bonusesForAdjacentBuilding"
             >
@@ -47,7 +45,7 @@
             <span
               v-if="
                 value.bonusesForAdjacentEnvironment &&
-                  value.bonusesForAdjacentEnvironment.length
+                value.bonusesForAdjacentEnvironment.length
               "
               v-for="(v, keyProduce) in value.bonusesForAdjacentEnvironment"
             >
@@ -61,12 +59,10 @@
       <div
         v-if="
           Object.values(buildingInfo.consume).filter((x) => x != null).length >
-            0
+          0
         "
       >
-        <div class="tooltip-title">
-          Consume:
-        </div>
+        <div class="tooltip-title">Consume:</div>
         <div
           v-for="(value, keyConsume) in buildingInfo.consume"
           :key="keyConsume"
@@ -157,7 +153,7 @@ export default class PriceTooltip extends IdleGameVue {
 }
 
 .not-buildable {
-  cursor: default;
+  cursor: url("../../public/img/cursors/cursor-hand-can-grab.png"), auto;
   opacity: 0.3;
 }
 </style>

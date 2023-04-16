@@ -6,16 +6,13 @@ import {
   StaticEnvironmentInfo,
 } from "./GameEngine";
 import { Research } from "@/models/Research";
+import SimplexNoise from "simplex-noise";
 
 class ImageService {
   private loaded: boolean = false;
-  private mapEnvironmentImages: { [id: number]: HTMLImageElement } = {
-    [Environment.Water]: new Image(),
-    [Environment.Field]: new Image(),
-    [Environment.Beach]: new Image(),
-    [Environment.Snow]: new Image(),
-    [Environment.Concrete]: new Image(),
-  };
+  private mapEnvironmentImages: { [id: number]: HTMLImageElement[] } = {};
+
+  private mapFieldImages = [new Image(), new Image()];
 
   private mapForestImages: { [id in number]: HTMLImageElement } = {
     1: new Image(),
@@ -24,7 +21,7 @@ class ImageService {
   };
 
   private static GetInitialMapBuildingImages(): {
-    [id in Building]: HTMLImageElement
+    [id in Building]: HTMLImageElement;
   } {
     let initialBuildingImages = Object.keys(StaticBuildingInfo).reduce<
       Partial<{ [id in Building]: HTMLImageElement }>
@@ -37,11 +34,11 @@ class ImageService {
   }
 
   private mapBuildingImages: {
-    [id in Building]: HTMLImageElement
+    [id in Building]: HTMLImageElement;
   } = ImageService.GetInitialMapBuildingImages();
 
   private static GetInitialResearchImages(): {
-    [id in Research]: HTMLImageElement
+    [id in Research]: HTMLImageElement;
   } {
     let initialResearchImages = Object.keys(ResearchInfo).reduce<
       Partial<{ [id in Research]: HTMLImageElement }>
@@ -54,13 +51,22 @@ class ImageService {
   }
 
   private researchImages: {
-    [id in Research]: HTMLImageElement
+    [id in Research]: HTMLImageElement;
   } = ImageService.GetInitialResearchImages();
 
   public constructor() {
-    for (const environment in StaticEnvironmentInfo)
-      this.mapEnvironmentImages[environment].src =
-        StaticEnvironmentInfo[environment].icon;
+    for (const environment in StaticEnvironmentInfo) {
+      this.mapEnvironmentImages[environment] = [];
+      for (
+        let i = 0;
+        i < StaticEnvironmentInfo[environment].icons.length;
+        i++
+      ) {
+        this.mapEnvironmentImages[environment][i] = new Image();
+        this.mapEnvironmentImages[environment][i].src =
+          StaticEnvironmentInfo[environment].icons[i];
+      }
+    }
 
     for (const building in StaticBuildingInfo)
       this.mapBuildingImages[building as Building].src =
@@ -75,8 +81,14 @@ class ImageService {
         ResearchInfo[research as Research].icon;
   }
 
-  public getEnvironmentImage(environment: Environment): HTMLImageElement {
-    return this.mapEnvironmentImages[environment];
+  public getEnvironmentImage(
+    environment: Environment,
+    r: number
+  ): HTMLImageElement {
+    let rndIndex = Math.floor(
+      (r / 100) * this.mapEnvironmentImages[environment].length
+    );
+    return this.mapEnvironmentImages[environment][rndIndex];
   }
 
   public getBuildingImage(
@@ -98,7 +110,10 @@ class ImageService {
   public isLoaded() {
     return new Promise<void>((resolve, reject) => {
       if (this.loaded) resolve();
-      let nbEnvImages = Object.keys(this.mapEnvironmentImages).length;
+      let nbEnvImages = 0;
+      for (const key in this.mapEnvironmentImages) {
+        nbEnvImages += Object.keys(this.mapEnvironmentImages[key]).length;
+      }
       let nbBuildingImages = Object.keys(this.mapBuildingImages).length;
 
       for (const key in this.mapBuildingImages) {
@@ -112,13 +127,15 @@ class ImageService {
       }
 
       for (const key in this.mapEnvironmentImages) {
-        (this.mapEnvironmentImages as any)[key].onload = () => {
-          nbEnvImages--;
-          if (nbEnvImages == 0 && nbBuildingImages == 0) {
-            this.loaded = true;
-            resolve();
-          }
-        };
+        for (let i = 0; i < this.mapEnvironmentImages[key].length; i++) {
+          this.mapEnvironmentImages[key][i].onload = () => {
+            nbEnvImages--;
+            if (nbEnvImages == 0 && nbBuildingImages == 0) {
+              this.loaded = true;
+              resolve();
+            }
+          };
+        }
       }
     });
   }

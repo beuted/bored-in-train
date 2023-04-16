@@ -9,14 +9,14 @@ export enum Environment {
 export function environmentName(env: Environment) {
   switch (env) {
     case Environment.Water:
-      return "sea";
+      return "Sea";
     case Environment.Field:
-      return "field";
+      return "Field";
     case Environment.Beach:
-      return "beach";
+      return "Beach";
     case Environment.Snow:
-      return "snow";
+      return "Snow";
     case Environment.Concrete:
-      return "mountain";
+      return "Mountain";
   }
 }

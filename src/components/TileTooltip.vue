@@ -5,23 +5,16 @@
         <div class="tooltip-title">You haven't discovered this zone yet</div>
       </div>
       <div v-if="tile.discovered || tile.discoverable">
-        <div class="tooltip-title">{{ tileCoord.x }}, {{ tileCoord.y }}</div>
-        <div v-if="tile.environment">
+        <div class="tooltip-title">({{ tileCoord.x }}, {{ tileCoord.y }})</div>
+        <div v-if="tile.e">
           <div class="tooltip-title">Landscape: {{ environmentName }}</div>
         </div>
-        <div v-if="tile.building">
-          <div class="tooltip-title">Building: {{ tile.building }}</div>
-        </div>
-        <div v-if="tile.pollution > 0">
+        <div v-if="tile.b">
           <div class="tooltip-title">
-            Pollution: {{ tile.pollution.toPrecision(2) }}
+            Building: {{ getBuildingName(tile.b) }}
           </div>
         </div>
-        <div class="actions">
-          <button class="delete-btn" v-if="false" v-on:click="deleteBuilding()">
-            <img src="img/trash.png" alt="delete" />
-          </button>
-        </div>
+        <div class="actions"></div>
       </div>
     </span>
   </div>
@@ -48,13 +41,13 @@ export default class TileTooltip extends IdleGameVue {
     return "left:" + this.coord.x + "px;top:" + this.coord.y + "px";
   }
 
-  public get environmentName() {
-    if (this.tile == null || this.tile.environment == null) return null;
-    return environmentName(this.tile.environment);
+  public getBuildingName(building: Building) {
+    return StaticBuildingInfo[building].name;
   }
 
-  public deleteBuilding() {
-    this.$emit("delete-building", this.tileCoord);
+  public get environmentName() {
+    if (this.tile == null || this.tile.e == null) return null;
+    return environmentName(this.tile.e);
   }
 }
 </script>
@@ -74,7 +67,7 @@ export default class TileTooltip extends IdleGameVue {
   top: 0;
   left: 0;
   margin-left: -100px; /* Use half of the width (200/2 = 100), to center the tooltip */
-  padding: 5px 0;
+  padding: 10px 5px;
   color: #fff;
   text-shadow: 0px 1px 1px #000;
   text-align: center;
@@ -103,7 +96,7 @@ export default class TileTooltip extends IdleGameVue {
 
   border: none;
   border-radius: 2px;
-  cursor: pointer;
+  cursor: url("../../public/img/cursors/cursor-hand.png"), auto;
   background-color: transparent;
   width: 28px;
   height: 28px;

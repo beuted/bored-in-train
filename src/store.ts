@@ -26,10 +26,11 @@ export interface IState {
   showHelp: boolean;
   hasWonTheGame: boolean;
   consumable: { [id in Consumable]: { quantity: number; isKnown: boolean } };
+  consumablesProduced: { [id in Consumable]?: number };
 }
 
 function GetInitialConsumableState(): {
-  [id in Consumable]: { quantity: number; isKnown: boolean }
+  [id in Consumable]: { quantity: number; isKnown: boolean };
 } {
   let initialConsumableState = Object.keys(StaticConsumableInfo).reduce<
     Partial<{ [id in Consumable]: { quantity: number; isKnown: boolean } }>
@@ -61,14 +62,15 @@ export default new Vuex.Store<IState>({
     showHelp: true,
     hasWonTheGame: false,
     consumable: GetInitialConsumableState(),
+    consumablesProduced: {},
   },
   mutations: {
     // For storeSaverPlugin
-    StoreSaverRestore: function(state: IState, restoredState: IState) {
+    StoreSaverRestore: function (state: IState, restoredState: IState) {
       Object.assign(state, restoredState);
     },
     // For storeSaverPlugin
-    StoreSaverSetSaveStatus: function(
+    StoreSaverSetSaveStatus: function (
       state: IState,
       newSaveStatus: SaveStatus
     ) {
@@ -81,6 +83,12 @@ export default new Vuex.Store<IState>({
     // Increment the value of a consumable from 'value'
     IncrementConsumable(state, obj: { name: Consumable; value: number }) {
       state.consumable[obj.name].quantity += obj.value;
+
+      if (
+        state.consumable[Consumable.population].quantity < 2 &&
+        state.consumable[Consumable.wood].quantity < 2
+      )
+        state.consumable[Consumable.population].quantity += 2;
     },
     // Increment the value of a consumable from 'value'
     IncrementConsumables(state, production: { [id in Consumable]: number }) {
@@ -88,9 +96,18 @@ export default new Vuex.Store<IState>({
         state.consumable[consumable as Consumable].quantity +=
           production[consumable as Consumable];
       }
+
+      if (
+        state.consumable[Consumable.population].quantity < 2 &&
+        state.consumable[Consumable.wood].quantity < 2
+      )
+        state.consumable[Consumable.population].quantity += 2;
     },
     WonTheGame(state, obj: { value: boolean }) {
       state.hasWonTheGame = obj.value;
+    },
+    ResetConsumablesProduced(state) {
+      state.consumablesProduced = {};
     },
   },
   actions: {},

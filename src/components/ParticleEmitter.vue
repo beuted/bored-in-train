@@ -45,8 +45,8 @@ export default class ParticleEmitter extends IdleGameVue {
       "consumable-production",
       (event: { [id in Consumable]: number }) => {
         //TODO: do better position should be set by the js
-        //if (event[this.consumable])
-        //this.emitParticles(event[this.consumable], this.consumable)
+        if (event[this.consumable])
+          this.emitParticles(event[this.consumable], this.consumable);
       }
     );
 
@@ -89,6 +89,7 @@ export default class ParticleEmitter extends IdleGameVue {
 .particle-box {
   position: relative;
   display: inline-block;
+  width: 100%;
 }
 
 /* particle */

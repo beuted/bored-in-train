@@ -254,7 +254,6 @@ export default class ShopMenu extends IdleGameVue {
   }
 
   public buildings(): Building[] {
-    console.log("can be built");
     return Object.keys(this.$store.state.research.buildingsKnown).filter(
       (building) =>
         this.$store.state.research.buildingsKnown[building as Building] &&

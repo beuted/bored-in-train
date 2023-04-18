@@ -18,10 +18,15 @@ import Vue from "vue";
 import { MessageService } from "@/services/MessageService";
 import { EventBus } from "@/EventBus";
 
+// weird stuff just to get the map out of the store because I don't want to do better, what are you going to do ? call the cops ?
+export let map: IMapTile[][] = [];
+export let setMap = function (newMap: IMapTile[][]) {
+  map = newMap;
+};
+
 export const MapSize = 100;
 export interface IMapState {
   mapNbTileFound: number;
-  map: IMapTile[][];
   mapSize: number;
   mapNeedsUpdate: boolean;
   buildings: IMapBuildings;
@@ -297,7 +302,6 @@ function GetInitialBuildingState() {
 export const MapModule: Module<IMapState, IState> = {
   state: {
     mapNbTileFound: 5,
-    map: [],
     mapSize: 42,
     mapNeedsUpdate: true,
     buildings: GetInitialBuildingState(),
@@ -308,13 +312,13 @@ export const MapModule: Module<IMapState, IState> = {
     InitMap(state: IMapState, size: number) {
       const res = MapBuilder.InitMap(size);
 
-      state.map = res.map;
+      map = res.map;
       state.mapSize = res.mapSize;
       state.buildings = res.buildings;
 
       // Build buildings
       var center = Math.floor(size / 2);
-      ChangeTile(state.map, state.buildings, {
+      ChangeTile(map, state.buildings, {
         x: center,
         y: center,
         type: Building.watchTower,
@@ -327,19 +331,16 @@ export const MapModule: Module<IMapState, IState> = {
       state: IMapState,
       obj: { x: number; y: number; type: Building | null }
     ) {
-      ChangeTile(state.map, state.buildings, obj);
+      ChangeTile(map, state.buildings, obj);
       state.mapNeedsUpdate = true;
     },
     MakeTileDiscovered(state: IMapState, obj: { x: number; y: number }) {
       console.log("MakeTileDiscovered start...");
       let startTime = Date.now();
 
-      let mapCopy = JSON.parse(JSON.stringify(state.map)); // TODO: better way to clone T[][] ?
-
-      MakeTileDiscovered(mapCopy, obj);
+      MakeTileDiscovered(map, obj);
       state.mapNbTileFound++;
 
-      state.map = mapCopy;
       state.mapNeedsUpdate = true;
       console.log(
         "MakeTileDiscovered stop, elapsed time:",
@@ -367,9 +368,9 @@ export const MapModule: Module<IMapState, IState> = {
           const j = coord.y;
 
           let orderOfDiscovery: { i: number; j: number }[][];
-          if (state.map[i][j].b == Building.stoneWatchTower)
+          if (map[i][j].b == Building.stoneWatchTower)
             orderOfDiscovery = stoneWatchTowerOrderOfDiscovery;
-          else if (state.map[i][j].b == Building.castle)
+          else if (map[i][j].b == Building.castle)
             orderOfDiscovery = castleOrderOfDiscovery;
           else orderOfDiscovery = watchTowerOrderOfDiscovery;
 
@@ -382,13 +383,13 @@ export const MapModule: Module<IMapState, IState> = {
                 j + possibleTile.j < 0 ||
                 i + possibleTile.i >= state.mapSize ||
                 j + possibleTile.j >= state.mapSize ||
-                state.map[i + possibleTile.i][j + possibleTile.j].discovered ||
-                (state.map[i + possibleTile.i][j + possibleTile.j].e ==
+                map[i + possibleTile.i][j + possibleTile.j].discovered ||
+                (map[i + possibleTile.i][j + possibleTile.j].e ==
                   Environment.Water &&
-                  state.map[i][j].b != Building.lighthouse)
+                  map[i][j].b != Building.lighthouse)
               )
                 continue;
-              MakeTileDiscovered(state.map, {
+              MakeTileDiscovered(map, {
                 x: i + possibleTile.i,
                 y: j + possibleTile.j,
               });

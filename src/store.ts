@@ -2,8 +2,9 @@ import Vue from "vue";
 import Vuex, { Store, Module } from "vuex";
 
 import { Consumable } from "./models/Consumable";
+import { IMapTile } from "./models/IMapTile";
 import { StaticConsumableInfo } from "./services/GameEngine";
-import { MapModule, IMapState } from "./store/mapStoreModule";
+import { MapModule, IMapState, map, setMap } from "./store/mapStoreModule";
 import { IResearchState, ResearchModule } from "./store/researchStoreModule";
 
 Vue.use(Vuex);
@@ -66,8 +67,12 @@ export default new Vuex.Store<IState>({
   },
   mutations: {
     // For storeSaverPlugin
-    StoreSaverRestore: function (state: IState, restoredState: IState) {
-      Object.assign(state, restoredState);
+    StoreSaverRestore: function (
+      state: IState,
+      obj: { restoredState: IState; mapNew: IMapTile[][] }
+    ) {
+      Object.assign(state, obj.restoredState);
+      setMap(obj.mapNew);
     },
     // For storeSaverPlugin
     StoreSaverSetSaveStatus: function (

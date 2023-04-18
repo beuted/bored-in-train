@@ -1,9 +1,12 @@
 import { IState, SaveStatus } from "@/store";
 import store from "@/store";
+import { IMapTile } from "@/models/IMapTile";
+import { map } from "./mapStoreModule";
 
 export class StoreSaver {
   private static storageKey = "content";
-  private static saveIntervalMs = 60000;
+  private static mapStorageKey = "map";
+  private static saveIntervalMs = 5000;
 
   public static SaveLoop() {
     // Recursive setTimeout for precision
@@ -15,13 +18,16 @@ export class StoreSaver {
   }
 
   public static Restore() {
-    store.commit("StoreSaverRestore", StoreSaver.LoadFromLocalDb());
+    store.commit("StoreSaverRestore", {
+      restoredState: StoreSaver.LoadFromLocalDb(),
+      mapNew: StoreSaver.LoadMapFromLocalDb(),
+    });
   }
 
   public static Save() {
     console.log("Saving...");
     store.commit("StoreSaverSetSaveStatus", SaveStatus.Saving);
-    StoreSaver.SaveFromLocalDb(store.state, function() {
+    StoreSaver.SaveFromLocalDb(store.state, map, function () {
       store.commit("StoreSaverSetSaveStatus", SaveStatus.Saved);
       console.log("Saved.");
     });
@@ -31,7 +37,11 @@ export class StoreSaver {
   public static Reset() {
     console.log("Resetting...");
     window.localStorage.setItem(StoreSaver.storageKey, JSON.stringify({}));
-    store.commit("StoreSaverRestore", {});
+    window.localStorage.setItem(StoreSaver.mapStorageKey, JSON.stringify([]));
+    store.commit("StoreSaverRestore", {
+      restoredState: {},
+      mapNew: [],
+    });
     store.commit("WonTheGame", { value: false });
     location.reload();
     console.log("Reset.");
@@ -43,8 +53,20 @@ export class StoreSaver {
     return JSON.parse(json);
   }
 
-  private static SaveFromLocalDb(content: IState, callback: Function) {
+  private static LoadMapFromLocalDb() {
+    var json =
+      window.localStorage.getItem(StoreSaver.mapStorageKey) ||
+      JSON.stringify("");
+    return JSON.parse(json);
+  }
+
+  private static SaveFromLocalDb(
+    content: IState,
+    map: IMapTile[][],
+    callback: Function
+  ) {
     window.localStorage.setItem(StoreSaver.storageKey, JSON.stringify(content));
+    window.localStorage.setItem(StoreSaver.mapStorageKey, JSON.stringify(map));
     callback();
   }
 }

@@ -77,7 +77,7 @@ import TileTooltip from "@/components/TileTooltip.vue";
 import ShopMenu from "@/components/ShopMenu.vue";
 import { KeyboardService } from "../services/KeyboardService";
 import { imageService } from "../services/ImageService";
-import { MapSize } from "../store/mapStoreModule";
+import { map, MapSize } from "../store/mapStoreModule";
 import { EventBus } from "@/EventBus";
 
 @Component({
@@ -155,10 +155,10 @@ export default class Map extends IdleGameVue {
 
     this.keyBoardService.Start();
 
-    if (this.$store.state.map.map.length <= 0) {
+    if (map.length <= 0) {
       this.$store.commit("InitMap", MapSize);
     }
-    this.map = this.$store.state.map.map;
+    this.map = map;
 
     imageService.isLoaded().then(() => {
       window.requestAnimationFrame(() => {
@@ -319,7 +319,7 @@ export default class Map extends IdleGameVue {
           }
 
           // The following statement is cached
-        } else if (this.$store.state.map.map[i][j].discoverable > 0) {
+        } else if (map[i][j].discoverable > 0) {
           let environmentImage = imageService.getEnvironmentImage(
             this.map[i][j].e,
             this.map[i][j].r

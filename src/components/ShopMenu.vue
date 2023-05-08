@@ -194,11 +194,9 @@ export default class ShopMenu extends IdleGameVue {
 
   public buyResearch(researchName: Research) {
     if (!this.canBuyResearch(researchName)) {
-      Vue.toasted.error(
-        `You don't have enough "knowledge" to buy this research.`
-      );
+      Vue.toasted.error(`You can't buy this research right now.`);
       MessageService.Help(
-        `In order to buy research you must have enough "knowledge". To generate some knowledge hire some druids.`,
+        `In order to unlock new researchs you must pay a price, but you also need to discorver specific buildings before. Try to place building on the map to find new building transformations.`,
         "research"
       );
       return;

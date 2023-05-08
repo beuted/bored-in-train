@@ -22,15 +22,23 @@
         document.documentElement.clientWidth || 0,
         window.innerWidth || 0
       );
+      const vh = Math.max(
+        document.documentElement.clientHeight || 0,
+        window.innerHeight || 0
+      );
       console.log(vw);
-      if (vw < 650) {
-        document.body.style.zoom = 0.5;
+      if (vw < 1150) {
+        document.body.style.zoom = Math.min(vw / 1150, vh / 730);
+        window.zoomFactor = document.body.style.zoom;
+
         /*const viewportmeta = document.querySelector("meta[name=viewport]");
         viewportmeta.setAttribute(
           "content",
           "width=device-width,initial-scale=0.5,user-scalable=no"
         );
         console.log("mobile detected, let's unzoom");*/
+      } else {
+        window.zoomFactor = 1;
       }
     </script>
     <div id="app"></div>

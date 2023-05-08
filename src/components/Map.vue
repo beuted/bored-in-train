@@ -45,8 +45,11 @@
         'cursor-pointing': building != null,
       }"
       v-on:mousedown="handleMouseDown"
+      v-on:touchstart="handleTouchStart"
       v-on:mouseup="handleMouseUp"
+      v-on:touchend="handleTouchEnd"
       v-on:mousemove="handleMouseMove"
+      v-on:touchmove="handleTouchMove"
       v-on:mouseout="handleMouseOut"
       :width="canvasSize + 'px'"
       :height="canvasSize + 'px'"
@@ -88,6 +91,7 @@ import { EventBus } from "@/EventBus";
 export default class Map extends IdleGameVue {
   private nbTilesOnRowOrColumnOnScreen = 20;
   public tileSize = 32;
+  private zoom = Number((window as any).zoomFactor);
 
   public readonly canvasSize =
     this.nbTilesOnRowOrColumnOnScreen * this.tileSize;
@@ -441,16 +445,47 @@ export default class Map extends IdleGameVue {
 
     var canvasSize = this.tileSize * MapSize;
     if (
-      event.pageX < canvasSize + this.canvas.offsetLeft &&
-      event.pageX > this.canvas.offsetLeft &&
-      event.pageY < canvasSize + this.canvas.offsetTop &&
-      event.pageY > this.canvas.offsetTop
+      event.pageX / this.zoom < canvasSize + this.canvas.offsetLeft &&
+      event.pageX / this.zoom > this.canvas.offsetLeft &&
+      event.pageY / this.zoom < canvasSize + this.canvas.offsetTop &&
+      event.pageY / this.zoom > this.canvas.offsetTop
     ) {
       this.isMouseDown = true;
       this.isDragging = true;
       this.draggingStartPoint = {
-        x: event.pageX - this.mapOffset.x,
-        y: event.pageY - this.mapOffset.y,
+        x: event.pageX / this.zoom - this.mapOffset.x,
+        y: event.pageY / this.zoom - this.mapOffset.y,
+      };
+    }
+  }
+
+  public handleTouchStart(events: TouchEvent) {
+    if (
+      !events.touches ||
+      events.touches.length == 0 ||
+      events.touches.length > 1
+    )
+      return;
+
+    let event = events.touches[0];
+
+    this.mouseTileCoord = this.getTileFromCoordinate(
+      event.pageX / this.zoom - this.canvas.offsetLeft,
+      event.pageY / this.zoom - this.canvas.offsetTop
+    );
+
+    var canvasSize = this.tileSize * MapSize;
+    if (
+      event.pageX / this.zoom < canvasSize + this.canvas.offsetLeft &&
+      event.pageX / this.zoom > this.canvas.offsetLeft &&
+      event.pageY / this.zoom < canvasSize + this.canvas.offsetTop &&
+      event.pageY / this.zoom > this.canvas.offsetTop
+    ) {
+      this.isMouseDown = true;
+      this.isDragging = true;
+      this.draggingStartPoint = {
+        x: event.pageX / this.zoom - this.mapOffset.x,
+        y: event.pageY / this.zoom - this.mapOffset.y,
       };
     }
   }
@@ -463,8 +498,8 @@ export default class Map extends IdleGameVue {
       return false;
     }
     var coord = this.getTileFromCoordinate(
-      event.pageX - this.canvas.offsetLeft,
-      event.pageY - this.canvas.offsetTop
+      event.pageX / this.zoom - this.canvas.offsetLeft,
+      event.pageY / this.zoom - this.canvas.offsetTop
     );
     this.showDraggingHand = false;
 
@@ -472,8 +507,8 @@ export default class Map extends IdleGameVue {
       if (this.building == null) {
         if (!this.tooltipTile) {
           this.tooltipCoord = {
-            x: event.pageX - this.canvas.offsetLeft,
-            y: event.pageY - this.canvas.offsetTop,
+            x: event.pageX / this.zoom - this.canvas.offsetLeft,
+            y: event.pageY / this.zoom - this.canvas.offsetTop,
           };
           this.tooltipTileCoord = { x: coord.x, y: coord.y };
           this.tooltipTile = this.map[coord.x][coord.y];
@@ -490,6 +525,45 @@ export default class Map extends IdleGameVue {
     this.isMouseDown = false;
   }
 
+  public handleTouchEnd(events: TouchEvent) {
+    if (
+      !events.touches ||
+      events.touches.length == 0 ||
+      events.touches.length > 1
+    )
+      return;
+
+    let event = events.touches[0];
+
+    var coord = this.getTileFromCoordinate(
+      event.pageX / this.zoom - this.canvas.offsetLeft,
+      event.pageY / this.zoom - this.canvas.offsetTop
+    );
+    this.showDraggingHand = false;
+
+    if (this.isDragging) {
+      if (this.building == null) {
+        if (!this.tooltipTile) {
+          this.tooltipCoord = {
+            x: event.pageX / this.zoom - this.canvas.offsetLeft,
+            y: event.pageY / this.zoom - this.canvas.offsetTop,
+          };
+          this.tooltipTileCoord = { x: coord.x, y: coord.y };
+          this.tooltipTile = this.map[coord.x][coord.y];
+        } else {
+          this.tooltipTile = null;
+        }
+      } else {
+        //Check if this was a drag or a click
+        this.tryBuild(coord, this.building);
+      }
+    }
+
+    this.isDragging = true;
+    this.isMouseDown = false;
+    this.mouseTileCoord = null;
+  }
+
   public handleMouseOut() {
     this.mouseTileCoord = null;
     this.isMouseDown = false;
@@ -499,13 +573,42 @@ export default class Map extends IdleGameVue {
   // TODO: could be gathered in the mainLoop
   public handleMouseMove(event: MouseEvent) {
     this.mouseTileCoord = this.getTileFromCoordinate(
-      event.pageX - this.canvas.offsetLeft,
-      event.pageY - this.canvas.offsetTop
+      event.pageX / this.zoom - this.canvas.offsetLeft,
+      event.pageY / this.zoom - this.canvas.offsetTop
     );
     if (this.isMouseDown) {
       //var prevMapOffeset = Object.assign({}, this.mapOffset);
-      this.mapOffset.x = event.pageX - this.draggingStartPoint.x;
-      this.mapOffset.y = event.pageY - this.draggingStartPoint.y;
+      this.mapOffset.x = event.pageX / this.zoom - this.draggingStartPoint.x;
+      this.mapOffset.y = event.pageY / this.zoom - this.draggingStartPoint.y;
+
+      this.boundMapOffset();
+
+      // If a drag happened do not consider it as a click
+      this.isDragging = false;
+      this.showDraggingHand = true;
+      this.showCursorHelp = false;
+      this.$forceUpdate();
+    }
+  }
+
+  public handleTouchMove(events: TouchEvent) {
+    if (
+      !events.touches ||
+      events.touches.length == 0 ||
+      events.touches.length > 1
+    )
+      return;
+
+    let event = events.touches[0];
+
+    this.mouseTileCoord = this.getTileFromCoordinate(
+      event.pageX / this.zoom - this.canvas.offsetLeft,
+      event.pageY / this.zoom - this.canvas.offsetTop
+    );
+    if (this.isMouseDown) {
+      //var prevMapOffeset = Object.assign({}, this.mapOffset);
+      this.mapOffset.x = event.pageX / this.zoom - this.draggingStartPoint.x;
+      this.mapOffset.y = event.pageY / this.zoom - this.draggingStartPoint.y;
 
       this.boundMapOffset();
 

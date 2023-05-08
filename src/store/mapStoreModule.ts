@@ -38,6 +38,15 @@ export type IMapBuildings = {
     coords: { [xThenCommaThenY in string]: { x: number; y: number } };
   };
 };
+const buildingOrderOfDiscovery = [
+  [{ i: 0, j: 0 }],
+  [
+    { i: 0, j: 1 },
+    { i: 1, j: 0 },
+    { i: 0, j: -1 },
+    { i: -1, j: 0 },
+  ], // radius 0.1
+];
 
 const watchTowerOrderOfDiscovery = [
   [{ i: 0, j: 0 }],
@@ -362,6 +371,24 @@ export const MapModule: Module<IMapState, IState> = {
         Building.stoneWatchTower,
         Building.lighthouse,
         Building.castle,
+        Building.village,
+        Building.gathererCamp,
+        Building.druidHut,
+        Building.school,
+        Building.barn,
+        Building.farm,
+        Building.sawmill,
+        Building.coalMine,
+        Building.stoneMine,
+        Building.windmill,
+        Building.lighthouse,
+        Building.factory,
+        Building.plankFactory,
+        Building.brickFactory,
+        Building.powerfarm,
+        Building.woodPlant,
+        Building.coalPlant,
+        Building.rocketSilo,
       ]) {
         for (let coord of Object.values(state.buildings[building].coords)) {
           const i = coord.x;
@@ -372,7 +399,12 @@ export const MapModule: Module<IMapState, IState> = {
             orderOfDiscovery = stoneWatchTowerOrderOfDiscovery;
           else if (map[i][j].b == Building.castle)
             orderOfDiscovery = castleOrderOfDiscovery;
-          else orderOfDiscovery = watchTowerOrderOfDiscovery;
+          else if (
+            map[i][j].b == Building.watchTower ||
+            map[i][j].b == Building.lighthouse
+          )
+            orderOfDiscovery = watchTowerOrderOfDiscovery;
+          else orderOfDiscovery = buildingOrderOfDiscovery;
 
           let TileDiscovered = false;
           for (let possibleTiles of orderOfDiscovery) {

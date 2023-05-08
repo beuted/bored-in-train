@@ -126,12 +126,16 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     consume: {},
     transformations: [
       {
-        to: Building.stoneMine,
-        onEnvironment: Environment.Concrete,
+        to: Building.coalMine,
+        nextToBuilding: Building.coalDeposite,
       },
       {
         to: Building.sawmill,
         nextToBuilding: Building.forest,
+      },
+      {
+        to: Building.stoneMine,
+        onEnvironment: Environment.Concrete,
       },
     ],
   },
@@ -203,12 +207,7 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
     },
     produce: {},
     consume: {},
-    transformations: [
-      {
-        to: Building.coalMine,
-        nextToBuilding: Building.coalDeposite,
-      },
-    ],
+    transformations: [],
   },
   farm: {
     name: "Farm",

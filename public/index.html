@@ -1,47 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1,user-scalable=no"
-    />
-    <title>bored-in-train</title>
-  </head>
-  <body>
-    <noscript>
-      <strong
-        >We're sorry but bored-in-train doesn't work properly without JavaScript
-        enabled. Please enable it to continue.</strong
-      >
-    </noscript>
-    <script>
-      const vw = Math.max(
-        document.documentElement.clientWidth || 0,
-        window.innerWidth || 0
-      );
-      const vh = Math.max(
-        document.documentElement.clientHeight || 0,
-        window.innerHeight || 0
-      );
-      console.log(vw);
-      if (vw < 1150) {
-        document.body.style.zoom = Math.min(vw / 1150, vh / 730);
-        window.zoomFactor = document.body.style.zoom;
 
-        /*const viewportmeta = document.querySelector("meta[name=viewport]");
-        viewportmeta.setAttribute(
-          "content",
-          "width=device-width,initial-scale=0.5,user-scalable=no"
-        );
-        console.log("mobile detected, let's unzoom");*/
-      } else {
-        window.zoomFactor = 1;
-      }
-    </script>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+  <title>Our wonderful planet</title>
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but Our wonderful planet doesn't work properly without JavaScript
+      enabled. Please enable it to continue.</strong>
+  </noscript>
+  <script>
+    const vw = Math.max(
+      document.documentElement.clientWidth || 0,
+      window.innerWidth || 0
+    );
+    const vh = Math.max(
+      document.documentElement.clientHeight || 0,
+      window.innerHeight || 0
+    );
+    console.log(vw);
+    if (vw < 1140) {
+      document.body.style.zoom = Math.min(vw / 1140, vh / 730);
+      window.zoomFactor = document.body.style.zoom;
+
+      /*const viewportmeta = document.querySelector("meta[name=viewport]");
+      viewportmeta.setAttribute(
+        "content",
+        "width=device-width,initial-scale=0.5,user-scalable=no"
+      );
+      console.log("mobile detected, let's unzoom");*/
+    } else {
+      window.zoomFactor = 1;
+    }
+  </script>
+  <div id="app"></div>
+  <!-- built files will be auto injected -->
+</body>
+
 </html>

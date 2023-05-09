@@ -8,7 +8,6 @@
         ></ShopMenu>
       </div>
       <div class="map-item">
-        <div class="title">Our wonderful planet</div>
         <div class="winning-overlay" v-if="hasWonTheGame">
           <span
             >You managed to leave the planet before depleting all resources,

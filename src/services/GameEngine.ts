@@ -130,12 +130,12 @@ export const StaticBuildingInfo: IStaticBuildingInfo = {
         nextToBuilding: Building.coalDeposite,
       },
       {
-        to: Building.sawmill,
-        nextToBuilding: Building.forest,
-      },
-      {
         to: Building.stoneMine,
         onEnvironment: Environment.Concrete,
+      },
+      {
+        to: Building.sawmill,
+        nextToBuilding: Building.forest,
       },
     ],
   },

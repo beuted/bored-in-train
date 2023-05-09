@@ -175,8 +175,8 @@ export class MapBuilder {
   private static NoiseHeight(x: number, y: number) {
     return Math.pow(
       0.5 +
-        0.9 * MapBuilder.simplexHeight.noise2D(x * 0.05, y * 0.05) +
-        0.1 * MapBuilder.simplexHeight.noise2D(x * 0.3, y * 0.3),
+      0.9 * MapBuilder.simplexHeight.noise2D(x * 0.05, y * 0.05) +
+      0.1 * MapBuilder.simplexHeight.noise2D(x * 0.3, y * 0.3),
       2
     );
   }
